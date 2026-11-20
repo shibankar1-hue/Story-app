@@ -1474,6 +1474,9 @@ function openSprint(k, minutes = 5) {
       p.made = `Sprint: +${n} words`;
       lastSaved = null; await save();
     }
+    showSummary(n, early);
+  }
+  function showSummary(n, early) {
     const today = todayBefore + n; // the stats update a moment later; show the result right away
     const g = Goal.words, met = today >= g;
     summary.replaceChildren(
@@ -1486,11 +1489,93 @@ function openSprint(k, minutes = 5) {
           h("i", { class: "before", style: `width:${Math.min(100, 100 * todayBefore / g)}%` }),
           h("i", { class: "now", style: `left:${Math.min(100, 100 * todayBefore / g)}%;width:${Math.max(0, Math.min(100, 100 * today / g) - Math.min(100, 100 * todayBefore / g))}%` })),
         h("div", { class: "row", style: "justify-content:center" },
-          h("button", { class: "primary", onclick: () => { closeSprint(); openSprint(k, 5); } }, "Another 5 minutes"),
+          n && AI.sample ? h("button", { class: "primary polishbtn", onclick: () => polish() }, "Polish my sprint") : null,
+          h("button", { class: n && AI.sample ? "" : "primary", onclick: () => { closeSprint(); openSprint(k, 5); } }, "Another 5 minutes"),
           h("button", { onclick: () => { summary.hidden = true; clock.textContent = "No timer"; bar.querySelector(".done").textContent = "Done"; ta.focus(); } }, "Keep writing"),
           h("button", { onclick: () => closeSprint() }, "Done"))));
     summary.hidden = false;
   }
+  // ----- Polish: tidy only what this sprint added -----
+  function sprintRegion() {
+    const a = startText, b = ta.value;
+    let pre = 0; while (pre < a.length && pre < b.length && a[pre] === b[pre]) pre++;
+    let suf = 0; while (suf < a.length - pre && suf < b.length - pre && a[a.length - 1 - suf] === b[b.length - 1 - suf]) suf++;
+    let s0 = pre, e0 = b.length - suf;
+    while (s0 > 0 && !/[.!?।\n]/.test(b[s0 - 1])) s0--;          // widen to whole sentences
+    while (e0 < b.length && !/[.!?।\n]/.test(b[e0 - 1] || "")) e0++;
+    return { start: s0, end: e0, text: b.slice(s0, e0) };
+  }
+  async function polish() {
+    const reg = sprintRegion();
+    if (!reg.text.trim()) return toast("Nothing new to polish");
+    const card = summary.querySelector(".sp-card");
+    const ctrl = new AbortController();
+    card.replaceChildren(h("span", { class: "label", text: "Polish my sprint" }), h("div", { class: "busy", style: "justify-content:center" }, h("span", { class: "dot" }), "Reading what you just wrote…"),
+      h("button", { onclick: () => ctrl.abort() }, "Cancel"));
+    const lang = effLang(story) === "hindi" ? "Hindi in Devanagari" : script ? "Hinglish (Roman script), in screenplay/play format" : "the same language and script as the text";
+    const prompt = `You are a careful copy editor. Polish ONLY the passage below, which a writer just drafted in a timed sprint. Fix spelling, grammar, punctuation and clumsy or repetitive phrasing. Keep their meaning, voice, rhythm, slang and dialect, and keep it in ${lang}. Do NOT add new content, ideas, details, lines or sentences, do not cut story content, and do not change formatting such as scene headings or character names. If a sentence is fine, leave it out.
+
+PASSAGE:
+"""
+${reg.text.slice(0, 12000)}
+"""
+
+Reply with JSON only: {"edits": [{"original": "one sentence or line copied exactly from the passage", "polished": "the tidied version", "why": "a few words in Hinglish on what changed"}]}. At most 25 edits, in passage order.`;
+    let edits = [];
+    try {
+      const r = await AI.sample.json(prompt, { signal: ctrl.signal, modelTier: AI.tier("default"), cache: false });
+      edits = (r?.edits || []).map(e => ({ original: String(e.original || ""), polished: String(e.polished || ""), why: String(e.why || "") }))
+        .filter(e => e.original.trim() && e.polished.trim() && e.original.trim() !== e.polished.trim() && findLoose(reg.text, e.original))
+        .map(e => ({ ...e, keep: true }));
+    } catch (e) {
+      if (e?.code !== "cancelled") toast(AI.errText(e));
+      return finishSummaryBack();
+    }
+    if (!edits.length) {
+      card.replaceChildren(h("span", { class: "label", text: "Polish my sprint" }), h("h2", { text: "Already clean" }), h("p", { text: "Claude found nothing worth changing in what you just wrote." }),
+        h("div", { class: "row", style: "justify-content:center" }, h("button", { class: "primary", onclick: () => closeSprint() }, "Done")));
+      return;
+    }
+    const list = h("ul", { class: "pol-list" });
+    const applyBtn = h("button", { class: "primary" });
+    const refresh = () => { const c = edits.filter(e => e.keep).length; applyBtn.textContent = c ? `Keep ${c} ${c === 1 ? "change" : "changes"}` : "Keep my original"; };
+    edits.forEach((e, i) => {
+      const diff = h("div", { class: "pol-diff" });
+      (wordDiff(e.original, e.polished) || [{ t: "del", s: e.original + " " }, { t: "ins", s: e.polished }]).forEach(x => diff.append(x.t === "same" ? document.createTextNode(x.s) : h(x.t === "ins" ? "ins" : "del", { text: x.s })));
+      list.append(h("li", {},
+        h("input", { type: "checkbox", id: "pol" + i, checked: "checked", onchange: ev => { e.keep = ev.target.checked; li(i).classList.toggle("off", !e.keep); refresh(); } }),
+        h("label", { for: "pol" + i }, diff, e.why ? h("span", { class: "pol-why", text: e.why }) : null)));
+    });
+    const li = i => list.children[i];
+    refresh();
+    applyBtn.onclick = async () => {
+      const keep = edits.filter(e => e.keep);
+      if (!keep.length) return finishSummaryBack();
+      let region = ta.value.slice(reg.start, reg.end); let changed = 0;
+      for (const e of keep) { const at = findLoose(region, e.original); if (at) { region = region.slice(0, at.start) + e.polished + region.slice(at.end); changed++; } }
+      const before = ta.value;
+      ta.value = before.slice(0, reg.start) + region + before.slice(reg.end); sizeTa();
+      p.history = [...(p.history || []), { text: before, at: p.at || Date.now(), style: p.style || "", made: p.made || "" }].slice(-8);
+      p.made = `Polished sprint (${changed} ${changed === 1 ? "change" : "changes"})`;
+      lastSaved = null; await save();
+      toast(`Kept ${changed} ${changed === 1 ? "change" : "changes"}. Your unpolished text is in the timeline.`);
+      card.replaceChildren(h("span", { class: "label", text: "Polished" }), h("h2", { text: `${changed} ${changed === 1 ? "change" : "changes"} kept` }),
+        h("p", { text: "The version before polishing is saved in this part's timeline, so you can compare or restore it." }),
+        h("div", { class: "row", style: "justify-content:center" },
+          h("button", { class: "primary", onclick: () => closeSprint() }, "Done"),
+          h("button", { onclick: () => { summary.hidden = true; clock.textContent = "No timer"; bar.querySelector(".done").textContent = "Done"; ta.focus(); } }, "Keep writing")));
+    };
+    card.replaceChildren(
+      h("span", { class: "label", text: "Polish my sprint" }),
+      h("h2", { class: "pol-h", text: `${edits.length} suggested ${edits.length === 1 ? "change" : "changes"}` }),
+      h("p", { class: "small", text: "Only the sentences from this sprint. Untick anything you want to keep as you wrote it." }),
+      h("div", { class: "row", style: "justify-content:center;gap:4px" },
+        h("button", { class: "ghost", onclick: () => { edits.forEach((e, i) => { e.keep = true; list.querySelector("#pol" + i).checked = true; li(i).classList.remove("off"); }); refresh(); } }, "Select all"),
+        h("button", { class: "ghost", onclick: () => { edits.forEach((e, i) => { e.keep = false; list.querySelector("#pol" + i).checked = false; li(i).classList.add("off"); }); refresh(); } }, "Select none")),
+      list,
+      h("div", { class: "row", style: "justify-content:center" }, applyBtn, h("button", { onclick: () => finishSummaryBack() }, "Cancel")));
+  }
+  function finishSummaryBack() { showSummary(count(), true); }
   root._finish = finish; root._save = save;
   root.addEventListener("keydown", e => { if (e.key === "Escape") { if (!done) finish(true); else closeSprint(); } });
   update(); requestAnimationFrame(() => { sizeTa(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.scrollTop = ta.scrollHeight; root.scrollTop = root.scrollHeight; });
