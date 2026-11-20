@@ -521,6 +521,7 @@ function roomCompare() {
     h("textarea", { id: "cmp" + k, rows: 8, value: C[k], placeholder: "Paste " + label + "…", oninput: e => { C[k] = e.target.value; } }));
   const sec = h("section", { class: "sheet" }, h("div", { class: "row" }, backToRoom()),
     C.back === "critique" ? h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => gotoRoom("critique") }, "← Back to the critique")) : null,
+    C.back === "draft" && story ? h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => gotoTab("stories") }, "← Back to the draft")) : null,
     h("h2", {}, icon(ICON_COMPARE), " Compare drafts"),
     h("p", { class: "muted", text: "Every word that changed is highlighted, the numbers compare the two, and Claude explains the difference in story, characters and writing style." }),
     h("div", { class: "two" }, side("a", "the first draft"), side("b", "the second draft")),
@@ -1089,8 +1090,8 @@ async function applyFix(i, quiet) {
   const splice = (t, at) => t.slice(0, at.start) + f.replacement + t.slice(at.end);
   if (ps) {
     const p = ps[hit.k], before = p.text;
-    p.history = [...(p.history || []), { text: before, at: p.at || Date.now(), style: p.style || "", fix: f.label }].slice(-8);
-    p.text = splice(before, hit.at); p.at = Date.now();
+    p.history = [...(p.history || []), { text: before, at: p.at || Date.now(), style: p.style || "", fix: f.label, made: p.made || "" }].slice(-8);
+    p.text = splice(before, hit.at); p.at = Date.now(); p.made = "Fix: " + f.label;
     const mk = f.mark && C.marks?.[f.mark - 1];
     (p.marks || []).forEach(m => {
       if ((mk && strip(mk.quote) === strip(m.quote)) || strip(f.original).includes(strip(m.quote)) || strip(m.quote).includes(strip(f.original))) m.done = true;
@@ -1114,8 +1115,8 @@ async function undoFix(i) {
     const at = findLoose(p.text, f.replacement);
     if (!at) { f.err = "The fixed line has been edited since, so it can't be undone automatically."; return render(); }
     const before = p.text;
-    p.history = [...(p.history || []), { text: before, at: p.at || Date.now(), style: p.style || "", fix: "Undo: " + f.label }].slice(-8);
-    p.text = before.slice(0, at.start) + f.original + before.slice(at.end); p.at = Date.now();
+    p.history = [...(p.history || []), { text: before, at: p.at || Date.now(), style: p.style || "", fix: "Undo: " + f.label, made: p.made || "" }].slice(-8);
+    p.text = before.slice(0, at.start) + f.original + before.slice(at.end); p.at = Date.now(); p.made = "Undid fix: " + f.label;
     await Store.savePart(C.source.storyId, p).catch(() => {});
     const t2 = findLoose(C.text, f.replacement); if (t2) C.text = C.text.slice(0, t2.start) + f.original + C.text.slice(t2.end);
   } else {
@@ -1150,4 +1151,56 @@ function fixList() {
             ? [h("button", { onclick: () => undoFix(i) }, "Undo"),
                h("button", { onclick: () => openCompare(f.applied.before, f.applied.after, "Before: " + f.label.slice(0, 40), "After the fix", "critique") }, icon(ICON_COMPARE), "Compare")]
             : h("button", { class: "primary", onclick: () => applyFix(i) }, "Fix this line")) : null)))));
+}
+
+
+// ---------- Version timeline ----------
+const tl = { key: "", sel: [] };
+function versionsOf(p) {
+  const hs = p.history || [];
+  const vs = hs.map((v, j) => ({ text: v.text, at: v.at, style: v.style,
+    made: v.made || (j === 0 ? "First draft" : hs[j - 1].fix ? "Fix: " + hs[j - 1].fix : "Rewrite" + (v.style ? " · " + v.style : "")) }));
+  vs.push({ text: p.text, at: p.at, style: p.style, current: true,
+    made: p.made || (hs.length && hs[hs.length - 1].fix ? "Fix: " + hs[hs.length - 1].fix : hs.length ? "Rewrite" + (p.style ? " · " + p.style : "") : "First draft") });
+  return vs;
+}
+const fmtWhen = at => at ? new Date(at).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "";
+function timeline(k) {
+  const p = parts[k]; const vs = versionsOf(p);
+  const key = story.id + ":" + k + ":" + vs.length;
+  if (tl.key !== key) { tl.key = key; tl.sel = []; }
+  const toggle = j => { tl.sel = tl.sel.includes(j) ? tl.sel.filter(x => x !== j) : [...tl.sel, j].slice(-2); render(); };
+  const track = h("div", { class: "tl-track", role: "group", "aria-label": "Versions of this part" }, vs.map((v, j) =>
+    h("button", { class: "tl-v" + (v.current ? " cur" : ""), "aria-pressed": tl.sel.includes(j) ? "true" : "false", title: `v${j + 1} · ${v.made} · ${fmtWhen(v.at)}`, onclick: () => toggle(j) },
+      h("span", { class: "tl-dot" }), h("span", { class: "tl-n", text: v.current ? `v${j + 1} · now` : `v${j + 1}` }), h("span", { class: "tl-m", text: v.made }))));
+  const words = t => (t.match(/\S+/g) || []).length;
+  let info;
+  if (!tl.sel.length) info = h("p", { class: "muted small", text: "Tap a dot to see that version, or tap two to compare them." });
+  else if (tl.sel.length === 1) {
+    const j = tl.sel[0], v = vs[j];
+    info = h("div", { class: "tl-info" },
+      h("div", {}, h("b", { text: `v${j + 1}${v.current ? " (current)" : ""}` }), h("span", { class: "muted small", text: ` · ${fmtWhen(v.at)} · ${words(v.text).toLocaleString("en-IN")} words` })),
+      h("p", { class: "small", text: v.made }),
+      h("p", { class: "muted small", text: "“" + v.text.replace(/\s+/g, " ").slice(0, 160) + (v.text.length > 160 ? "…" : "") + "”" }),
+      h("div", { class: "row" },
+        !v.current ? h("button", { onclick: () => openCompare(v.text, p.text, `v${j + 1} · ${v.made}`, `v${vs.length} · now`, "draft") }, icon(ICON_COMPARE), "Compare with now") : null,
+        !v.current ? h("button", { class: "primary", onclick: () => restoreVersion(k, j) }, "Restore this version") : h("span", { class: "muted small", text: "Tap another dot to compare." })));
+  } else {
+    const [a, b] = [...tl.sel].sort((x, y) => x - y);
+    info = h("div", { class: "tl-info" },
+      h("p", { class: "small" }, h("b", { text: `v${a + 1}` }), ` ${vs[a].made}  →  `, h("b", { text: `v${b + 1}` }), ` ${vs[b].made}`),
+      h("div", { class: "row" },
+        h("button", { class: "primary", onclick: () => openCompare(vs[a].text, vs[b].text, `v${a + 1} · ${vs[a].made}`, `v${b + 1}${vs[b].current ? " · now" : ""} · ${vs[b].made}`, "draft") }, icon(ICON_COMPARE), `Compare v${a + 1} and v${b + 1}`),
+        h("button", { class: "ghost", onclick: () => { tl.sel = []; render(); } }, "Clear")));
+  }
+  requestAnimationFrame(() => { const last = tl.sel.length ? track.children[Math.max(...tl.sel)] : track.lastElementChild; if (last) track.scrollLeft = Math.max(0, last.offsetLeft + last.offsetWidth - track.clientWidth); });
+  return h("div", { class: "tl" }, h("span", { class: "label", text: `Versions (${vs.length})` }), track, info);
+}
+async function restoreVersion(k, j) {
+  const p = parts[k]; const vs = versionsOf(p); const v = vs[j]; if (!v || v.current) return;
+  p.history = [...(p.history || []), { text: p.text, at: p.at || Date.now(), style: p.style || "", made: vs[vs.length - 1].made }].slice(-8);
+  p.text = v.text; p.style = v.style || ""; p.at = Date.now(); p.made = `Restored v${j + 1} (${v.made})`; p.truncated = false;
+  try { await Store.savePart(story.id, p); toast(`Restored v${j + 1}. The text you had is kept in the timeline.`); }
+  catch (e) { toast("Couldn't save: " + (e?.message || e?.code)); }
+  tl.key = ""; render();
 }
