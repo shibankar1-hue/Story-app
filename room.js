@@ -20,9 +20,18 @@ function gotoTab(t) {
 }
 function gotoRoom(view, extra) { tab = "room"; room.view = view; Object.assign(room, extra || {}); render(); window.scrollTo(0, 0); }
 function tabsNav() {
+  const I = {
+    stories: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+    room: '<path d="M7 8h10"/><path d="M7 12h6"/><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    books: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    videos: '<rect x="2" y="5" width="15" height="14" rx="3"/><path d="m22 8-5 4 5 4z"/>' };
   const tabs = [["stories", "Stories"], ["room", "Writers' Room"], ["books", "Books"], ["videos", "Videos"]];
-  return h("nav", { class: "tabs", "aria-label": "Sections" }, tabs.map(([k, l]) =>
-    h("button", { "aria-current": tab === k ? "page" : null, onclick: () => gotoTab(k) }, l)));
+  return h("nav", { class: "tabs", "aria-label": "Sections" }, tabs.map(([k, l]) => {
+    const b = h("button", { "aria-current": tab === k ? "page" : null, onclick: () => gotoTab(k) });
+    b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
+    b.append(h("span", { text: l }));
+    return b;
+  }));
 }
 function roomBusyRow() {
   if (!roomBusy) return null;
