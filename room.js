@@ -803,3 +803,67 @@ function stylePanel() {
     st.a && st.b ? h("div", { class: "field" }, h("label", { for: "mix" }, `Mix: ${st.mix}% ${writerById(st.a)?.name} · ${100 - st.mix}% ${writerById(st.b)?.name}`),
       h("input", { id: "mix", type: "range", min: "50", max: "90", step: "10", value: st.mix, onchange: e => { st.mix = +e.target.value; persist(); render(); } })) : null);
 }
+
+// ---------- Reading mode ----------
+const ICON_READ = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>';
+const readerPrefs = (() => { try { return Object.assign({ size: 21, tone: "auto", font: "serif" }, JSON.parse(localStorage.getItem("pd.reader") || "{}")); } catch { return { size: 21, tone: "auto", font: "serif" }; } })();
+const saveReaderPrefs = () => { try { localStorage.setItem("pd.reader", JSON.stringify(readerPrefs)); } catch {} };
+let readerEl = null;
+function openReader(startPart) {
+  closeReader(true);
+  const o = story.outline, script = medium(story) !== "page";
+  const written = o.parts.map((p, k) => parts[k]?.text ? k : -1).filter(k => k >= 0);
+  const words = written.reduce((a, k) => a + (parts[k].text.match(/\S+/g) || []).length, 0);
+  const minutes = Math.max(1, Math.round(words / (script ? 180 : 220)));
+  const darkHost = matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light" || document.documentElement.dataset.theme === "dark";
+  const tone = () => readerPrefs.tone === "auto" ? (darkHost ? "night" : "day") : readerPrefs.tone;
+  const root = h("div", { class: "reader", role: "dialog", "aria-modal": "true", "aria-label": "Reading mode: " + o.title, tabindex: "-1" });
+  const apply = () => { root.dataset.tone = tone(); root.dataset.font = readerPrefs.font; root.style.setProperty("--r-size", readerPrefs.size + "px"); toneBtns.forEach(b => b.setAttribute("aria-pressed", b.dataset.t === readerPrefs.tone ? "true" : "false")); };
+  const toneBtns = [["auto", "Auto"], ["day", "Day"], ["sepia", "Sepia"], ["night", "Night"]].map(([t, l]) => { const b = h("button", { onclick: () => { readerPrefs.tone = t; saveReaderPrefs(); apply(); } }, l); b.dataset.t = t; return b; });
+  const progress = h("div", { class: "reader-progress", "aria-hidden": "true" });
+  const panel = h("div", { class: "reader-panel", hidden: true },
+    h("button", { "aria-label": "Smaller text", onclick: () => { readerPrefs.size = Math.max(16, readerPrefs.size - 2); saveReaderPrefs(); apply(); } }, "A−"),
+    h("button", { "aria-label": "Larger text", onclick: () => { readerPrefs.size = Math.min(32, readerPrefs.size + 2); saveReaderPrefs(); apply(); } }, "A+"),
+    toneBtns,
+    script ? h("button", { onclick: e => { readerPrefs.font = readerPrefs.font === "serif" ? "courier" : "serif"; saveReaderPrefs(); apply(); e.currentTarget.textContent = readerPrefs.font === "serif" ? "Script font" : "Serif font"; } }, readerPrefs.font === "serif" ? "Script font" : "Serif font") : null,
+    document.fullscreenEnabled ? h("button", { onclick: () => { (document.fullscreenElement ? document.exitFullscreen() : root.requestFullscreen()).catch(() => {}); } }, "Full screen") : null);
+  const aa = h("button", { "aria-label": "Text settings", "aria-expanded": "false", onclick: () => { panel.hidden = !panel.hidden; aa.setAttribute("aria-expanded", String(!panel.hidden)); } }, "Aa");
+  const bar = h("div", { class: "reader-bar" },
+    h("button", { class: "done", onclick: () => closeReader() }, "Done"),
+    h("span", { class: "rtitle", text: o.title }), aa, panel);
+  const text = h("article", { class: "reader-text" },
+    h("header", { class: "r-cover" }, h("h1", { text: o.title }), o.logline ? h("p", { text: o.logline }) : null,
+      h("p", { class: "meta", text: `${fmtOf(story).name} · ${written.length} of ${o.parts.length} parts · about ${minutes} min read` })));
+  o.parts.forEach((p, k) => {
+    const sec = h("section", { class: "r-part", id: "rpart-" + k },
+      o.parts.length > 1 ? h("div", { class: "r-label", text: `Part ${k + 1}` }) : null, h("h2", { text: p.title }));
+    sec.append(parts[k]?.text ? renderText(parts[k].text) : h("p", { class: "r-missing", text: "This part isn't written yet." }));
+    text.append(sec);
+  });
+  text.append(h("footer", { class: "r-end" }, h("span", { class: "orn", text: "· · ·" }), h("p", { text: "End of the draft so far." }),
+    h("div", { class: "row", style: "justify-content:center" },
+      h("button", { class: "primary", onclick: () => { const t = written.map(k => parts[k].text).join("\n\n"); closeReader(); room.critique = { ...room.critique, text: t, label: o.title + " · whole draft", lens: story.style?.a || "", out: "", rewrite: "", err: "" }; gotoRoom("critique"); } }, "Critique this draft"),
+      h("button", { onclick: () => closeReader() }, "Back to editing"))));
+  root.append(progress, bar, text);
+  apply();
+  // Bar hides while reading and returns on scroll up, tap, or mouse near the top.
+  let lastY = 0, calmTimer = 0;
+  root.addEventListener("scroll", () => {
+    const y = root.scrollTop, max = root.scrollHeight - root.clientHeight;
+    progress.style.width = (max > 0 ? Math.min(100, 100 * y / max) : 100) + "%";
+    root.classList.toggle("calm", y > lastY + 4 && y > 120); if (y < lastY - 4) root.classList.remove("calm");
+    lastY = y;
+  }, { passive: true });
+  text.addEventListener("click", e => { if (!e.target.closest("button")) root.classList.toggle("calm"); });
+  root.addEventListener("mousemove", e => { if (e.clientY < 70) root.classList.remove("calm"); });
+  root.addEventListener("keydown", e => { if (e.key === "Escape" && !document.fullscreenElement) closeReader(); });
+  document.body.append(root); document.body.style.overflow = "hidden";
+  readerEl = root; root.focus({ preventScroll: true });
+  if (startPart > 0 && parts[startPart]?.text) requestAnimationFrame(() => document.getElementById("rpart-" + startPart)?.scrollIntoView());
+}
+function closeReader(silent) {
+  if (!readerEl) return;
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  readerEl.remove(); readerEl = null; document.body.style.overflow = "";
+  if (!silent) document.querySelector(".readbtn")?.focus();
+}
