@@ -251,6 +251,16 @@ mark.hl.flash { background: color-mix(in srgb, var(--accent) 55%, transparent); 
 .revlist .rv-q { font-family: var(--font-display); font-style: italic; }
 .revlist li.done .rv-q, .revlist li.done .rv-n { text-decoration: line-through; color: var(--muted); }
 .revlist button { min-height: 32px; padding: 2px 8px; color: var(--muted); }
+.fixes { display: flex; flex-direction: column; gap: 12px; }
+.revlist .fx-body button { min-height: 36px; padding: 6px 14px; color: var(--accent); }
+.revlist .fx-body button.primary { color: var(--accent-ink); }
+.fx-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.fx-diff { display: flex; flex-direction: column; gap: 4px; font-family: var(--font-display); font-size: 1.02rem; line-height: 1.5; }
+.fx-diff del, .fx-diff ins { padding: 4px 8px; border-radius: 8px; white-space: pre-wrap; }
+.fx-dot { width: 20px; height: 20px; margin-top: 3px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--fill-strong); display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--accent-ink); }
+.fx-dot.on { background: var(--accent); box-shadow: none; }
+.revlist li.done .fx-diff ins { text-decoration: none; }
+.revlist li.done .rv-n { text-decoration: line-through; color: var(--muted); }
 .focuslist { margin: 8px 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
 .md li.todo { list-style: none; margin-left: -1.3em; display: flex; gap: 8px; }
 .md li.todo .box { color: var(--accent); flex: none; }
@@ -882,7 +892,7 @@ async function writePart(i, mode, note) {
     const old = parts[i];
     const history = (old?.history || []).slice();
     if (mode !== "continue" && old?.text) history.push({ text: old.text, at: old.at || Date.now(), style: old.style || "" });
-    parts[i] = { i, text: base + r.text.trim(), truncated: !!r.truncated, at: Date.now(), style: styleLabel(story.style), history: history.slice(-4), marks: old?.marks || [] };
+    parts[i] = { i, text: base + r.text.trim(), truncated: !!r.truncated, at: Date.now(), style: styleLabel(story.style), history: history.slice(-8), marks: old?.marks || [] };
     await Store.savePart(story.id, parts[i]).catch(e => { msg = { text: "Couldn't save this part: " + (e?.message || e?.code) + ". Download it before leaving.", err: true }; });
     persist();
     if (!r.truncated && n > 1) summarise(i);
@@ -994,7 +1004,7 @@ function renderDraft() {
     !p?.text ? h("button", { class: "primary", disabled: !AI.sample, onclick: () => writePart(curPart, "write") }, `Write part ${curPart + 1}`) : null,
     p?.truncated ? h("button", { class: "primary", disabled: !AI.sample, onclick: () => writePart(curPart, "continue") }, "Continue this part") : null,
     p?.text ? h("button", { disabled: !AI.sample, onclick: () => writePart(curPart, "rewrite", note.value.trim()) }, story.style?.a ? "Rewrite in chosen style" : "Rewrite with note") : null,
-    p?.text ? h("button", { onclick: () => { room.critique = { ...room.critique, text: p.text, label: `${o.title} · Part ${curPart + 1}`, lens: story.style?.a || "", out: "", rewrite: "", err: "" }; gotoRoom("critique"); } }, "Critique") : null,
+    p?.text ? h("button", { onclick: () => { room.critique = { ...room.critique, text: p.text, label: `${o.title} · Part ${curPart + 1}`, lens: story.style?.a || "", marks: [], out: "", rewrite: "", err: "", fixes: [], source: { storyId: story.id, ks: [curPart] } }; gotoRoom("critique"); } }, "Critique") : null,
     p?.history?.length ? h("button", { title: "Compare with the previous version", onclick: () => { const prev = p.history[p.history.length - 1]; openCompare(prev.text, p.text, "Previous version" + (prev.style ? " · " + prev.style : ""), "Current version" + (p.style ? " · " + p.style : "")); } }, icon(ICON_COMPARE), "Compare versions") : null,
     h("span", { class: "spacer" }),
     p?.text && curPart < n - 1 ? h("button", { class: p.truncated ? "" : "primary", disabled: !AI.sample, onclick: () => { curPart += 1; parts[curPart]?.text ? render() : writePart(curPart, "write"); } }, parts[curPart + 1]?.text ? "Next part →" : "Write next part →") : null);
@@ -1178,7 +1188,7 @@ function md(text) {
 async function streamInto(el, prompt, opts = {}) {
   let raf = 0, latest = "";
   const r = await AI.sample(prompt, { cache: false, modelTier: AI.tier(opts.tier || "default"), signal: opts.signal,
-    onText: ({ text }) => { latest = text; if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (el) el.replaceChildren(md(latest)); }); } });
+    onText: ({ text }) => { latest = text; if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (el) el.replaceChildren(md(opts.clean ? opts.clean(latest) : latest)); }); } });
   return r.text;
 }
 
@@ -1461,10 +1471,10 @@ function roomCritique() {
     h("option", { value: "" }, "No style lens"), styleChoices().map(w => h("option", { value: w.id, selected: C.lens === w.id ? "selected" : null }, w.name)));
   const crafts = WRITERS.filter(w => w.group === "craft");
   const hasLib = libraryIds().length > 0;
-  const ta = h("textarea", { id: "crittext", rows: 10, placeholder: "Paste a scene, chapter or script pages…", value: C.text, oninput: e => C.text = e.target.value });
+  const ta = h("textarea", { id: "crittext", rows: 10, placeholder: "Paste a scene, chapter or script pages…", value: C.text, oninput: e => { C.text = e.target.value; if (C.source && !C.fixes?.some(f => f.status === "fixed")) C.source = null; } });
   const sec = h("section", { class: "sheet" }, h("div", { class: "row" }, backToRoom()), h("h2", { text: "Critic" }),
     h("p", { class: "muted", text: "Honest-mentor notes in Hinglish: what works, the biggest problems with fixes, line-by-line improvements, and what the craft books say." }),
-    partPicker((text, label) => { C.text = text; C.label = label; C.marks = []; render(); }),
+    partPicker((text, label, ref) => { C.text = text; C.label = label; C.marks = []; C.out = ""; C.fixes = []; C.source = ref && !/earlier version/.test(label) ? { storyId: ref.story.id, ks: [ref.i] } : null; render(); }),
     C.label ? h("p", { class: "small muted", text: "Loaded: " + C.label }) : null,
     C.marks?.length ? h("div", { class: "note" }, h("b", { text: `Focusing on ${C.marks.length} marked ${C.marks.length === 1 ? "line" : "lines"}` }),
       h("ol", { class: "focuslist" }, C.marks.map(m => h("li", {}, h("i", { text: "“" + m.quote.replace(/\s+/g, " ").slice(0, 140) + (m.quote.length > 140 ? "…" : "") + "”" }), m.note ? " — " + m.note : ""))),
@@ -1478,6 +1488,7 @@ function roomCritique() {
     errNote(C.err),
     roomBusy ? roomBusyRow() : h("div", { class: "row end" }, h("button", { class: "primary", disabled: !AI.sample, onclick: runCritique }, "Critique")),
     h("div", { class: "page mdpage", id: "critout", hidden: !C.out && !roomBusy }, C.out ? md(C.out) : null));
+  if (C.out && !roomBusy && C.fixes?.length) put(sec, fixList());
   if (C.out && !roomBusy) put(sec, h("div", { class: "row" },
     h("button", { disabled: !AI.sample, onclick: rewriteFromCritique }, "Rewrite using this critique"),
     C.rewrite ? h("button", { onclick: () => openCompare(C.text, C.rewrite, "Your original", "Rewrite after critique") }, icon(ICON_COMPARE), "Compare original and rewrite") : null));
@@ -1501,8 +1512,15 @@ async function runCritique() {
     (lensName ? `## Style lens: ${lensName}\n(how close the text is to this style, which 2–3 techniques to borrow and where; refer to the passages above when they exist)\n` : "") +
     `## Craft books kya kehti hain\n(2–4 points, each naming the book and the idea; quote only the exact public-domain quotes given above; never invent quotes or page numbers)\n` +
     (lib.length ? `## Aapki library se\n(what their own books/videos suggest here, with [label] citations and what to re-read or re-watch)\n` : "") + `## Agla exercise\n(one short exercise aimed at the biggest problem)` +
-    (C.marks?.length ? `\n## Revision list\n(a checklist, most important first, every item starting "- [ ] ": include every marked line plus the 3 biggest problems)` : "");
-  try { C.out = await streamInto(document.getElementById("critout"), prompt, { signal: ctrl.signal, tier: "complex" }); }
+    `\n## Revision list\n(a checklist, most important first, every item starting "- [ ] "${C.marks?.length ? ": include every marked line plus the 3 biggest problems" : ""})\n\n` +
+    `Finally, after everything else, output the revision list again as machine-readable JSON inside a fenced block that starts with \`\`\`fixes and ends with \`\`\`:\n` +
+    `{"items": [{"label": "short checklist text, same as above", "original": "the exact line or sentence from THE WRITER'S TEXT this item is about, copied character for character (keep its punctuation; no part labels); empty string if the item is not about one specific line", "replacement": "the improved version of that exact line, in the same language, script and format, ready to paste in its place; empty string if original is empty", "mark": the mark number this item answers, or null}]}\n` +
+    `Give a replacement for every marked line and for every line-by-line fix. Keep "original" short: one line, sentence or dialogue block, never a whole paragraph.`;
+  try {
+    const raw = await streamInto(document.getElementById("critout"), prompt, { signal: ctrl.signal, tier: "complex", clean: cleanCritique });
+    C.fixes = parseFixes(raw).map(f => ({ ...f, status: "open" }));
+    C.out = C.fixes.length ? dropRevisionSection(cleanCritique(raw)) : cleanCritique(raw);
+  }
   catch (e) { C.err = AI.errText(e); }
   roomBusy = null; render();
 }
@@ -1561,7 +1579,7 @@ async function runSbs() {
 }
 
 // Compare drafts
-function openCompare(a, b, aLabel, bLabel) { room.compare = { a: a || "", b: b || "", aLabel: aLabel || "Draft A", bLabel: bLabel || "Draft B", out: "", err: "", shown: true }; gotoRoom("compare"); }
+function openCompare(a, b, aLabel, bLabel, back) { room.compare = { a: a || "", b: b || "", aLabel: aLabel || "Draft A", bLabel: bLabel || "Draft B", out: "", err: "", shown: true, back: back || "" }; gotoRoom("compare"); }
 function textStats(t) {
   const words = (t.match(/\S+/g) || []).length;
   const sentences = Math.max(1, (t.match(/[^.!?।]+[.!?।]+/g) || []).length || 1);
@@ -1596,6 +1614,7 @@ function roomCompare() {
     partPicker((text, l) => { C[k] = text; C[k + "Label"] = l; C.out = ""; render(); }, "Load"),
     h("textarea", { id: "cmp" + k, rows: 8, value: C[k], placeholder: "Paste " + label + "…", oninput: e => { C[k] = e.target.value; } }));
   const sec = h("section", { class: "sheet" }, h("div", { class: "row" }, backToRoom()),
+    C.back === "critique" ? h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => gotoRoom("critique") }, "← Back to the critique")) : null,
     h("h2", {}, icon(ICON_COMPARE), " Compare drafts"),
     h("p", { class: "muted", text: "Every word that changed is highlighted, the numbers compare the two, and Claude explains the difference in story, characters and writing style." }),
     h("div", { class: "two" }, side("a", "the first draft"), side("b", "the second draft")),
@@ -1951,7 +1970,7 @@ function openReader(startPart) {
   text.append(h("footer", { class: "r-end" }, h("span", { class: "orn", text: "· · ·" }), h("p", { text: "End of the draft so far." }),
     h("div", { class: "row", style: "justify-content:center" },
       endMarksBtn,
-      h("button", { class: endMarksBtn.hidden ? "primary" : "", onclick: () => { const t = written.map(k => parts[k].text).join("\n\n"); closeReader(); room.critique = { ...room.critique, text: t, label: o.title + " · whole draft", lens: story.style?.a || "", marks: [], out: "", rewrite: "", err: "" }; gotoRoom("critique"); } }, "Critique the whole draft"),
+      h("button", { class: endMarksBtn.hidden ? "primary" : "", onclick: () => { const t = written.map(k => parts[k].text).join("\n\n"); closeReader(); room.critique = { ...room.critique, text: t, label: o.title + " · whole draft", lens: story.style?.a || "", marks: [], out: "", rewrite: "", err: "", fixes: [], source: { storyId: story.id, ks: written } }; gotoRoom("critique"); } }, "Critique the whole draft"),
       h("button", { onclick: () => closeReader() }, "Back to editing"))));
   // Highlighting: select words, then Highlight or Add note. Tap a highlight to edit it.
   let lastSel = null, selTimer = 0;
@@ -2090,7 +2109,7 @@ function critiqueMarks() {
   const text = ks.map(k => (o.parts.length > 1 ? `[Part ${k + 1}: ${o.parts[k].title}]\n` : "") + parts[k].text).join("\n\n");
   closeReader(true);
   room.critique = { ...room.critique, text, label: `${o.title} · ${ms.length} marked ${ms.length === 1 ? "line" : "lines"}`, lens: story.style?.a || "",
-    marks: ms.map(m => ({ part: m.part, quote: m.quote, note: m.note })), out: "", rewrite: "", err: "" };
+    marks: ms.map(m => ({ part: m.part, quote: m.quote, note: m.note })), out: "", rewrite: "", err: "", fixes: [], source: { storyId: story.id, ks } };
   gotoRoom("critique");
 }
 function revisionPanel() {
@@ -2111,6 +2130,120 @@ function revisionPanel() {
       h("button", { onclick: () => openReader(ms.find(m => !m.done)?.part ?? 0) }, icon(ICON_READ), "Open in reading mode"),
       h("span", { class: "spacer" }),
       h("button", { class: "primary", disabled: !open || !AI.sample, onclick: () => critiqueMarks() }, "Critique marked lines")));
+}
+
+
+// ---------- Fix this line ----------
+function cleanCritique(t) {
+  const i = (t || "").search(/```\s*(fixes|json)/i);
+  return i >= 0 ? t.slice(0, i).trimEnd() : t;
+}
+function dropRevisionSection(t) { return t.replace(/\n#{2,3}\s*Revision list[\s\S]*$/i, "").trimEnd(); }
+function parseFixes(raw) {
+  const m = (raw || "").match(/```\s*(?:fixes|json)\s*([\s\S]*?)```/i) || (raw || "").match(/```\s*(?:fixes|json)\s*([\s\S]*)$/i);
+  if (!m) return [];
+  try {
+    const j = JSON.parse(m[1].trim());
+    return (j.items || j || []).filter(x => x && x.label).map(x => ({ label: String(x.label), original: String(x.original || "").trim(), replacement: String(x.replacement || "").trim(), mark: Number(x.mark) || null }))
+      .map(x => (x.original && x.replacement && x.original !== x.replacement) ? x : { ...x, original: "", replacement: "" });
+  } catch { return []; }
+}
+const QUOTES = "[\"“”„'‘’]";
+function findLoose(text, needle) {
+  if (!text || !needle) return null;
+  const i = text.indexOf(needle); if (i >= 0) return { start: i, end: i + needle.length };
+  const esc = needle.trim().split(/\s+/).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/["“”„'‘’]/g, QUOTES)).join("\\s+");
+  try { const m = new RegExp(esc).exec(text); if (m) return { start: m.index, end: m.index + m[0].length }; } catch {}
+  return null;
+}
+async function fixTargets() {
+  const C = room.critique, src = C.source;
+  if (!src?.storyId) return null;
+  const cur = story && story.id === src.storyId;
+  const ps = cur ? parts : (C._ps && C._ps.id === src.storyId ? C._ps.parts : null) || await Store.parts(src.storyId).catch(() => ({}));
+  if (!cur) C._ps = { id: src.storyId, parts: ps };
+  return ps;
+}
+function locateFix(f, ps) {
+  const src = room.critique.source;
+  if (ps) {
+    const order = [...new Set([...(src.ks || []), ...Object.keys(ps).map(Number)])];
+    for (const k of order) { const at = findLoose(ps[k]?.text, f.original); if (at) return { k, at }; }
+    return null;
+  }
+  const at = findLoose(room.critique.text, f.original);
+  return at ? { k: null, at } : null;
+}
+async function applyFix(i, quiet) {
+  const C = room.critique, f = C.fixes[i];
+  if (!f || f.status === "fixed" || !f.original) return false;
+  const ps = await fixTargets();
+  const hit = locateFix(f, ps);
+  if (!hit) { f.err = "This line isn't in the draft any more (it may already have changed). Edit it by hand."; if (!quiet) render(); return false; }
+  const splice = (t, at) => t.slice(0, at.start) + f.replacement + t.slice(at.end);
+  if (ps) {
+    const p = ps[hit.k], before = p.text;
+    p.history = [...(p.history || []), { text: before, at: p.at || Date.now(), style: p.style || "", fix: f.label }].slice(-8);
+    p.text = splice(before, hit.at); p.at = Date.now();
+    const mk = f.mark && C.marks?.[f.mark - 1];
+    (p.marks || []).forEach(m => {
+      if ((mk && strip(mk.quote) === strip(m.quote)) || strip(f.original).includes(strip(m.quote)) || strip(m.quote).includes(strip(f.original))) m.done = true;
+    });
+    try { await Store.savePart(C.source.storyId, p); }
+    catch (e) { p.text = before; p.history.pop(); f.err = "Couldn't save the change: " + (e?.message || e?.code); if (!quiet) render(); return false; }
+    f.applied = { k: hit.k, before, after: p.text };
+    const inText = findLoose(C.text, f.original); if (inText) C.text = splice(C.text, inText);
+  } else {
+    const before = C.text; C.text = splice(before, hit.at); f.applied = { k: null, before, after: C.text };
+  }
+  f.status = "fixed"; f.err = "";
+  if (!quiet) { toast("Line fixed"); render(); }
+  return true;
+}
+async function undoFix(i) {
+  const C = room.critique, f = C.fixes[i]; if (!f?.applied) return;
+  const ps = await fixTargets();
+  if (ps && f.applied.k != null) {
+    const p = ps[f.applied.k];
+    const at = findLoose(p.text, f.replacement);
+    if (!at) { f.err = "The fixed line has been edited since, so it can't be undone automatically."; return render(); }
+    const before = p.text;
+    p.history = [...(p.history || []), { text: before, at: p.at || Date.now(), style: p.style || "", fix: "Undo: " + f.label }].slice(-8);
+    p.text = before.slice(0, at.start) + f.original + before.slice(at.end); p.at = Date.now();
+    await Store.savePart(C.source.storyId, p).catch(() => {});
+    const t2 = findLoose(C.text, f.replacement); if (t2) C.text = C.text.slice(0, t2.start) + f.original + C.text.slice(t2.end);
+  } else {
+    const at = findLoose(C.text, f.replacement); if (at) C.text = C.text.slice(0, at.start) + f.original + C.text.slice(at.end);
+  }
+  f.status = "open"; f.applied = null; f.err = ""; toast("Change undone"); render();
+}
+async function fixAll(btn) {
+  const C = room.critique; let n = 0;
+  btn.disabled = true; btn.textContent = "Fixing…";
+  for (let i = 0; i < C.fixes.length; i++) if (C.fixes[i].status === "open" && C.fixes[i].original) { if (await applyFix(i, true)) n++; }
+  toast(n ? `Fixed ${n} ${n === 1 ? "line" : "lines"}` : "No lines could be fixed automatically"); render();
+}
+function fixList() {
+  const C = room.critique;
+  const fixable = C.fixes.filter(f => f.original && f.status === "open").length;
+  const done = C.fixes.filter(f => f.status !== "open").length;
+  const target = C.source?.storyId ? "your draft" : "the text above";
+  return h("div", { class: "fixes" },
+    h("div", { class: "row" }, h("h3", { class: "spacer", text: `Revision list · ${C.fixes.length - done} to do` }),
+      fixable > 1 ? h("button", { onclick: e => fixAll(e.currentTarget) }, `Fix all ${fixable} lines`) : null),
+    h("p", { class: "muted small", text: `“Fix this line” puts the suggested line into ${target} and keeps the old version, so you can compare or undo.` }),
+    h("ul", { class: "revlist" }, C.fixes.map((f, i) => h("li", { class: f.status !== "open" ? "done" : "" },
+      !f.original ? h("input", { type: "checkbox", id: "fx-" + i, "aria-label": "Done", checked: f.status === "done" ? "checked" : null, onchange: e => { f.status = e.target.checked ? "done" : "open"; render(); } })
+        : h("span", { class: "fx-dot" + (f.status === "fixed" ? " on" : ""), "aria-hidden": "true", text: f.status === "fixed" ? "✓" : "" }),
+      h("div", { class: "fx-body" },
+        h("label", { for: f.original ? null : "fx-" + i, class: "rv-n", text: f.label }),
+        f.original ? h("div", { class: "fx-diff" }, h("del", { text: f.original }), h("ins", { text: f.replacement })) : null,
+        f.err ? h("p", { class: "small", style: "color:var(--danger)", text: f.err }) : null,
+        f.original ? h("div", { class: "row" },
+          f.status === "fixed"
+            ? [h("button", { onclick: () => undoFix(i) }, "Undo"),
+               h("button", { onclick: () => openCompare(f.applied.before, f.applied.after, "Before: " + f.label.slice(0, 40), "After the fix", "critique") }, icon(ICON_COMPARE), "Compare")]
+            : h("button", { class: "primary", onclick: () => applyFix(i) }, "Fix this line")) : null)))));
 }
 
 /*ROOM:END*/
