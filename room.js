@@ -1941,3 +1941,31 @@ function jaalCard(kept) {
   sec.append(h("p", { class: "muted small", text: "Tap a story or a thread. Thicker threads mean more shared motifs." }));
   return sec;
 }
+
+
+// ---------- Weekly digest (read by the "Sangam Sunday" scheduled task) ----------
+let digestLast = "", digestTimer = 0;
+function buildDigest() {
+  const tot = dailyTotals(), g = Goal.words, days = [];
+  for (let i = 6; i >= 0; i--) { const k = dayKey(new Date(Date.now() - i * 864e5)); days.push({ k, v: tot[k] || 0 }); }
+  let run = 0, longest = 0; for (const d of days) { run = d.v >= g ? run + 1 : 0; longest = Math.max(longest, run); }
+  const weekAgo = Date.now() - 7 * 864e5;
+  const sprints = SprintLog.items.filter(e => e.at >= weekAgo);
+  const pool = sprints.length ? sprints : SprintLog.items;
+  const tb = BUCKETS.map(([name, range, test]) => { const xs = pool.filter(e => test(new Date(e.at).getHours())); const w = xs.reduce((a, e) => a + (e.words || 0), 0); return { name, range, sprints: xs.length, avg: xs.length ? Math.round(w / xs.length) : 0 }; }).filter(b => b.sprints);
+  const best = tb.sort((a, b) => b.avg - a.avg || b.sprints - a.sprints)[0] || null;
+  const perStory = stories.map(s => ({ title: s.outline?.title || s.title, w: days.reduce((a, d) => a + (s.stats?.daily?.[d.k] || 0), 0) })).filter(x => x.w > 0 && x.title).sort((a, b) => b.w - a.w);
+  const seeds = (Lib.seeds || []).filter(x => x.at >= weekAgo && x.status !== "discarded").slice(0, 12).map(x => ({ type: x.type, text: x.text, story: x.story, motifs: x.motifs || [] }));
+  return { updatedAt: Date.now(), updatedDay: dayKey(), goal: g, words7: days.reduce((a, d) => a + d.v, 0), days: days.map(d => ({ day: d.k, words: d.v })),
+    daysWritten: days.filter(d => d.v > 0).length, goalDays: days.filter(d => d.v >= g).length, longestStreak7: longest, currentStreak: streakOf(tot, g),
+    sprints7: sprints.length, bestTime: best ? { ...best, basis: sprints.length ? "this week" : "all time" } : null, stories: perStory.slice(0, 5), seeds7: seeds };
+}
+function scheduleDigest() {
+  if (Store.mode !== "db" || !Goal.loaded || !SprintLog.loaded || !Lib.loaded || loading) return;
+  clearTimeout(digestTimer);
+  digestTimer = setTimeout(async () => {
+    const d = buildDigest(); const key = JSON.stringify({ ...d, updatedAt: 0 });
+    if (key === digestLast) return;
+    try { await Store.col().doc("_digest").set(d); digestLast = key; } catch {}
+  }, 1500);
+}
