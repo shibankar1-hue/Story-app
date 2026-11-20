@@ -1402,7 +1402,8 @@ function nudgeCard() {
       h("h3", { text: today ? `${short.toLocaleString("en-IN")} more words to reach today's goal` : `Still time for today's ${Goal.words} words` }),
       tgt ? h("p", { class: "muted small", text: `Pick up “${tgt.s.outline.title}” where you left off: ${tgt.s.stats.written} of ${tgt.s.stats.total} parts written` + (tgt.s.stats.open ? `, ${tgt.s.stats.open} lines to revise.` : ".") }) : h("p", { class: "muted small", text: "Start a new story, or add a few lines anywhere." })),
     h("div", { class: "row" },
-      tgt ? h("button", { class: "primary", onclick: () => continueWhereLeft(tgt) }, "Continue where I left off")
+      tgt ? h("button", { class: "primary", onclick: () => continueWhereLeft(tgt) }, "Continue where I left off") : null,
+      tgt ? h("button", { class: "sprintbtn", onclick: async () => { await continueWhereLeft(tgt); if (story?.stage === "draft") openSprint(curPart, 5); } }, icon(ICON_TIMER), "5-minute sprint")
           : h("button", { class: "primary", onclick: () => { story = newStory(); parts = {}; render(); } }, "+ New story"),
       h("button", { class: "ghost", onclick: () => { try { localStorage.setItem("pd.nudge", dayKey()); } catch {} render(); } }, "Not today")));
 }
@@ -1416,4 +1417,88 @@ async function continueWhereLeft(tgt) {
     story.stage = "draft"; curPart = k;
   }
   render(); window.scrollTo(0, 0);
+}
+
+
+// ---------- Writing sprint ----------
+const ICON_TIMER = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>';
+let sprintEl = null;
+function openSprint(k, minutes = 5) {
+  if (!story?.outline) return;
+  closeSprint(true); closeReader(true);
+  const o = story.outline, script = medium(story) !== "page";
+  if (!parts[k]) parts[k] = { i: k, text: "", at: Date.now(), history: [], marks: [] };
+  const p = parts[k];
+  const startText = p.text || "", startWords = wc(startText);
+  const todayBefore = dailyTotals()[dayKey()] || 0;
+  let end = Date.now() + minutes * 60000, done = false, saveTimer = 0, tick = 0, lastSaved = startText;
+  const root = h("div", { class: "reader sprint", role: "dialog", "aria-modal": "true", "aria-label": `Writing sprint: ${o.parts[k].title}` });
+  const darkHost = matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light" || document.documentElement.dataset.theme === "dark";
+  root.dataset.tone = readerPrefs.tone === "auto" ? (darkHost ? "night" : "day") : readerPrefs.tone;
+  root.style.setProperty("--r-size", readerPrefs.size + "px");
+  const clock = h("span", { class: "sp-clock", "aria-live": "off" });
+  const added = h("span", { class: "sp-added", "aria-live": "polite" });
+  const progress = h("div", { class: "reader-progress" });
+  const ta = h("textarea", { class: "sp-text" + (script ? " script-font" : "") + (effLang(story) === "hindi" ? " hindi" : ""), id: "sprinttext", "aria-label": "Your part",
+    spellcheck: "true", placeholder: script ? "INT. JAGAH - DIN\n\nLikhna shuru karo…" : "Likhna shuru karo…", value: startText });
+  const bar = h("div", { class: "reader-bar sp-bar" },
+    h("button", { class: "done", onclick: () => done ? closeSprint() : finish(true) }, "Stop"), clock, added);
+  const head = h("header", { class: "sp-head" }, h("span", { class: "label", text: `${o.title} · Part ${k + 1}` }), h("h2", { text: o.parts[k].title }),
+    o.parts[k].summary ? h("p", { class: "muted small", text: o.parts[k].summary }) : null);
+  const summary = h("div", { class: "sp-summary", hidden: true });
+  root.append(progress, bar, h("div", { class: "sp-wrap" }, head, ta), summary);
+  document.body.append(root); document.body.style.overflow = "hidden"; sprintEl = root;
+  const sizeTa = () => { ta.style.height = "auto"; ta.style.height = Math.max(ta.scrollHeight, window.innerHeight * 0.6) + "px"; };
+  const count = () => Math.max(0, wc(ta.value) - startWords);
+  const fmt = ms => { const t = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`; };
+  const update = () => {
+    const left = end - Date.now();
+    clock.textContent = done ? "Time" : fmt(left);
+    clock.classList.toggle("last", !done && left < 30000);
+    const n = count(); added.textContent = `+${n.toLocaleString("en-IN")} ${n === 1 ? "word" : "words"}`;
+    progress.style.width = done ? "100%" : (100 * (1 - left / (minutes * 60000))) + "%";
+    if (!done && left <= 0) finish(false);
+  };
+  const save = async () => {
+    if (ta.value === lastSaved) return;
+    lastSaved = ta.value; p.text = ta.value; p.at = Date.now();
+    try { await Store.savePart(story.id, p); } catch { toast("Couldn't save — keep this window open and try again"); }
+  };
+  ta.addEventListener("input", () => { sizeTa(); update(); clearTimeout(saveTimer); saveTimer = setTimeout(save, 1500); });
+  tick = setInterval(update, 250);
+  async function finish(early) {
+    if (done) return; done = true; clearInterval(tick); clearTimeout(saveTimer); update();
+    const n = count();
+    if (ta.value !== startText) {
+      if (startText) p.history = [...(p.history || []), { text: startText, at: p.at || Date.now(), style: p.style || "", made: p.made || "" }].slice(-8);
+      p.made = `Sprint: +${n} words`;
+      lastSaved = null; await save();
+    }
+    const today = todayBefore + n; // the stats update a moment later; show the result right away
+    const g = Goal.words, met = today >= g;
+    summary.replaceChildren(
+      h("div", { class: "sp-card" },
+        h("span", { class: "label", text: early ? "Sprint stopped" : "Time's up" }),
+        h("h2", { text: n ? `+${n.toLocaleString("en-IN")} words` : "No new words this time" }),
+        h("p", { text: met ? (todayBefore < g ? `That takes you past today's goal: ${today.toLocaleString("en-IN")} of ${g} words.` : `Today: ${today.toLocaleString("en-IN")} words, goal already met.`)
+          : `Today: ${today.toLocaleString("en-IN")} of ${g} words. ${(g - today).toLocaleString("en-IN")} to go.` }),
+        h("div", { class: "sp-meter", role: "img", "aria-label": `${today} of ${g} words today` },
+          h("i", { class: "before", style: `width:${Math.min(100, 100 * todayBefore / g)}%` }),
+          h("i", { class: "now", style: `left:${Math.min(100, 100 * todayBefore / g)}%;width:${Math.max(0, Math.min(100, 100 * today / g) - Math.min(100, 100 * todayBefore / g))}%` })),
+        h("div", { class: "row", style: "justify-content:center" },
+          h("button", { class: "primary", onclick: () => { closeSprint(); openSprint(k, 5); } }, "Another 5 minutes"),
+          h("button", { onclick: () => { summary.hidden = true; clock.textContent = "No timer"; bar.querySelector(".done").textContent = "Done"; ta.focus(); } }, "Keep writing"),
+          h("button", { onclick: () => closeSprint() }, "Done"))));
+    summary.hidden = false;
+  }
+  root._finish = finish; root._save = save;
+  root.addEventListener("keydown", e => { if (e.key === "Escape") { if (!done) finish(true); else closeSprint(); } });
+  update(); requestAnimationFrame(() => { sizeTa(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.scrollTop = ta.scrollHeight; root.scrollTop = root.scrollHeight; });
+}
+async function closeSprint(silent) {
+  if (!sprintEl) return;
+  const el = sprintEl; sprintEl = null;
+  try { await el._save?.(); } catch {}
+  el.remove(); document.body.style.overflow = "";
+  if (!silent && tab === "stories" && story) render();
 }

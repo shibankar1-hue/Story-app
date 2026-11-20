@@ -276,6 +276,30 @@ mark.hl.flash { background: color-mix(in srgb, var(--accent) 55%, transparent); 
 .goal-set.remind-row { flex-wrap: wrap; row-gap: 6px; }
 .goal-set input[type=time] { font-family: var(--font-body); max-width: 100%; width: auto; padding: 4px 10px; min-height: 32px; font-size: 0.88rem; border-radius: 10px; }
 .goal-set input[type=time]:disabled { opacity: 0.45; }
+.sprintbtn { background: var(--sheet); }
+/* Sprint */
+.sprint .sp-bar { justify-content: space-between; }
+.sp-clock { font-family: var(--font-display); font-size: 1.5rem; font-variant-numeric: tabular-nums; min-width: 4ch; text-align: center; }
+.sp-clock.last { color: var(--accent); }
+.sp-added { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--accent); min-width: 7ch; text-align: right; padding-right: 6px; }
+.sp-wrap { max-width: 40rem; margin: 0 auto; padding: 5vh max(24px, env(safe-area-inset-right, 0px)) calc(30vh + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 18px; }
+.sp-head { text-align: center; display: flex; flex-direction: column; gap: 6px; }
+.sp-head .label, .sp-head .muted { color: var(--r-muted); }
+.sp-text { background: transparent; color: var(--r-ink); border: 0; border-radius: 0; padding: 0; resize: none; overflow: hidden; font-family: var(--font-display); font-size: var(--r-size, 21px); line-height: 1.7; min-height: 60vh; caret-color: var(--accent); }
+.sp-text:focus-visible { outline: none; }
+.sp-text.script-font { font-family: var(--font-script); font-size: calc(var(--r-size, 21px) * 0.82); line-height: 1.5; }
+.sp-text.hindi { font-family: var(--font-hindi); line-height: 1.9; }
+.sp-text::placeholder { color: var(--r-muted); }
+.sp-summary { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 24px; background: color-mix(in srgb, var(--r-bg) 70%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); animation: rfade 0.25s ease; }
+.sp-card { background: var(--r-bg); color: var(--r-ink); border-radius: 24px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2), 0 0 0 0.5px var(--r-line); padding: 28px 24px; max-width: 420px; width: 100%; display: flex; flex-direction: column; gap: 12px; text-align: center; }
+.sp-card h2 { font-size: 2.2rem; color: var(--accent); }
+.sp-card .label { color: var(--r-muted); }
+.sp-card button { background: var(--r-line); color: var(--r-ink); }
+.sp-card button.primary { background: var(--accent); color: #fff; }
+.sp-meter { position: relative; height: 8px; border-radius: 4px; background: var(--r-line); overflow: hidden; }
+.sp-meter i { position: absolute; top: 0; bottom: 0; }
+.sp-meter .before { left: 0; background: color-mix(in srgb, var(--accent) 40%, transparent); }
+.sp-meter .now { background: var(--accent); }
 .nudge { flex-direction: row; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--accent-soft); box-shadow: none; }
 .nudge-text { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 4px; }
 .nudge-text .label { color: var(--accent); }
@@ -1080,7 +1104,9 @@ function renderDraft() {
   const head = h("div", { class: "row" }, h("div", { class: "spacer" },
     h("span", { class: "label", text: `Part ${curPart + 1} of ${n}` }), h("h2", { text: o.parts[curPart].title }),
     h("p", { class: "muted small", text: o.parts[curPart].summary })),
-    Object.values(parts).some(x => x?.text) && !busy ? h("button", { class: "readbtn", title: "Read the whole draft in reading mode", onclick: () => openReader(curPart) }, icon(ICON_READ), "Read") : null);
+    !busy ? h("div", { class: "row", style: "align-self:flex-start;gap:6px" },
+      Object.values(parts).some(x => x?.text) ? h("button", { class: "readbtn", title: "Read the whole draft in reading mode", onclick: () => openReader(curPart) }, icon(ICON_READ), "Read") : null,
+      h("button", { class: "readbtn", title: "Write this part yourself for 5 minutes", onclick: () => openSprint(curPart, 5) }, icon(ICON_TIMER), "Sprint")) : null);
   const body = h("div", { class: "page", id: "pagebody" });
   if (p?.text) body.append(renderText(p.text));
   else if (!busy) body.append(h("div", { class: "empty" }, curPart > 0 && !parts[curPart - 1]?.text ? "Tip: write the earlier parts first so this one can follow on from them." : "This part isn't written yet."));
@@ -2581,7 +2607,8 @@ function nudgeCard() {
       h("h3", { text: today ? `${short.toLocaleString("en-IN")} more words to reach today's goal` : `Still time for today's ${Goal.words} words` }),
       tgt ? h("p", { class: "muted small", text: `Pick up “${tgt.s.outline.title}” where you left off: ${tgt.s.stats.written} of ${tgt.s.stats.total} parts written` + (tgt.s.stats.open ? `, ${tgt.s.stats.open} lines to revise.` : ".") }) : h("p", { class: "muted small", text: "Start a new story, or add a few lines anywhere." })),
     h("div", { class: "row" },
-      tgt ? h("button", { class: "primary", onclick: () => continueWhereLeft(tgt) }, "Continue where I left off")
+      tgt ? h("button", { class: "primary", onclick: () => continueWhereLeft(tgt) }, "Continue where I left off") : null,
+      tgt ? h("button", { class: "sprintbtn", onclick: async () => { await continueWhereLeft(tgt); if (story?.stage === "draft") openSprint(curPart, 5); } }, icon(ICON_TIMER), "5-minute sprint")
           : h("button", { class: "primary", onclick: () => { story = newStory(); parts = {}; render(); } }, "+ New story"),
       h("button", { class: "ghost", onclick: () => { try { localStorage.setItem("pd.nudge", dayKey()); } catch {} render(); } }, "Not today")));
 }
@@ -2595,6 +2622,90 @@ async function continueWhereLeft(tgt) {
     story.stage = "draft"; curPart = k;
   }
   render(); window.scrollTo(0, 0);
+}
+
+
+// ---------- Writing sprint ----------
+const ICON_TIMER = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>';
+let sprintEl = null;
+function openSprint(k, minutes = 5) {
+  if (!story?.outline) return;
+  closeSprint(true); closeReader(true);
+  const o = story.outline, script = medium(story) !== "page";
+  if (!parts[k]) parts[k] = { i: k, text: "", at: Date.now(), history: [], marks: [] };
+  const p = parts[k];
+  const startText = p.text || "", startWords = wc(startText);
+  const todayBefore = dailyTotals()[dayKey()] || 0;
+  let end = Date.now() + minutes * 60000, done = false, saveTimer = 0, tick = 0, lastSaved = startText;
+  const root = h("div", { class: "reader sprint", role: "dialog", "aria-modal": "true", "aria-label": `Writing sprint: ${o.parts[k].title}` });
+  const darkHost = matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light" || document.documentElement.dataset.theme === "dark";
+  root.dataset.tone = readerPrefs.tone === "auto" ? (darkHost ? "night" : "day") : readerPrefs.tone;
+  root.style.setProperty("--r-size", readerPrefs.size + "px");
+  const clock = h("span", { class: "sp-clock", "aria-live": "off" });
+  const added = h("span", { class: "sp-added", "aria-live": "polite" });
+  const progress = h("div", { class: "reader-progress" });
+  const ta = h("textarea", { class: "sp-text" + (script ? " script-font" : "") + (effLang(story) === "hindi" ? " hindi" : ""), id: "sprinttext", "aria-label": "Your part",
+    spellcheck: "true", placeholder: script ? "INT. JAGAH - DIN\n\nLikhna shuru karo…" : "Likhna shuru karo…", value: startText });
+  const bar = h("div", { class: "reader-bar sp-bar" },
+    h("button", { class: "done", onclick: () => done ? closeSprint() : finish(true) }, "Stop"), clock, added);
+  const head = h("header", { class: "sp-head" }, h("span", { class: "label", text: `${o.title} · Part ${k + 1}` }), h("h2", { text: o.parts[k].title }),
+    o.parts[k].summary ? h("p", { class: "muted small", text: o.parts[k].summary }) : null);
+  const summary = h("div", { class: "sp-summary", hidden: true });
+  root.append(progress, bar, h("div", { class: "sp-wrap" }, head, ta), summary);
+  document.body.append(root); document.body.style.overflow = "hidden"; sprintEl = root;
+  const sizeTa = () => { ta.style.height = "auto"; ta.style.height = Math.max(ta.scrollHeight, window.innerHeight * 0.6) + "px"; };
+  const count = () => Math.max(0, wc(ta.value) - startWords);
+  const fmt = ms => { const t = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`; };
+  const update = () => {
+    const left = end - Date.now();
+    clock.textContent = done ? "Time" : fmt(left);
+    clock.classList.toggle("last", !done && left < 30000);
+    const n = count(); added.textContent = `+${n.toLocaleString("en-IN")} ${n === 1 ? "word" : "words"}`;
+    progress.style.width = done ? "100%" : (100 * (1 - left / (minutes * 60000))) + "%";
+    if (!done && left <= 0) finish(false);
+  };
+  const save = async () => {
+    if (ta.value === lastSaved) return;
+    lastSaved = ta.value; p.text = ta.value; p.at = Date.now();
+    try { await Store.savePart(story.id, p); } catch { toast("Couldn't save — keep this window open and try again"); }
+  };
+  ta.addEventListener("input", () => { sizeTa(); update(); clearTimeout(saveTimer); saveTimer = setTimeout(save, 1500); });
+  tick = setInterval(update, 250);
+  async function finish(early) {
+    if (done) return; done = true; clearInterval(tick); clearTimeout(saveTimer); update();
+    const n = count();
+    if (ta.value !== startText) {
+      if (startText) p.history = [...(p.history || []), { text: startText, at: p.at || Date.now(), style: p.style || "", made: p.made || "" }].slice(-8);
+      p.made = `Sprint: +${n} words`;
+      lastSaved = null; await save();
+    }
+    const today = todayBefore + n; // the stats update a moment later; show the result right away
+    const g = Goal.words, met = today >= g;
+    summary.replaceChildren(
+      h("div", { class: "sp-card" },
+        h("span", { class: "label", text: early ? "Sprint stopped" : "Time's up" }),
+        h("h2", { text: n ? `+${n.toLocaleString("en-IN")} words` : "No new words this time" }),
+        h("p", { text: met ? (todayBefore < g ? `That takes you past today's goal: ${today.toLocaleString("en-IN")} of ${g} words.` : `Today: ${today.toLocaleString("en-IN")} words, goal already met.`)
+          : `Today: ${today.toLocaleString("en-IN")} of ${g} words. ${(g - today).toLocaleString("en-IN")} to go.` }),
+        h("div", { class: "sp-meter", role: "img", "aria-label": `${today} of ${g} words today` },
+          h("i", { class: "before", style: `width:${Math.min(100, 100 * todayBefore / g)}%` }),
+          h("i", { class: "now", style: `left:${Math.min(100, 100 * todayBefore / g)}%;width:${Math.max(0, Math.min(100, 100 * today / g) - Math.min(100, 100 * todayBefore / g))}%` })),
+        h("div", { class: "row", style: "justify-content:center" },
+          h("button", { class: "primary", onclick: () => { closeSprint(); openSprint(k, 5); } }, "Another 5 minutes"),
+          h("button", { onclick: () => { summary.hidden = true; clock.textContent = "No timer"; bar.querySelector(".done").textContent = "Done"; ta.focus(); } }, "Keep writing"),
+          h("button", { onclick: () => closeSprint() }, "Done"))));
+    summary.hidden = false;
+  }
+  root._finish = finish; root._save = save;
+  root.addEventListener("keydown", e => { if (e.key === "Escape") { if (!done) finish(true); else closeSprint(); } });
+  update(); requestAnimationFrame(() => { sizeTa(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.scrollTop = ta.scrollHeight; root.scrollTop = root.scrollHeight; });
+}
+async function closeSprint(silent) {
+  if (!sprintEl) return;
+  const el = sprintEl; sprintEl = null;
+  try { await el._save?.(); } catch {}
+  el.remove(); document.body.style.overflow = "";
+  if (!silent && tab === "stories" && story) render();
 }
 
 /*ROOM:END*/
