@@ -46,6 +46,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
 body {
   background: var(--paper); color: var(--ink);
   font-family: var(--font-body); font-size: 17px; line-height: 1.5; letter-spacing: -0.005em;
@@ -214,6 +215,45 @@ input[type=file]::file-selector-button { font: inherit; font-weight: 600; border
 
 /* Progress */
 .readbtn { align-self: flex-start; }
+mark.hl { background: color-mix(in srgb, var(--accent) 24%, transparent); color: inherit; border-radius: 3px; padding: 0.05em 0; cursor: pointer; transition: background 0.3s ease; }
+mark.hl.noted { box-shadow: inset 0 -2px 0 var(--accent); }
+mark.hl.done { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+mark.hl.flash { background: color-mix(in srgb, var(--accent) 55%, transparent); }
+.reader ::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+.sel-pill { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(22px + env(safe-area-inset-bottom, 0px)); z-index: 5; display: flex; gap: 4px; padding: 5px;
+  background: var(--r-ink); border-radius: 999px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25); }
+.sel-pill[hidden] { display: none; }
+.sel-pill button { background: transparent; color: var(--r-bg); min-height: 40px; padding: 6px 16px; }
+.sel-pill button:hover { background: rgba(127, 127, 127, 0.25); }
+.mark-sheet { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; z-index: 6; width: min(560px, 100%); display: flex; flex-direction: column; gap: 10px;
+  background: var(--r-bar); -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px); color: var(--r-ink);
+  border-radius: 22px 22px 0 0; box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.2); padding: 18px max(18px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px)); animation: sheetup 0.25s ease; }
+.mark-sheet[hidden] { display: none; }
+@keyframes sheetup { from { transform: translate(-50%, 30px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .mark-sheet { animation: none; } }
+.mark-sheet textarea { background: var(--r-line); color: var(--r-ink); min-height: 80px; }
+.mark-sheet button { background: transparent; color: var(--r-ink); }
+.mark-sheet button.done { background: var(--accent); color: #fff; }
+.mark-sheet button.danger { color: var(--danger); padding-inline: 4px; }
+.sheet-q { font-family: var(--font-display); font-style: italic; color: var(--r-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.sheet-label { font-size: 0.85rem; color: var(--r-muted); font-weight: 500; }
+.marks-panel { flex-direction: column; align-items: stretch; max-height: 60vh; overflow-y: auto; }
+.mk-item .mk-jump { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 2px; border-radius: 12px; padding: 10px 12px; font-weight: 400; }
+.mk-q { font-family: var(--font-display); font-style: italic; }
+.mk-n { font-size: 0.9rem; }
+.mk-meta, .mk-empty { font-size: 0.78rem; color: var(--r-muted); text-align: center; }
+.mk-meta { text-align: left; }
+.revlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; background: var(--paper); border-radius: 16px; }
+.revlist li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; }
+.revlist li + li { border-top: 0.5px solid var(--line); }
+.revlist input { width: 20px; height: 20px; margin-top: 3px; flex: none; }
+.revlist label { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
+.revlist .rv-q { font-family: var(--font-display); font-style: italic; }
+.revlist li.done .rv-q, .revlist li.done .rv-n { text-decoration: line-through; color: var(--muted); }
+.revlist button { min-height: 32px; padding: 2px 8px; color: var(--muted); }
+.focuslist { margin: 8px 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+.md li.todo { list-style: none; margin-left: -1.3em; display: flex; gap: 8px; }
+.md li.todo .box { color: var(--accent); flex: none; }
 /* Reading mode */
 .reader { position: fixed; inset: 0; z-index: 40; background: var(--r-bg); color: var(--r-ink); overflow-y: auto; overscroll-behavior: contain;
   --r-bg: #fbfaf6; --r-ink: #24221e; --r-muted: #8a857b; --r-line: rgba(36, 34, 30, 0.1); --r-bar: rgba(251, 250, 246, 0.82); animation: rfade 0.25s ease; }
@@ -842,14 +882,14 @@ async function writePart(i, mode, note) {
     const old = parts[i];
     const history = (old?.history || []).slice();
     if (mode !== "continue" && old?.text) history.push({ text: old.text, at: old.at || Date.now(), style: old.style || "" });
-    parts[i] = { i, text: base + r.text.trim(), truncated: !!r.truncated, at: Date.now(), style: styleLabel(story.style), history: history.slice(-4) };
+    parts[i] = { i, text: base + r.text.trim(), truncated: !!r.truncated, at: Date.now(), style: styleLabel(story.style), history: history.slice(-4), marks: old?.marks || [] };
     await Store.savePart(story.id, parts[i]).catch(e => { msg = { text: "Couldn't save this part: " + (e?.message || e?.code) + ". Download it before leaving.", err: true }; });
     persist();
     if (!r.truncated && n > 1) summarise(i);
     if (r.truncated) msg = { text: "This part was cut short. Press “Continue this part” to finish it.", err: false };
   } catch (e) {
     if (e?.text && e.code === "cancelled" && (base + e.text).trim()) {
-      parts[i] = { i, text: base + e.text.trim(), truncated: true, at: Date.now(), style: styleLabel(story.style), history: parts[i]?.history || [] };
+      parts[i] = { i, text: base + e.text.trim(), truncated: true, at: Date.now(), style: styleLabel(story.style), history: parts[i]?.history || [], marks: parts[i]?.marks || [] };
       Store.savePart(story.id, parts[i]).catch(() => {});
     }
     msg = { text: AI.errText(e), err: e?.code !== "cancelled" };
@@ -961,6 +1001,7 @@ function renderDraft() {
   const sec = h("section", { class: "sheet" }, nav, head, body, p?.text && !busy ? h("div", { class: "field" }, h("label", { for: "rewritenote" }, "Rewrite note (optional)"), note) : null, actions);
   app.append(stylePanel());
   app.append(sec);
+  const rv = revisionPanel(); if (rv) app.append(rv);
   const sf = sofarPanel(); if (sf) app.append(sf);
   app.append(exportBar());
 }
@@ -1121,7 +1162,9 @@ function md(text) {
     if (li) {
       if (para.length || quote.length) { const p = para, q = quote; para = []; quote = []; if (p.length) { const e = h("p"); e.append(inlineMd(p.join(" "))); box.append(e); } if (q.length) { const e = h("blockquote"); e.append(inlineMd(q.join(" "))); box.append(e); } }
       if (!list) { list = h(/^\s*\d/.test(l) ? "ol" : "ul"); box.append(list); }
-      const item = h("li"); item.append(inlineMd(li[1])); list.append(item); continue;
+      const item = h("li"); const cb = li[1].match(/^\[( |x|X)\]\s*(.*)/);
+      if (cb) { item.className = "todo"; item.append(h("span", { class: "box", text: cb[1] === " " ? "☐" : "☑" }), inlineMd(cb[2])); } else item.append(inlineMd(li[1]));
+      list.append(item); continue;
     }
     const bq = l.match(/^\s*>\s?(.*)/);
     if (bq) { if (para.length) { const e = h("p"); e.append(inlineMd(para.join(" "))); box.append(e); para = []; } list = null; quote.push(bq[1]); continue; }
@@ -1421,8 +1464,11 @@ function roomCritique() {
   const ta = h("textarea", { id: "crittext", rows: 10, placeholder: "Paste a scene, chapter or script pages…", value: C.text, oninput: e => C.text = e.target.value });
   const sec = h("section", { class: "sheet" }, h("div", { class: "row" }, backToRoom()), h("h2", { text: "Critic" }),
     h("p", { class: "muted", text: "Honest-mentor notes in Hinglish: what works, the biggest problems with fixes, line-by-line improvements, and what the craft books say." }),
-    partPicker((text, label) => { C.text = text; C.label = label; render(); }),
+    partPicker((text, label) => { C.text = text; C.label = label; C.marks = []; render(); }),
     C.label ? h("p", { class: "small muted", text: "Loaded: " + C.label }) : null,
+    C.marks?.length ? h("div", { class: "note" }, h("b", { text: `Focusing on ${C.marks.length} marked ${C.marks.length === 1 ? "line" : "lines"}` }),
+      h("ol", { class: "focuslist" }, C.marks.map(m => h("li", {}, h("i", { text: "“" + m.quote.replace(/\s+/g, " ").slice(0, 140) + (m.quote.length > 140 ? "…" : "") + "”" }), m.note ? " — " + m.note : ""))),
+      h("button", { class: "ghost", onclick: () => { C.marks = []; render(); } }, "Clear focus")) : null,
     h("div", { class: "field" }, h("label", { for: "crittext" }, "Text to critique"), ta),
     h("div", { class: "field" }, h("label", { for: "lens" }, "Style lens (optional)"), lensSel),
     h("div", { class: "field" }, h("span", { class: "label", text: "Craft books" }),
@@ -1449,10 +1495,13 @@ async function runCritique() {
   const lensName = C.lens ? writerById(C.lens)?.name : "";
   const prompt = `${MENTOR} ${HINGLISH}\n\n${lens ? "STYLE LENS THE WRITER CHOSE:\n" + lens + "\n\n" : ""}${craftBrief(C.craft)}\n\n` +
     (lib.length ? `PASSAGES FROM THE WRITER'S OWN LIBRARY (their uploaded books and video transcripts). Cite them as [label] and recommend specific pages or moments to revisit:\n${lib.map(p => `[${p.label}]\n${p.text}`).join("\n\n")}\n\n` : "") +
-    `THE WRITER'S TEXT:\n"""\n${text}\n"""\n\nWrite the critique in Markdown with these headings:\n## Kya kaam kar raha hai\n## Sabse badi 3 problems\n(for each: what it is, why it hurts the reader or audience, and a concrete fix)\n## Line-by-line fixes\n(quote 3–6 original lines, each on its own line starting "> ", then the improved line and a few words on why)\n` +
+    (C.marks?.length ? `WHILE READING, THE WRITER MARKED THESE LINES. Deal with every one of them first, in this order:\n${C.marks.map((m, n) => `${n + 1}. ${C.marks.some(x => x.part !== C.marks[0].part) ? "(Part " + (m.part + 1) + ") " : ""}"${m.quote.replace(/\s+/g, " ")}"${m.note ? " — writer's note: " + m.note : " — no note (they felt something was off)"}`).join("\n")}\n\n` : "") +
+    `THE WRITER'S TEXT:\n"""\n${text}\n"""\n\nWrite the critique in Markdown with these headings:\n` +
+    (C.marks?.length ? `## Aapki marked lines\n(one block per mark, in order: "### Mark N", the line quoted with "> ", what is wrong or right with it in light of the writer's note, then "**Fix:**" with a rewritten line or a concrete change)\n` : "") + `## Kya kaam kar raha hai\n## Sabse badi 3 problems\n(for each: what it is, why it hurts the reader or audience, and a concrete fix)\n## Line-by-line fixes\n(quote 3–6 original lines, each on its own line starting "> ", then the improved line and a few words on why)\n` +
     (lensName ? `## Style lens: ${lensName}\n(how close the text is to this style, which 2–3 techniques to borrow and where; refer to the passages above when they exist)\n` : "") +
     `## Craft books kya kehti hain\n(2–4 points, each naming the book and the idea; quote only the exact public-domain quotes given above; never invent quotes or page numbers)\n` +
-    (lib.length ? `## Aapki library se\n(what their own books/videos suggest here, with [label] citations and what to re-read or re-watch)\n` : "") + `## Agla exercise\n(one short exercise aimed at the biggest problem)`;
+    (lib.length ? `## Aapki library se\n(what their own books/videos suggest here, with [label] citations and what to re-read or re-watch)\n` : "") + `## Agla exercise\n(one short exercise aimed at the biggest problem)` +
+    (C.marks?.length ? `\n## Revision list\n(a checklist, most important first, every item starting "- [ ] ": include every marked line plus the 3 biggest problems)` : "");
   try { C.out = await streamInto(document.getElementById("critout"), prompt, { signal: ctrl.signal, tier: "complex" }); }
   catch (e) { C.err = AI.errText(e); }
   roomBusy = null; render();
@@ -1870,25 +1919,84 @@ function openReader(startPart) {
     toneBtns,
     script ? h("button", { onclick: e => { readerPrefs.font = readerPrefs.font === "serif" ? "courier" : "serif"; saveReaderPrefs(); apply(); e.currentTarget.textContent = readerPrefs.font === "serif" ? "Script font" : "Serif font"; } }, readerPrefs.font === "serif" ? "Script font" : "Serif font") : null,
     document.fullscreenEnabled ? h("button", { onclick: () => { (document.fullscreenElement ? document.exitFullscreen() : root.requestFullscreen()).catch(() => {}); } }, "Full screen") : null);
-  const aa = h("button", { "aria-label": "Text settings", "aria-expanded": "false", onclick: () => { panel.hidden = !panel.hidden; aa.setAttribute("aria-expanded", String(!panel.hidden)); } }, "Aa");
+  const marksPanel = h("div", { class: "reader-panel marks-panel", hidden: true });
+  const marksBtn = h("button", { "aria-expanded": "false", onclick: () => { marksPanel.hidden = !marksPanel.hidden; panel.hidden = true; marksBtn.setAttribute("aria-expanded", String(!marksPanel.hidden)); if (!marksPanel.hidden) fillMarksPanel(); } });
+  const fillMarksPanel = () => {
+    const ms = allMarks();
+    marksBtn.textContent = ms.length ? `Marks ${ms.length}` : "Marks";
+    if (marksPanel.hidden) return;
+    marksPanel.replaceChildren(...(ms.length ? ms.map(m => h("div", { class: "mk-item" },
+      h("button", { class: "mk-jump", onclick: () => { const el = root.querySelector(`mark.hl[data-id="${m.id}"]`); marksPanel.hidden = true; el?.scrollIntoView({ block: "center", behavior: "smooth" }); el?.classList.add("flash"); setTimeout(() => el?.classList.remove("flash"), 1200); } },
+        h("span", { class: "mk-q", text: "“" + m.quote.replace(/\s+/g, " ").slice(0, 120) + (m.quote.length > 120 ? "…" : "") + "”" }),
+        m.note ? h("span", { class: "mk-n", text: m.note }) : null,
+        h("span", { class: "mk-meta", text: (o.parts.length > 1 ? `Part ${m.part + 1}` : "") + (markStale(m.part, m) ? " · line has changed" : "") + (m.done ? " · done" : "") })))) :
+      [h("p", { class: "mk-empty", text: "Select any words in the draft, then tap Highlight or Add note." })]),
+      ms.length ? h("div", { class: "row", style: "justify-content:center;width:100%" }, h("button", { class: "done", onclick: () => critiqueMarks() }, "Critique marked lines")) : null);
+  };
+  const aa = h("button", { "aria-label": "Text settings", "aria-expanded": "false", onclick: () => { marksPanel.hidden = true; panel.hidden = !panel.hidden; aa.setAttribute("aria-expanded", String(!panel.hidden)); } }, "Aa");
   const bar = h("div", { class: "reader-bar" },
     h("button", { class: "done", onclick: () => closeReader() }, "Done"),
-    h("span", { class: "rtitle", text: o.title }), aa, panel);
+    h("span", { class: "rtitle", text: o.title }), marksBtn, aa, panel, marksPanel);
   const text = h("article", { class: "reader-text" },
     h("header", { class: "r-cover" }, h("h1", { text: o.title }), o.logline ? h("p", { text: o.logline }) : null,
       h("p", { class: "meta", text: `${fmtOf(story).name} · ${written.length} of ${o.parts.length} parts · about ${minutes} min read` })));
   o.parts.forEach((p, k) => {
     const sec = h("section", { class: "r-part", id: "rpart-" + k },
       o.parts.length > 1 ? h("div", { class: "r-label", text: `Part ${k + 1}` }) : null, h("h2", { text: p.title }));
-    sec.append(parts[k]?.text ? renderText(parts[k].text) : h("p", { class: "r-missing", text: "This part isn't written yet." }));
+    if (parts[k]?.text) { const body = h("div", { class: "r-body" }, renderText(parts[k].text)); body.dataset.part = k; sec.append(body); }
+    else sec.append(h("p", { class: "r-missing", text: "This part isn't written yet." }));
     text.append(sec);
   });
+  const endMarksBtn = h("button", { class: "primary", hidden: !allMarks().length, onclick: () => critiqueMarks() }, "Critique marked lines");
   text.append(h("footer", { class: "r-end" }, h("span", { class: "orn", text: "· · ·" }), h("p", { text: "End of the draft so far." }),
     h("div", { class: "row", style: "justify-content:center" },
-      h("button", { class: "primary", onclick: () => { const t = written.map(k => parts[k].text).join("\n\n"); closeReader(); room.critique = { ...room.critique, text: t, label: o.title + " · whole draft", lens: story.style?.a || "", out: "", rewrite: "", err: "" }; gotoRoom("critique"); } }, "Critique this draft"),
+      endMarksBtn,
+      h("button", { class: endMarksBtn.hidden ? "primary" : "", onclick: () => { const t = written.map(k => parts[k].text).join("\n\n"); closeReader(); room.critique = { ...room.critique, text: t, label: o.title + " · whole draft", lens: story.style?.a || "", marks: [], out: "", rewrite: "", err: "" }; gotoRoom("critique"); } }, "Critique the whole draft"),
       h("button", { onclick: () => closeReader() }, "Back to editing"))));
-  root.append(progress, bar, text);
+  // Highlighting: select words, then Highlight or Add note. Tap a highlight to edit it.
+  let lastSel = null, selTimer = 0;
+  const pill = h("div", { class: "sel-pill", hidden: true },
+    h("button", { onclick: () => { if (lastSel) { addMark(lastSel.k, lastSel.quote, lastSel.occ, ""); afterMark(); } } }, "Highlight"),
+    h("button", { onclick: () => { if (lastSel) openSheet({ k: lastSel.k, quote: lastSel.quote, occ: lastSel.occ }); } }, "Add note"));
+  pill.addEventListener("pointerdown", e => e.preventDefault());
+  const sheetNote = h("textarea", { id: "marknote", rows: 3, placeholder: "Quick note, e.g. “too much explaining”, “sharper line chahiye”" });
+  const sheetQuote = h("p", { class: "sheet-q" });
+  const sheetDel = h("button", { class: "danger" }, "Remove highlight");
+  const sheet = h("div", { class: "mark-sheet", hidden: true, role: "dialog", "aria-label": "Note for this line" },
+    sheetQuote, h("label", { for: "marknote", class: "sheet-label" }, "Your note"), sheetNote,
+    h("div", { class: "row" }, sheetDel, h("span", { class: "spacer" }), h("button", { onclick: () => { sheet.hidden = true; } }, "Cancel"), h("button", { class: "done" }, "Save")));
+  let sheetTarget = null;
+  sheet.querySelector("button.done").onclick = () => {
+    const note = sheetNote.value.trim();
+    if (sheetTarget.id) updateMark(sheetTarget.k, sheetTarget.id, { note }); else addMark(sheetTarget.k, sheetTarget.quote, sheetTarget.occ, note);
+    sheet.hidden = true; afterMark();
+  };
+  sheetDel.onclick = () => { if (sheetTarget?.id) removeMark(sheetTarget.k, sheetTarget.id); sheet.hidden = true; afterMark(); };
+  function openSheet(t) {
+    sheetTarget = t; pill.hidden = true;
+    sheetQuote.textContent = "“" + t.quote.replace(/\s+/g, " ").slice(0, 220) + (t.quote.length > 220 ? "…" : "") + "”";
+    sheetNote.value = t.note || ""; sheetDel.hidden = !t.id; sheet.hidden = false; sheetNote.focus();
+  }
+  function afterMark() {
+    getSelection()?.removeAllRanges(); pill.hidden = true; lastSel = null;
+    root.querySelectorAll(".r-body").forEach(b => paintMarks(b, +b.dataset.part));
+    endMarksBtn.hidden = !allMarks().length; fillMarksPanel();
+  }
+  document.addEventListener("selectionchange", onSel);
+  function onSel() {
+    if (!readerEl) return document.removeEventListener("selectionchange", onSel);
+    clearTimeout(selTimer);
+    selTimer = setTimeout(() => { const info = selectionInfo(root); if (info) { lastSel = info; pill.hidden = false; } else if (!sheet.contains(document.activeElement)) pill.hidden = true; }, 220);
+  }
+  text.addEventListener("click", e => {
+    const mk = e.target.closest("mark.hl"); if (!mk) return;
+    e.stopPropagation(); const k = +mk.closest(".r-body").dataset.part; const m = (parts[k].marks || []).find(x => x.id === mk.dataset.id);
+    if (m) openSheet({ k, id: m.id, quote: m.quote, note: m.note });
+  }, true);
+  root.append(progress, bar, text, pill, sheet);
   apply();
+  root.querySelectorAll(".r-body").forEach(b => paintMarks(b, +b.dataset.part));
+  fillMarksPanel();
   // Bar hides while reading and returns on scroll up, tap, or mouse near the top.
   let lastY = 0, calmTimer = 0;
   root.addEventListener("scroll", () => {
@@ -1897,7 +2005,7 @@ function openReader(startPart) {
     root.classList.toggle("calm", y > lastY + 4 && y > 120); if (y < lastY - 4) root.classList.remove("calm");
     lastY = y;
   }, { passive: true });
-  text.addEventListener("click", e => { if (!e.target.closest("button")) root.classList.toggle("calm"); });
+  text.addEventListener("click", e => { if (!e.target.closest("button") && getSelection()?.isCollapsed !== false) root.classList.toggle("calm"); });
   root.addEventListener("mousemove", e => { if (e.clientY < 70) root.classList.remove("calm"); });
   root.addEventListener("keydown", e => { if (e.key === "Escape" && !document.fullscreenElement) closeReader(); });
   document.body.append(root); document.body.style.overflow = "hidden";
@@ -1908,7 +2016,101 @@ function closeReader(silent) {
   if (!readerEl) return;
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   readerEl.remove(); readerEl = null; document.body.style.overflow = "";
-  if (!silent) document.querySelector(".readbtn")?.focus();
+  if (!silent) { if (tab === "stories" && story) render(); document.querySelector(".readbtn")?.focus(); }
+}
+
+
+// ---------- Marks: highlighted lines with notes ----------
+const strip = t => (t || "").replace(/\s+/g, "");
+function allMarks() {
+  const out = [];
+  (story?.outline?.parts || []).forEach((p, k) => (parts[k]?.marks || []).forEach(m => out.push({ ...m, part: k })));
+  return out;
+}
+const markStale = (k, m) => !strip(parts[k]?.text).includes(strip(m.quote));
+function saveMarks(k) { Store.savePart(story.id, parts[k]).catch(() => toast("Couldn't save the highlight")); }
+function addMark(k, quote, occ, note) {
+  const p = parts[k]; if (!p) return;
+  p.marks = p.marks || [];
+  p.marks.push({ id: "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), quote: quote.slice(0, 600), occ: occ || 0, note: note || "", at: Date.now(), done: false });
+  saveMarks(k); toast(note ? "Note added" : "Highlighted");
+}
+function updateMark(k, id, patch) { const m = (parts[k]?.marks || []).find(x => x.id === id); if (m) { Object.assign(m, patch); saveMarks(k); } }
+function removeMark(k, id) { if (!parts[k]) return; parts[k].marks = (parts[k].marks || []).filter(x => x.id !== id); saveMarks(k); }
+function selectionInfo(root) {
+  const sel = getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+  const r = sel.getRangeAt(0);
+  const el = n => n.nodeType === 3 ? n.parentNode : n;
+  const body = el(r.startContainer).closest?.(".r-body");
+  if (!body || !root.contains(body) || el(r.endContainer).closest?.(".r-body") !== body) return null;
+  const quote = sel.toString().trim(); const q = strip(quote);
+  if (q.length < 2) return null;
+  const pre = document.createRange(); pre.setStart(body, 0); pre.setEnd(r.startContainer, r.startOffset);
+  const preS = strip(pre.toString()); let occ = 0, i = -1;
+  while ((i = preS.indexOf(q, i + 1)) >= 0) occ++;
+  return { k: +body.dataset.part, quote, occ };
+}
+function paintMarks(container, k) {
+  container.querySelectorAll("mark.hl").forEach(mk => mk.replaceWith(...mk.childNodes));
+  container.normalize();
+  const ms = parts[k]?.marks || []; if (!ms.length) return;
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+  const map = []; let str = "", node;
+  while ((node = walker.nextNode())) { const t = node.nodeValue; for (let i = 0; i < t.length; i++) if (!/\s/.test(t[i])) { map.push([node, i]); str += t[i]; } }
+  const ranges = [];
+  for (const m of ms) {
+    const q = strip(m.quote); if (!q) continue;
+    let idx = -1, from = 0;
+    for (let n = 0; n <= (m.occ || 0); n++) { const f = str.indexOf(q, from); if (f < 0) break; idx = f; from = f + 1; }
+    if (idx < 0) continue;
+    const [sn, so] = map[idx], [en, eo] = map[idx + q.length - 1];
+    const rg = document.createRange(); rg.setStart(sn, so); rg.setEnd(en, eo + 1);
+    ranges.push({ rg, m });
+  }
+  for (const { rg, m } of ranges) {
+    const nodes = []; const w = document.createTreeWalker(container, NodeFilter.SHOW_TEXT); let n;
+    while ((n = w.nextNode())) if (rg.intersectsNode(n)) nodes.push(n);
+    const sc = rg.startContainer, so = rg.startOffset, ec = rg.endContainer, eo = rg.endOffset;
+    for (let t of nodes) {
+      let a = t === sc ? so : 0, b = t === ec ? eo : t.nodeValue.length;
+      if (a >= b || !t.nodeValue.slice(a, b).trim()) continue;
+      if (b < t.nodeValue.length) t.splitText(b);
+      if (a > 0) t = t.splitText(a);
+      const mk = document.createElement("mark"); mk.className = "hl" + (m.note ? " noted" : "") + (m.done ? " done" : ""); mk.dataset.id = m.id;
+      if (m.note) mk.title = m.note;
+      t.parentNode.insertBefore(mk, t); mk.append(t);
+    }
+  }
+}
+function critiqueMarks() {
+  const ms = allMarks().filter(m => !m.done);
+  if (!ms.length) return toast("All marked lines are done. Mark new ones, or untick some.");
+  const ks = [...new Set(ms.map(m => m.part))].sort((a, b) => a - b);
+  const o = story.outline;
+  const text = ks.map(k => (o.parts.length > 1 ? `[Part ${k + 1}: ${o.parts[k].title}]\n` : "") + parts[k].text).join("\n\n");
+  closeReader(true);
+  room.critique = { ...room.critique, text, label: `${o.title} · ${ms.length} marked ${ms.length === 1 ? "line" : "lines"}`, lens: story.style?.a || "",
+    marks: ms.map(m => ({ part: m.part, quote: m.quote, note: m.note })), out: "", rewrite: "", err: "" };
+  gotoRoom("critique");
+}
+function revisionPanel() {
+  const ms = allMarks(); if (!ms.length) return null;
+  const open = ms.filter(m => !m.done).length;
+  const o = story.outline;
+  return h("details", { class: "sheet sofar revision", open: true },
+    h("summary", {}, h("h3", { text: `Revision list · ${open} to do` + (ms.length - open ? `, ${ms.length - open} done` : "") })),
+    h("p", { class: "muted small", text: "Lines you marked in reading mode. Tick them off as you fix them; the Critic works through the ones still open." }),
+    h("ul", { class: "revlist" }, ms.map(m => h("li", { class: m.done ? "done" : "" },
+      h("input", { type: "checkbox", id: "rv-" + m.id, checked: m.done ? "checked" : null, "aria-label": "Done", onchange: e => { updateMark(m.part, m.id, { done: e.target.checked }); render(); } }),
+      h("label", { for: "rv-" + m.id },
+        h("span", { class: "rv-q", text: "“" + m.quote.replace(/\s+/g, " ").slice(0, 160) + (m.quote.length > 160 ? "…" : "") + "”" }),
+        m.note ? h("span", { class: "rv-n", text: m.note }) : null,
+        h("span", { class: "muted small", text: (o.parts.length > 1 ? `Part ${m.part + 1}: ${o.parts[m.part].title}` : "") + (markStale(m.part, m) ? " · this line has changed since" : "") })),
+      h("button", { class: "ghost", "aria-label": "Remove", onclick: () => { removeMark(m.part, m.id); render(); } }, "✕")))),
+    h("div", { class: "row" },
+      h("button", { onclick: () => openReader(ms.find(m => !m.done)?.part ?? 0) }, icon(ICON_READ), "Open in reading mode"),
+      h("span", { class: "spacer" }),
+      h("button", { class: "primary", disabled: !open || !AI.sample, onclick: () => critiqueMarks() }, "Critique marked lines")));
 }
 
 /*ROOM:END*/
