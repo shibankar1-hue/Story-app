@@ -1204,3 +1204,110 @@ async function restoreVersion(k, j) {
   catch (e) { toast("Couldn't save: " + (e?.message || e?.code)); }
   tl.key = ""; render();
 }
+
+
+// ---------- Story dashboard ----------
+const wc = t => ((t || "").match(/\S+/g) || []).length;
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+function computeStats(s, ps) {
+  const total = s.outline?.parts.length || 0;
+  let written = 0, words = 0, open = 0;
+  for (let k = 0; k < total; k++) {
+    const p = ps[k]; if (p?.text) { written++; words += wc(p.text); }
+    open += (p?.marks || []).filter(m => !m.done).length;
+  }
+  return { total, written, words, open };
+}
+function pruneDaily(d) { const cut = dayKey(new Date(Date.now() - 60 * 864e5)); for (const k of Object.keys(d)) if (k < cut) delete d[k]; return d; }
+function backfillDaily(s, ps) {
+  const d = {};
+  for (const p of Object.values(ps || {})) if (p?.text && p.at) { const k = dayKey(new Date(p.at)); d[k] = (d[k] || 0) + wc(p.text); }
+  return pruneDaily(d);
+}
+let statsTimer = 0;
+function partsChanged(id) {
+  if (story && story.id === id) { clearTimeout(statsTimer); statsTimer = setTimeout(refreshStats, 400); }
+  else { const s = stories.find(x => x.id === id); if (s?.stats) s.stats.stale = true; }
+}
+function refreshStats() {
+  if (!story?.outline) return;
+  const st = computeStats(story, parts), prev = story.stats;
+  let daily = { ...(prev?.daily || {}) };
+  if (prev && prev.words != null && !prev.stale) { const d = st.words - prev.words; if (d > 0) { const k = dayKey(); daily[k] = (daily[k] || 0) + d; } }
+  else if (!prev) daily = backfillDaily(story, parts);
+  story.stats = { ...st, daily: pruneDaily(daily), at: Date.now() };
+  const listed = stories.find(x => x.id === story.id); if (listed) listed.stats = story.stats;
+  persist();
+}
+async function backfillStats() {
+  let changed = false;
+  for (const s of stories) {
+    if (!s.outline || (s.stats && !s.stats.stale)) continue;
+    try {
+      const ps = await Store.parts(s.id);
+      const st = computeStats(s, ps);
+      s.stats = { ...st, daily: s.stats?.daily ? s.stats.daily : backfillDaily(s, ps), at: Date.now() };
+      await Store.save(s, true); changed = true;
+    } catch {}
+  }
+  if (changed && !story && tab === "stories") render();
+}
+function attention(s) {
+  const st = s.stats; if (!st) return null;
+  const days = Object.entries(st.daily || {}).filter(([, v]) => v > 0).map(([k]) => k).sort();
+  const last = days.length ? new Date(days[days.length - 1] + "T12:00:00") : new Date(s.updatedAt);
+  const idle = Math.floor((Date.now() - last.getTime()) / 864e5);
+  if (st.open) return { warn: true, text: `${st.open} ${st.open === 1 ? "line" : "lines"} to revise` };
+  if (st.total && st.written < st.total && idle >= 7) return { warn: true, text: `No new words for ${idle} days` };
+  if (st.total && st.written === 0) return { warn: true, text: "No parts written yet" };
+  if (st.total && st.written === st.total) return { warn: false, text: "All parts written" };
+  return { warn: false, text: "On track" };
+}
+let sparkTip = null;
+function sparkline(daily) {
+  const N = 14, today = new Date(); const days = [];
+  for (let i = N - 1; i >= 0; i--) { const d = new Date(today.getTime() - i * 864e5); days.push({ k: dayKey(d), d, v: daily?.[dayKey(d)] || 0 }); }
+  const max = Math.max(...days.map(x => x.v), 1), sum = days.reduce((a, x) => a + x.v, 0);
+  const W = 14 * 10, H = 34, bw = 7;
+  const NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `Words added per day, last 14 days: ${sum.toLocaleString("en-IN")} in total, most on one day ${max === 1 && !sum ? 0 : max.toLocaleString("en-IN")}.`);
+  const tipText = x => `${x.d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}: ${x.v.toLocaleString("en-IN")} words`;
+  days.forEach((x, i) => {
+    const g = document.createElementNS(NS, "g");
+    const hgt = x.v ? Math.max(3, Math.round((x.v / max) * (H - 2))) : 2;
+    const xPos = i * 10 + 1.5;
+    const hit = document.createElementNS(NS, "rect"); hit.setAttribute("class", "hit"); hit.setAttribute("x", i * 10); hit.setAttribute("y", 0); hit.setAttribute("width", 10); hit.setAttribute("height", H);
+    const bar = document.createElementNS(NS, "path"); bar.setAttribute("class", "bar" + (x.v ? "" : " zero"));
+    const r = Math.min(2, bw / 2, hgt / 2), y = H - hgt;
+    bar.setAttribute("d", `M${xPos},${H} V${y + r} Q${xPos},${y} ${xPos + r},${y} H${xPos + bw - r} Q${xPos + bw},${y} ${xPos + bw},${y + r} V${H} Z`);
+    const title = document.createElementNS(NS, "title"); title.textContent = tipText(x); g.append(title);
+    g.append(hit, bar);
+    g.addEventListener("pointerenter", e => {
+      sparkTip?.remove(); sparkTip = h("div", { class: "spark-tip", text: tipText(x) });
+      const rc = bar.getBoundingClientRect(); sparkTip.style.left = (rc.left + rc.width / 2) + "px"; sparkTip.style.top = rc.top + "px"; document.body.append(sparkTip);
+    });
+    g.addEventListener("pointerleave", () => { sparkTip?.remove(); sparkTip = null; });
+    svg.append(g);
+  });
+  return h("div", { class: "spark" }, svg,
+    h("div", { class: "spark-cap" }, h("span", { text: "Words added, last 14 days" }), h("span", { text: sum.toLocaleString("en-IN") })));
+}
+function storyDash(s) {
+  if (!s.outline) return h("p", { class: "muted small", text: "No outline yet." });
+  const st = s.stats;
+  if (!st) return h("p", { class: "muted small", text: "Counting words…" });
+  const a = attention(s);
+  const target = totalWords(s) || 0;
+  return h("div", { class: "dash" },
+    a ? h("span", { class: "attn" + (a.warn ? "" : " ok"), text: a.text }) : null,
+    h("div", { class: "dash-stats" },
+      h("div", { class: "dash-stat" }, h("b", { text: `${st.written}/${st.total}` }), h("span", { text: "parts written" })),
+      h("div", { class: "dash-stat" }, h("b", { text: st.words >= 10000 ? (st.words / 1000).toFixed(1).replace(/\.0$/, "") + "k" : st.words.toLocaleString("en-IN") }),
+        h("span", { text: target ? `of ~${target >= 10000 ? Math.round(target / 1000) + "k" : target.toLocaleString("en-IN")} words` : "words" })),
+      h("div", { class: "dash-stat" + (st.open ? " warn" : "") }, h("b", { text: String(st.open) }), h("span", { text: "to revise" }))),
+    h("div", { class: "dash-bar", role: "progressbar", "aria-label": "Parts written", "aria-valuemin": "0", "aria-valuemax": String(st.total), "aria-valuenow": String(st.written) },
+      h("i", { style: `width:${st.total ? Math.round(100 * st.written / st.total) : 0}%` })),
+    sparkline(st.daily));
+}

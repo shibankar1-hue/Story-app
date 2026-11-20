@@ -252,6 +252,27 @@ mark.hl.flash { background: color-mix(in srgb, var(--accent) 55%, transparent); 
 .revlist li.done .rv-q, .revlist li.done .rv-n { text-decoration: line-through; color: var(--muted); }
 .revlist button { min-height: 32px; padding: 2px 8px; color: var(--muted); }
 .fixes { display: flex; flex-direction: column; gap: 12px; }
+/* Story dashboard on cards */
+.dash { display: flex; flex-direction: column; gap: 10px; padding: 12px 0 2px; border-top: 0.5px solid var(--line); margin-top: 4px; }
+.dash-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.dash-stat { display: flex; flex-direction: column; min-width: 0; }
+.dash-stat b { font-family: var(--font-display); font-weight: 500; font-size: 1.3rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.dash-stat span { font-size: 0.72rem; color: var(--muted); }
+.dash-stat.warn b { color: var(--marigold); }
+.dash-bar { height: 4px; border-radius: 2px; background: var(--fill-strong); overflow: hidden; }
+.dash-bar i { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+.spark { display: flex; flex-direction: column; gap: 2px; }
+.spark svg { width: 100%; height: 34px; display: block; overflow: visible; }
+.spark .bar { fill: var(--accent); }
+.spark .bar.zero { fill: var(--fill-strong); }
+.spark .hit { fill: transparent; }
+.spark .hit:hover + .bar, .spark g:hover .bar { fill: color-mix(in srgb, var(--accent) 75%, var(--ink)); }
+.spark-cap { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.attn { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; color: var(--marigold); }
+.attn::before { content: "!"; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--marigold); color: var(--sheet); font-size: 0.7rem; }
+.attn.ok { color: var(--muted); font-weight: 500; }
+.attn.ok::before { content: "✓"; background: var(--fill-strong); color: var(--muted); }
+.spark-tip { position: fixed; z-index: 30; pointer-events: none; background: var(--ink); color: var(--paper); font-size: 0.75rem; font-weight: 600; padding: 4px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, -120%); }
 /* Version timeline */
 .tl { display: flex; flex-direction: column; gap: 10px; }
 .tl-track { display: flex; gap: 0; overflow-x: auto; padding: 4px 2px 2px; scrollbar-width: none; }
@@ -483,8 +504,8 @@ const Store = {
     }
     return Object.values(this.localGet("pd.stories", {})).sort((a, b) => b.updatedAt - a.updatedAt);
   },
-  async save(s) {
-    s.updatedAt = Date.now();
+  async save(s, keepTime) {
+    if (!keepTime) s.updatedAt = Date.now();
     const data = JSON.parse(JSON.stringify(s));
     if (this.mode === "db") return this.col().doc(s.id).set(data);
     const all = this.localGet("pd.stories", {}); all[s.id] = data; this.localSet("pd.stories", all);
@@ -506,8 +527,9 @@ const Store = {
     return this.localGet("pd.parts." + id, {}) || {};
   },
   async savePart(id, p) {
-    if (this.mode === "db") return this.col().doc(id).collection("parts").doc("p" + p.i).set(p);
-    const all = this.localGet("pd.parts." + id, {}) || {}; all[p.i] = p; this.localSet("pd.parts." + id, all);
+    if (this.mode === "db") await this.col().doc(id).collection("parts").doc("p" + p.i).set(p);
+    else { const all = this.localGet("pd.parts." + id, {}) || {}; all[p.i] = p; this.localSet("pd.parts." + id, all); }
+    partsChanged(id);
   },
 };
 
@@ -667,7 +689,16 @@ function renderHome() {
   else if (!stories.length) sec.append(h("div", { class: "empty" },
     h("p", { text: "Your story ideas and drafts appear here." }),
     h("p", { class: "small", text: "Press “New story”, type your idea, and Pehla Draft will ask you a few questions, build an outline and write the first draft part by part." })));
-  else sec.append(h("div", { class: "stories" }, stories.map(s => {
+  else {
+    let sortBy = "recent"; try { sortBy = localStorage.getItem("pd.sort") || "recent"; } catch {}
+    const score = s => { const a = attention(s); return (a?.warn ? 1e6 : 0) + (s.stats?.open || 0) * 1000 + (s.updatedAt || 0) / 1e9; };
+    const list = sortBy === "attention" ? stories.slice().sort((a, b) => score(b) - score(a)) : stories;
+    const need = stories.filter(s => attention(s)?.warn).length;
+    sec.append(h("div", { class: "row" },
+      h("div", { class: "chips", role: "group", "aria-label": "Sort stories" },
+        [["recent", "Recent"], ["attention", need ? `Needs attention · ${need}` : "Needs attention"]].map(([k, l]) =>
+          h("button", { "aria-pressed": sortBy === k ? "true" : "false", onclick: () => { try { localStorage.setItem("pd.sort", k); } catch {} render(); } }, l)))));
+    sec.append(h("div", { class: "stories" }, list.map(s => {
     const f = fmtOf(s);
     const del = confirmDelete === s.id
       ? h("div", { class: "row" }, h("button", { class: "danger", onclick: async e => { e.stopPropagation(); await Store.remove(s.id).catch(() => {}); confirmDelete = null; toast("Deleted"); loadList(); } }, "Delete for good"),
@@ -677,8 +708,10 @@ function renderHome() {
       h("span", { class: "t", text: s.outline?.title || s.title || "Untitled idea" }),
       h("p", { class: "muted small", text: s.idea.slice(0, 110) + (s.idea.length > 110 ? "…" : "") }),
       h("div", { class: "row" }, f ? h("span", { class: "chip", text: f.name }) : null, h("span", { class: "chip gold", text: STEPS.find(x => x[0] === s.stage)?.[1] || "" })),
-      h("div", { class: "row" }, h("span", { class: "muted small spacer", text: new Date(s.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) }), del));
+      storyDash(s),
+      h("div", { class: "row" }, h("span", { class: "muted small spacer", text: "Edited " + new Date(s.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) }), del));
   })));
+  }
   app.append(sec);
 }
 async function openStory(s) {
@@ -2321,6 +2354,113 @@ async function restoreVersion(k, j) {
   tl.key = ""; render();
 }
 
+
+// ---------- Story dashboard ----------
+const wc = t => ((t || "").match(/\S+/g) || []).length;
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+function computeStats(s, ps) {
+  const total = s.outline?.parts.length || 0;
+  let written = 0, words = 0, open = 0;
+  for (let k = 0; k < total; k++) {
+    const p = ps[k]; if (p?.text) { written++; words += wc(p.text); }
+    open += (p?.marks || []).filter(m => !m.done).length;
+  }
+  return { total, written, words, open };
+}
+function pruneDaily(d) { const cut = dayKey(new Date(Date.now() - 60 * 864e5)); for (const k of Object.keys(d)) if (k < cut) delete d[k]; return d; }
+function backfillDaily(s, ps) {
+  const d = {};
+  for (const p of Object.values(ps || {})) if (p?.text && p.at) { const k = dayKey(new Date(p.at)); d[k] = (d[k] || 0) + wc(p.text); }
+  return pruneDaily(d);
+}
+let statsTimer = 0;
+function partsChanged(id) {
+  if (story && story.id === id) { clearTimeout(statsTimer); statsTimer = setTimeout(refreshStats, 400); }
+  else { const s = stories.find(x => x.id === id); if (s?.stats) s.stats.stale = true; }
+}
+function refreshStats() {
+  if (!story?.outline) return;
+  const st = computeStats(story, parts), prev = story.stats;
+  let daily = { ...(prev?.daily || {}) };
+  if (prev && prev.words != null && !prev.stale) { const d = st.words - prev.words; if (d > 0) { const k = dayKey(); daily[k] = (daily[k] || 0) + d; } }
+  else if (!prev) daily = backfillDaily(story, parts);
+  story.stats = { ...st, daily: pruneDaily(daily), at: Date.now() };
+  const listed = stories.find(x => x.id === story.id); if (listed) listed.stats = story.stats;
+  persist();
+}
+async function backfillStats() {
+  let changed = false;
+  for (const s of stories) {
+    if (!s.outline || (s.stats && !s.stats.stale)) continue;
+    try {
+      const ps = await Store.parts(s.id);
+      const st = computeStats(s, ps);
+      s.stats = { ...st, daily: s.stats?.daily ? s.stats.daily : backfillDaily(s, ps), at: Date.now() };
+      await Store.save(s, true); changed = true;
+    } catch {}
+  }
+  if (changed && !story && tab === "stories") render();
+}
+function attention(s) {
+  const st = s.stats; if (!st) return null;
+  const days = Object.entries(st.daily || {}).filter(([, v]) => v > 0).map(([k]) => k).sort();
+  const last = days.length ? new Date(days[days.length - 1] + "T12:00:00") : new Date(s.updatedAt);
+  const idle = Math.floor((Date.now() - last.getTime()) / 864e5);
+  if (st.open) return { warn: true, text: `${st.open} ${st.open === 1 ? "line" : "lines"} to revise` };
+  if (st.total && st.written < st.total && idle >= 7) return { warn: true, text: `No new words for ${idle} days` };
+  if (st.total && st.written === 0) return { warn: true, text: "No parts written yet" };
+  if (st.total && st.written === st.total) return { warn: false, text: "All parts written" };
+  return { warn: false, text: "On track" };
+}
+let sparkTip = null;
+function sparkline(daily) {
+  const N = 14, today = new Date(); const days = [];
+  for (let i = N - 1; i >= 0; i--) { const d = new Date(today.getTime() - i * 864e5); days.push({ k: dayKey(d), d, v: daily?.[dayKey(d)] || 0 }); }
+  const max = Math.max(...days.map(x => x.v), 1), sum = days.reduce((a, x) => a + x.v, 0);
+  const W = 14 * 10, H = 34, bw = 7;
+  const NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `Words added per day, last 14 days: ${sum.toLocaleString("en-IN")} in total, most on one day ${max === 1 && !sum ? 0 : max.toLocaleString("en-IN")}.`);
+  const tipText = x => `${x.d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}: ${x.v.toLocaleString("en-IN")} words`;
+  days.forEach((x, i) => {
+    const g = document.createElementNS(NS, "g");
+    const hgt = x.v ? Math.max(3, Math.round((x.v / max) * (H - 2))) : 2;
+    const xPos = i * 10 + 1.5;
+    const hit = document.createElementNS(NS, "rect"); hit.setAttribute("class", "hit"); hit.setAttribute("x", i * 10); hit.setAttribute("y", 0); hit.setAttribute("width", 10); hit.setAttribute("height", H);
+    const bar = document.createElementNS(NS, "path"); bar.setAttribute("class", "bar" + (x.v ? "" : " zero"));
+    const r = Math.min(2, bw / 2, hgt / 2), y = H - hgt;
+    bar.setAttribute("d", `M${xPos},${H} V${y + r} Q${xPos},${y} ${xPos + r},${y} H${xPos + bw - r} Q${xPos + bw},${y} ${xPos + bw},${y + r} V${H} Z`);
+    const title = document.createElementNS(NS, "title"); title.textContent = tipText(x); g.append(title);
+    g.append(hit, bar);
+    g.addEventListener("pointerenter", e => {
+      sparkTip?.remove(); sparkTip = h("div", { class: "spark-tip", text: tipText(x) });
+      const rc = bar.getBoundingClientRect(); sparkTip.style.left = (rc.left + rc.width / 2) + "px"; sparkTip.style.top = rc.top + "px"; document.body.append(sparkTip);
+    });
+    g.addEventListener("pointerleave", () => { sparkTip?.remove(); sparkTip = null; });
+    svg.append(g);
+  });
+  return h("div", { class: "spark" }, svg,
+    h("div", { class: "spark-cap" }, h("span", { text: "Words added, last 14 days" }), h("span", { text: sum.toLocaleString("en-IN") })));
+}
+function storyDash(s) {
+  if (!s.outline) return h("p", { class: "muted small", text: "No outline yet." });
+  const st = s.stats;
+  if (!st) return h("p", { class: "muted small", text: "Counting words…" });
+  const a = attention(s);
+  const target = totalWords(s) || 0;
+  return h("div", { class: "dash" },
+    a ? h("span", { class: "attn" + (a.warn ? "" : " ok"), text: a.text }) : null,
+    h("div", { class: "dash-stats" },
+      h("div", { class: "dash-stat" }, h("b", { text: `${st.written}/${st.total}` }), h("span", { text: "parts written" })),
+      h("div", { class: "dash-stat" }, h("b", { text: st.words >= 10000 ? (st.words / 1000).toFixed(1).replace(/\.0$/, "") + "k" : st.words.toLocaleString("en-IN") }),
+        h("span", { text: target ? `of ~${target >= 10000 ? Math.round(target / 1000) + "k" : target.toLocaleString("en-IN")} words` : "words" })),
+      h("div", { class: "dash-stat" + (st.open ? " warn" : "") }, h("b", { text: String(st.open) }), h("span", { text: "to revise" }))),
+    h("div", { class: "dash-bar", role: "progressbar", "aria-label": "Parts written", "aria-valuemin": "0", "aria-valuemax": String(st.total), "aria-valuenow": String(st.written) },
+      h("i", { style: `width:${st.total ? Math.round(100 * st.written / st.total) : 0}%` })),
+    sparkline(st.daily));
+}
+
 /*ROOM:END*/
 // ---------- Boot ----------
 async function loadList() {
@@ -2328,6 +2468,7 @@ async function loadList() {
   try { stories = await Promise.race([Store.list(), new Promise((_, rej) => setTimeout(() => rej(new Error("timed out")), 10000))]); }
   catch (e) { stories = []; msg = null; toast("Couldn't load your stories: " + (e?.code || e?.message || "error")); }
   loading = false; render();
+  backfillStats();
 }
 render();
 (async () => {
