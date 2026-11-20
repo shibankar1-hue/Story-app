@@ -1,0 +1,820 @@
+<title>Pehla Draft</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Mukta:wght@400;500;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: a single writing column, like a script binder — steps across the top, one page of work at a time. */
+:root {
+  --paper: #f3f5f8;
+  --sheet: #ffffff;
+  --ink: #1b2233;
+  --muted: #5d6679;
+  --line: #d9dee8;
+  --accent: #2f3fa0;      /* fountain-pen ink */
+  --accent-ink: #ffffff;
+  --accent-soft: #e4e7f7;
+  --marigold: #c98a00;    /* index-card highlight */
+  --marigold-soft: #fbefd2;
+  --danger: #b3261e;
+  --font-display: "Bricolage Grotesque", "Mukta", system-ui, sans-serif;
+  --font-body: "Mukta", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-script: "Courier Prime", "Courier New", Courier, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12151d; --sheet: #1a1f2b; --ink: #e7eaf2; --muted: #9aa3b6; --line: #2c3344;
+    --accent: #9aa8ff; --accent-ink: #12151d; --accent-soft: #252c4a;
+    --marigold: #f0b93a; --marigold-soft: #3a3020; --danger: #ff8a80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12151d; --sheet: #1a1f2b; --ink: #e7eaf2; --muted: #9aa3b6; --line: #2c3344;
+  --accent: #9aa8ff; --accent-ink: #12151d; --accent-soft: #252c4a;
+  --marigold: #f0b93a; --marigold-soft: #3a3020; --danger: #ff8a80;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 1.35rem; font-weight: 800; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 0.875rem; }
+.label { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.brand .hi { font-family: var(--font-body); color: var(--marigold); font-weight: 700; font-size: 1.1rem; }
+
+button, .btn {
+  font: inherit; font-weight: 600; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--sheet); color: var(--ink); padding: 10px 16px; cursor: pointer; min-height: 44px;
+}
+button:hover { border-color: var(--accent); }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, .card:focus-visible {
+  outline: 3px solid var(--accent); outline-offset: 2px;
+}
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.ghost { background: transparent; border-color: transparent; color: var(--accent); padding-inline: 8px; }
+button.danger { color: var(--danger); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.row.end { justify-content: flex-end; }
+.spacer { flex: 1; }
+
+input[type=text], input[type=number], textarea, select {
+  font: inherit; color: var(--ink); background: var(--sheet); border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px 12px; width: 100%;
+}
+textarea { resize: vertical; min-height: 120px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field label { font-weight: 600; font-size: 0.95rem; }
+
+.sheet { background: var(--sheet); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* Step bar */
+.steps { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.steps button { flex: 0 0 auto; min-height: 36px; padding: 6px 12px; font-size: 0.875rem; border-radius: 999px; background: transparent; }
+.steps button[aria-current="step"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.steps button.done { border-color: var(--accent); color: var(--accent); }
+
+/* Story list */
+.stories { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.card { background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; text-align: left; min-height: 0; font-weight: 400; }
+.card:hover { border-color: var(--accent); }
+.card .t { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); width: fit-content; }
+.chip.gold { background: var(--marigold-soft); color: var(--marigold); }
+.empty { border: 1px dashed var(--line); border-radius: 12px; padding: 24px; text-align: center; color: var(--muted); }
+
+/* Format picker */
+.group { display: flex; flex-direction: column; gap: 8px; }
+.formats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.fmt { text-align: left; font-weight: 400; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; }
+.fmt b { font-family: var(--font-display); font-weight: 600; }
+.fmt .meta { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fmt[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--accent-soft); padding: 11px 13px; }
+.lengths { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.note { background: var(--marigold-soft); border-radius: 10px; padding: 10px 14px; font-size: 0.92rem; }
+.note.err { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+
+/* Interview */
+.chat { display: flex; flex-direction: column; gap: 10px; }
+.bubble { max-width: 88%; padding: 10px 14px; border-radius: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble.q { background: var(--accent-soft); align-self: flex-start; border-bottom-left-radius: 4px; }
+.bubble.a { background: var(--sheet); border: 1px solid var(--line); align-self: flex-end; border-bottom-right-radius: 4px; }
+.bubble.a.skip { color: var(--muted); font-style: italic; }
+
+/* Outline */
+.parts-edit { display: flex; flex-direction: column; gap: 10px; }
+.part-edit { border-left: 3px solid var(--marigold); padding-left: 12px; display: flex; flex-direction: column; gap: 6px; }
+.part-edit textarea { min-height: 70px; }
+.suggest { display: flex; flex-direction: column; gap: 8px; }
+.suggest label { display: flex; gap: 10px; align-items: flex-start; background: var(--marigold-soft); padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+.suggest input { margin-top: 5px; flex: none; width: 18px; height: 18px; }
+
+/* Draft */
+.partnav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.partnav button { flex: 0 0 auto; min-height: 36px; padding: 6px 12px; font-size: 0.85rem; border-radius: 999px; }
+.partnav button.written::after { content: " ✓"; color: var(--accent); }
+.partnav button[aria-current="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.partnav button[aria-current="true"].written::after { color: var(--accent-ink); }
+.page { background: var(--sheet); border: 1px solid var(--line); border-radius: 6px; padding: 28px clamp(16px, 5vw, 48px); min-height: 200px; overflow-x: auto; }
+.prose p { margin: 0 0 1em; max-width: 65ch; }
+.prose h3 { margin: 0.4em 0 1em; }
+.prose.hindi { font-size: 1.08rem; line-height: 1.8; }
+.script { font-family: var(--font-script); font-size: 0.95rem; line-height: 1.4; max-width: 62ch; }
+.script .scene { font-weight: 700; text-transform: uppercase; margin: 1.4em 0 0.8em; }
+.script .action { margin: 0 0 1em; white-space: pre-wrap; }
+.script .char { margin: 1em 0 0 38%; text-transform: uppercase; }
+.script .paren { margin: 0 0 0 30%; }
+.script .dlg { margin: 0 12% 1em 18%; white-space: pre-wrap; }
+.script .trans { text-align: right; text-transform: uppercase; margin: 1em 0; }
+.script .stagedir { font-style: italic; margin: 0 0 1em 18%; color: var(--muted); }
+.script .center { text-align: center; font-weight: 700; margin: 1.5em 0 1em; }
+@media (max-width: 520px) {
+  .script .char { margin-left: 25%; }
+  .script .paren { margin-left: 18%; }
+  .script .dlg { margin: 0 4% 1em 10%; }
+  .script .stagedir { margin-left: 8%; }
+}
+.busy { display: flex; gap: 10px; align-items: center; color: var(--muted); }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--marigold); animation: pulse 1s infinite ease-in-out; }
+@keyframes pulse { 50% { opacity: 0.25; transform: scale(0.7); } }
+@media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--paper); padding: 10px 18px; border-radius: 999px; font-weight: 600; z-index: 20; max-width: calc(100% - 32px); text-align: center; }
+</style>
+
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+// ---------- Formats and length maths ----------
+const WORDS_PER_PROSE_PAGE = 250;
+const WORDS_PER_SCRIPT_PAGE = 180; // one screenplay/play page ≈ one minute
+const FORMATS = [
+  { key: "short-story", group: "page", name: "Short story", words: 4000 },
+  { key: "long-story", group: "page", name: "Long story / novella", words: 20000 },
+  { key: "novel", group: "page", name: "Novel", words: 70000 },
+  { key: "one-act", group: "stage", name: "One-act play", minutes: 30 },
+  { key: "full-play", group: "stage", name: "Full-length play", minutes: 90 },
+  { key: "yt-short", group: "screen", name: "YouTube short", minutes: 1, seconds: 60 },
+  { key: "short-film", group: "screen", name: "Short film", minutes: 10 },
+  { key: "feature", group: "screen", name: "Feature film", minutes: 110 },
+  { key: "web-series", group: "screen", name: "Web series", episodes: 6, epMinutes: 20 },
+];
+const GROUPS = { page: "On the page", stage: "On stage", screen: "On screen" };
+const SCREEN_CATS = ["YouTube short", "Short film", "Feature film", "Web series", "Stage"];
+const fmtOf = s => FORMATS.find(f => f.key === s.formatKey);
+const medium = s => fmtOf(s)?.group || "page";
+const effLang = s => medium(s) === "page" ? s.lang : "hinglish";
+
+function presetLength(f) {
+  if (f.group === "page") return { words: f.words, pages: Math.round(f.words / WORDS_PER_PROSE_PAGE), minutes: Math.round(f.words / WORDS_PER_PROSE_PAGE) };
+  if (f.key === "web-series") return { episodes: f.episodes, epMinutes: f.epMinutes, minutes: f.episodes * f.epMinutes, pages: f.episodes * f.epMinutes };
+  return { minutes: f.minutes, pages: Math.max(1, f.minutes) };
+}
+function suggestCat(s) {
+  const f = fmtOf(s); if (!f) return "Short film";
+  if (f.group === "stage") return "Stage";
+  if (f.key === "yt-short") return "YouTube short";
+  if (f.key === "short-film") return "Short film";
+  if (f.key === "feature") return "Feature film";
+  if (f.key === "web-series") return "Web series";
+  const m = s.len.minutes || 0;
+  return m <= 40 ? "Short film" : m <= 180 ? "Feature film" : "Web series";
+}
+function fmtMinutes(m) {
+  if (m < 1.5) return "60 sec";
+  if (m < 90) return Math.round(m) + " min";
+  const h = Math.floor(m / 60), r = Math.round(m % 60);
+  return h + " h" + (r ? " " + r + " min" : "");
+}
+function presetMeta(f) {
+  const l = presetLength(f);
+  if (f.group === "page") return `${l.words.toLocaleString("en-IN")} words · ≈ ${l.pages} pages`;
+  if (f.key === "web-series") return `${l.episodes} × ${l.epMinutes} min · ≈ ${l.pages} pages`;
+  return `${fmtMinutes(l.minutes)} · ≈ ${l.pages} ${l.pages === 1 ? "page" : "pages"}`;
+}
+function totalWords(s) {
+  return medium(s) === "page" ? (s.len.words || 0) : Math.round((s.len.pages || 1) * WORDS_PER_SCRIPT_PAGE);
+}
+function partCount(s) {
+  const f = fmtOf(s);
+  if (f?.key === "yt-short") return 1;
+  let n = Math.max(1, Math.min(40, Math.round(totalWords(s) / 2200)));
+  if (f?.key === "web-series") {
+    const eps = Math.max(1, s.len.episodes || 1);
+    const per = Math.max(1, Math.round(n / eps));
+    n = Math.min(40, Math.max(eps, per * eps));
+  }
+  return n;
+}
+function lenLabel(s) {
+  const m = medium(s), l = s.len;
+  if (m === "page") return `${(l.words || 0).toLocaleString("en-IN")} words (≈ ${l.pages} pages); about ${fmtMinutes(l.minutes || 1)} if adapted for the screen`;
+  if (fmtOf(s)?.key === "web-series") return `${l.episodes} episodes × ${l.epMinutes} min (≈ ${l.pages} script pages in total)`;
+  return `${fmtMinutes(l.minutes || 1)} running time (≈ ${l.pages} script ${l.pages === 1 ? "page" : "pages"})`;
+}
+
+// ---------- Storage: private per-person rows in the artifact db, browser storage as fallback ----------
+const Store = {
+  db: null, uid: null, mode: "local",
+  async init() {
+    try {
+      if (!window.claude?.use) return;
+      const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+      const uid = user ? await user.id() : null;
+      if (db && uid) { this.db = db; this.uid = uid; this.mode = "db"; }
+    } catch (e) { /* stay local */ }
+  },
+  col() { return this.db.collection("data/users/" + this.uid); },
+  localGet(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  localSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  async list() {
+    if (this.mode === "db") {
+      const snap = await this.col().orderBy("updatedAt", "desc").limit(200).get();
+      return snap.docs.map(d => d.data());
+    }
+    return Object.values(this.localGet("pd.stories", {})).sort((a, b) => b.updatedAt - a.updatedAt);
+  },
+  async save(s) {
+    s.updatedAt = Date.now();
+    const data = JSON.parse(JSON.stringify(s));
+    if (this.mode === "db") return this.col().doc(s.id).set(data);
+    const all = this.localGet("pd.stories", {}); all[s.id] = data; this.localSet("pd.stories", all);
+  },
+  async remove(id) {
+    if (this.mode === "db") {
+      const parts = await this.col().doc(id).collection("parts").get();
+      for (const d of parts.docs) await this.col().doc(id).collection("parts").doc(d.id).delete();
+      return this.col().doc(id).delete();
+    }
+    const all = this.localGet("pd.stories", {}); delete all[id]; this.localSet("pd.stories", all);
+    this.localSet("pd.parts." + id, null);
+  },
+  async parts(id) {
+    if (this.mode === "db") {
+      const snap = await this.col().doc(id).collection("parts").get();
+      const out = {}; snap.docs.forEach(d => { const v = d.data(); out[v.i] = v; }); return out;
+    }
+    return this.localGet("pd.parts." + id, {}) || {};
+  },
+  async savePart(id, p) {
+    if (this.mode === "db") return this.col().doc(id).collection("parts").doc("p" + p.i).set(p);
+    const all = this.localGet("pd.parts." + id, {}) || {}; all[p.i] = p; this.localSet("pd.parts." + id, all);
+  },
+};
+
+// ---------- Claude ----------
+const AI = {
+  sample: null, tiers: ["default", "complex", "quick"], ready: false,
+  async init() {
+    try {
+      if (!window.claude?.use) return;
+      this.sample = await claude.use("sample");
+      if (this.sample) {
+        const lim = await this.sample.limits().catch(() => null);
+        if (lim?.modelTiers) this.tiers = lim.modelTiers;
+      }
+    } catch (e) { this.sample = null; }
+    this.ready = true;
+  },
+  tier(t) { return this.tiers.includes(t) ? t : undefined; },
+  errText(e) {
+    const c = e?.code;
+    if (c === "not_granted") return "This page isn't allowed to use Claude. Open the page's permissions and allow Claude, then try again.";
+    if (c === "rate_limited") return "You've reached your Claude usage limit for now. Wait a while, then try again.";
+    if (c === "cancelled") return "Stopped.";
+    if (c === "invalid_json") return "Claude's reply came back in the wrong shape. Press the button again.";
+    return "Claude couldn't answer: " + (e?.message || "unknown error") + ". Try again.";
+  },
+};
+const langRule = s => effLang(s) === "hindi"
+  ? "Hindi in Devanagari script. Natural, modern spoken Hindi; keep English words only where Hindi speakers naturally would."
+  : "Hinglish: Hindi written in Roman (Latin) letters, mixed naturally with English the way Indian film and web-series scripts are written. Never use Devanagari.";
+const langName = s => effLang(s) === "hindi" ? "Hindi (Devanagari)" : "Hinglish (Roman script)";
+
+function bible(s, withOutline) {
+  const f = fmtOf(s);
+  let t = `STORY IDEA:\n${s.idea}\n\nWorking title: ${s.title || "(none yet)"}\nForm: ${f.name} (${GROUPS[f.group].toLowerCase()})\nLength: ${lenLabel(s)}\nScreen category: ${s.screenCat}\nLanguage of all writing: ${langRule(s)}\n`;
+  const qa = s.qa.filter(x => x.a);
+  if (qa.length) t += `\nTHE WRITER'S ANSWERS TO DEVELOPMENT QUESTIONS:\n` + qa.map(x => `Q: ${x.q}\nA: ${x.a}`).join("\n") + "\n";
+  if (withOutline && s.outline) {
+    const o = s.outline;
+    t += `\nTITLE: ${o.title}\nLOGLINE: ${o.logline}\nCHARACTERS:\n` + o.characters.map(c => `- ${c.name}: ${c.role}`).join("\n") + "\n";
+  }
+  return t;
+}
+function formatRules(s) {
+  const f = fmtOf(s);
+  if (f.group === "screen") {
+    let r = `Write in screenplay format using Fountain syntax:
+- Scene headings on their own line, starting INT. or EXT., then the location in Hinglish, then " - DAY" / " - NIGHT", e.g. "INT. SHARMA JI KA GHAR - NIGHT".
+- Action lines in present tense, short and visual, in Hinglish.
+- Character name in CAPITALS on its own line, the dialogue on the lines right below it; a parenthetical like (dheere se) on its own line between name and dialogue when needed.
+- Transitions like "CUT TO:" in capitals on their own line, sparingly.
+- Leave one blank line between elements.`;
+    if (f.key === "yt-short") r += `\n- This is a 60-second vertical short: a hook in the first 3 seconds, 3–5 quick beats, and a punchy last line. About 150 words.`;
+    if (f.key === "web-series") r += `\n- When a part starts a new episode, begin it with a centred line like "> EPISODE 2: TITLE <".`;
+    return r;
+  }
+  if (f.group === "stage") return `Write in stage-play format:
+- Act and scene headings in capitals on their own line, e.g. "ANK 1 — DRISHYA 2" or "ACT ONE, SCENE TWO".
+- Stage directions on their own line inside round brackets, e.g. (Lights come up on a crowded railway platform.)
+- Character name in CAPITALS on its own line, the dialogue on the lines right below it.
+- Leave one blank line between elements. All text in Hinglish.`;
+  return `Write as prose fiction: vivid scenes, dialogue in quotation marks, paragraphs separated by a blank line. Start the part with its heading on the first line, prefixed with "# ".`;
+}
+
+// ---------- App state ----------
+const app = document.getElementById("app");
+let stories = [], story = null, parts = {}, view = "home", curPart = 0, loading = true;
+let busy = null; // {label, ctrl}
+let msg = null;  // {text, err}
+let confirmDelete = null;
+const STEPS = [["idea", "Idea"], ["format", "Format & length"], ["interview", "Questions"], ["outline", "Outline"], ["draft", "Draft"]];
+const STAGE_ORDER = STEPS.map(s => s[0]);
+
+function newStory() {
+  return { id: "s" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: "", idea: "", lang: "hinglish",
+    formatKey: null, len: {}, screenCat: "", qa: [], qIndex: 0, outline: null, stage: "idea", createdAt: Date.now(), updatedAt: Date.now() };
+}
+const EXAMPLE = { title: "Aakhri Local", idea: "Mumbai ki aakhri local train mein ek retired ticket collector roz ek hi ladki ko bina ticket safar karte dekhta hai. Ek raat woh use pakad leta hai — aur pata chalta hai ki woh 30 saal pehle ki ek train accident se judi hai jiska sach sirf usse pata hai.", lang: "hinglish" };
+
+function h(tag, attrs = {}, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k === "class") el.className = v;
+    else if (k === "text") el.textContent = v;
+    else if (k === "value") el.value = v;
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return el;
+}
+function toast(t) {
+  const el = document.getElementById("toast"); el.textContent = t; el.hidden = false;
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2600);
+}
+async function persist() {
+  try { await Store.save(story); }
+  catch (e) { msg = { text: "Couldn't save: " + (e?.message || e?.code || "unknown error") + ". Your work is still on screen.", err: true }; render(); }
+}
+let saveTimer = null;
+function persistSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(persist, 800); }
+function go(stage) {
+  story.stage = stage; msg = null; persist(); render(); window.scrollTo(0, 0);
+  if (stage === "interview" && !story.qa.length && AI.sample) askQuestions();
+}
+function canReach(stage) {
+  if (!story) return false;
+  const i = STAGE_ORDER.indexOf(stage);
+  if (i <= 0) return true;
+  if (!story.idea.trim()) return false;
+  if (i >= 2 && !story.formatKey) return false;
+  if (i >= 4 && !story.outline) return false;
+  return true;
+}
+
+// ---------- Rendering ----------
+function render() {
+  app.replaceChildren();
+  const top = h("header", { class: "top" },
+    h("div", { class: "brand" }, h("h1", { text: "Pehla Draft" }), h("span", { class: "hi", text: "पहला ड्राफ़्ट" })),
+    story ? h("button", { class: "ghost", onclick: () => { story = null; view = "home"; msg = null; loadList(); } }, "← All stories") : null);
+  app.append(top);
+  if (!AI.sample && AI.ready) app.append(h("div", { class: "note" }, "Writing with Claude works when this page is open on claude.ai or in the Claude app while you're signed in. You can still browse and export saved stories."));
+  if (!story) return renderHome();
+  app.append(stepBar());
+  if (msg) app.append(h("div", { class: "note" + (msg.err ? " err" : ""), role: msg.err ? "alert" : "status" }, msg.text));
+  ({ idea: renderIdea, format: renderFormat, interview: renderInterview, outline: renderOutline, draft: renderDraft })[story.stage]();
+}
+function stepBar() {
+  const cur = STAGE_ORDER.indexOf(story.stage);
+  return h("nav", { class: "steps", "aria-label": "Steps" }, STEPS.map(([k, label], i) =>
+    h("button", { class: i < cur ? "done" : "", "aria-current": i === cur ? "step" : null, disabled: !canReach(k) || !!busy, onclick: () => go(k) }, `${i + 1} · ${label}`)));
+}
+function busyRow() {
+  if (!busy) return null;
+  return h("div", { class: "busy", role: "status" }, h("span", { class: "dot" }), busy.label,
+    h("button", { class: "ghost", onclick: () => busy?.ctrl.abort() }, "Stop"));
+}
+
+function renderHome() {
+  const sec = h("section", { class: "sheet" },
+    h("div", { class: "row" }, h("div", { class: "spacer" }, h("h2", { text: "Your stories" }),
+      h("p", { class: "muted small", text: Store.mode === "db" ? "Saved privately to your Claude account." : "Saved in this browser only." })),
+      h("button", { class: "primary", onclick: () => { story = newStory(); parts = {}; render(); } }, "+ New story")));
+  if (loading) sec.append(h("div", { class: "empty" }, "Loading your stories…"));
+  else if (!stories.length) sec.append(h("div", { class: "empty" },
+    h("p", { text: "Your story ideas and drafts appear here." }),
+    h("p", { class: "small", text: "Press “New story”, type your idea, and Pehla Draft will ask you a few questions, build an outline and write the first draft part by part." })));
+  else sec.append(h("div", { class: "stories" }, stories.map(s => {
+    const f = fmtOf(s);
+    const del = confirmDelete === s.id
+      ? h("div", { class: "row" }, h("button", { class: "danger", onclick: async e => { e.stopPropagation(); await Store.remove(s.id).catch(() => {}); confirmDelete = null; toast("Deleted"); loadList(); } }, "Delete for good"),
+          h("button", { class: "ghost", onclick: e => { e.stopPropagation(); confirmDelete = null; render(); } }, "Keep"))
+      : h("button", { class: "ghost danger", onclick: e => { e.stopPropagation(); confirmDelete = s.id; render(); } }, "Delete");
+    return h("div", { class: "card", tabindex: "0", role: "button", onclick: () => openStory(s), onkeydown: e => { if (e.key === "Enter") openStory(s); } },
+      h("span", { class: "t", text: s.outline?.title || s.title || "Untitled idea" }),
+      h("p", { class: "muted small", text: s.idea.slice(0, 110) + (s.idea.length > 110 ? "…" : "") }),
+      h("div", { class: "row" }, f ? h("span", { class: "chip", text: f.name }) : null, h("span", { class: "chip gold", text: STEPS.find(x => x[0] === s.stage)?.[1] || "" })),
+      h("div", { class: "row" }, h("span", { class: "muted small spacer", text: new Date(s.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) }), del));
+  })));
+  app.append(sec);
+}
+async function openStory(s) {
+  story = JSON.parse(JSON.stringify(s)); parts = {}; msg = null; render();
+  try { parts = await Store.parts(story.id); } catch { parts = {}; }
+  curPart = firstUnwritten(); render();
+}
+
+function renderIdea() {
+  const sec = h("section", { class: "sheet" },
+    h("h2", { text: "What's the story?" }),
+    h("div", { class: "field" }, h("label", { for: "idea" }, "Your idea"),
+      h("textarea", { id: "idea", rows: 7, placeholder: "Ek ya do line mein — kaun hai, kya chahta hai, kya rok raha hai…", value: story.idea, oninput: e => { story.idea = e.target.value; persistSoon(); } })),
+    h("div", { class: "field" }, h("label", { for: "title" }, "Working title (optional)"),
+      h("input", { id: "title", type: "text", value: story.title, oninput: e => { story.title = e.target.value; persistSoon(); } })),
+    h("div", { class: "field" }, h("span", { class: "label", text: "Language" }),
+      h("div", { class: "row" }, [["hinglish", "Hinglish"], ["hindi", "हिंदी (Hindi)"]].map(([k, l]) =>
+        h("button", { "aria-pressed": story.lang === k ? "true" : "false", class: story.lang === k ? "primary" : "", onclick: () => { story.lang = k; persistSoon(); render(); } }, l))),
+      h("p", { class: "muted small", text: "Scripts for screen and stage are always written in Hinglish. Stories, novellas and novels use the language you pick here." })),
+    h("div", { class: "row" },
+      !story.idea ? h("button", { class: "ghost", onclick: () => { Object.assign(story, EXAMPLE); render(); } }, "Try an example idea") : null,
+      h("span", { class: "spacer" }),
+      h("button", { id: "tonext", class: "primary", disabled: !story.idea.trim(), onclick: () => go("format") }, "Next: format & length →")));
+  app.append(sec);
+  sec.querySelector("#idea").addEventListener("input", () => sec.querySelector("#tonext").disabled = !story.idea.trim());
+}
+
+function pickFormat(f) {
+  story.formatKey = f.key; story.len = presetLength(f); story.screenCat = suggestCat(story);
+  persistSoon(); render();
+}
+function renderFormat() {
+  const sec = h("section", { class: "sheet" }, h("h2", { text: "What form should it take?" }),
+    h("p", { class: "muted", text: "Pick a preset, then adjust the length. Screen time and page count update together (one script page ≈ one minute; one book page ≈ 250 words)." }));
+  for (const g of ["page", "stage", "screen"]) {
+    sec.append(h("div", { class: "group" }, h("span", { class: "label", text: GROUPS[g] }),
+      h("div", { class: "formats" }, FORMATS.filter(f => f.group === g).map(f =>
+        h("button", { class: "fmt", "aria-pressed": story.formatKey === f.key ? "true" : "false", onclick: () => pickFormat(f) },
+          h("b", { text: f.name }), h("span", { class: "meta", text: presetMeta(f) }))))));
+  }
+  app.append(sec);
+  if (!story.formatKey) return;
+  const f = fmtOf(story), L = story.len;
+  const num = (id, label, val, onset, step = 1) => h("div", { class: "field" }, h("label", { for: id }, label),
+    h("input", { id, type: "number", min: "1", step, inputmode: "numeric", value: val ?? "", onchange: e => { const v = Math.max(1, Number(e.target.value) || 1); onset(v); story.screenCat = suggestCat(story); persistSoon(); render(); } }));
+  const fields = [];
+  if (f.group === "page") {
+    fields.push(num("words", "Words", L.words, v => { L.words = v; L.pages = Math.max(1, Math.round(v / WORDS_PER_PROSE_PAGE)); L.minutes = L.pages; }, 500));
+    fields.push(num("pages", "Pages on paper", L.pages, v => { L.pages = v; L.words = v * WORDS_PER_PROSE_PAGE; L.minutes = v; }));
+    fields.push(num("minutes", "Minutes on screen, if adapted", L.minutes, v => { L.minutes = v; }));
+  } else if (f.key === "web-series") {
+    fields.push(num("episodes", "Episodes", L.episodes, v => { L.episodes = v; L.minutes = v * L.epMinutes; L.pages = L.minutes; }));
+    fields.push(num("epmin", "Minutes per episode", L.epMinutes, v => { L.epMinutes = v; L.minutes = v * L.episodes; L.pages = L.minutes; }));
+    fields.push(num("pages", "Script pages (total)", L.pages, v => { L.pages = v; L.minutes = v; L.epMinutes = Math.max(1, Math.round(v / L.episodes)); }));
+  } else {
+    fields.push(num("minutes", "Minutes on screen / stage", L.minutes, v => { L.minutes = v; L.pages = v; }));
+    fields.push(num("pages", "Script pages", L.pages, v => { L.pages = v; L.minutes = v; }));
+  }
+  const n = partCount(story);
+  const len = h("section", { class: "sheet" }, h("h2", { text: f.name + ": length" }),
+    h("div", { class: "lengths" }, fields),
+    h("div", { class: "field" }, h("label", { for: "cat" }, "Screen category"),
+      h("select", { id: "cat", onchange: e => { story.screenCat = e.target.value; persistSoon(); } },
+        SCREEN_CATS.map(c => h("option", { value: c, selected: story.screenCat === c ? "selected" : null }, c)))),
+    h("p", { class: "note", text: `Plan: ${lenLabel(story)}. Written in ${langName(story)}, in ${n} ${n === 1 ? "part" : "parts"} of about ${Math.round(totalWords(story) / n).toLocaleString("en-IN")} words each.` }),
+    h("div", { class: "row end" }, h("button", { class: "primary", onclick: () => go("interview") }, "Next: questions →")));
+  app.append(len);
+}
+
+async function askQuestions(more) {
+  if (!AI.sample) return;
+  const ctrl = new AbortController(); busy = { label: "Reading your idea and thinking of questions…", ctrl }; msg = null; render();
+  const prev = story.qa.length ? "\nQuestions already asked (do not repeat them):\n" + story.qa.map(x => "- " + x.q).join("\n") : "";
+  const count = more ? "2 or 3" : "4 to 6";
+  const prompt = `You are a story development editor preparing a writer for a first draft.\n\n${bible(story)}${prev}\n\nAsk the ${count} questions whose answers would most improve the first draft of THIS story: only what the idea leaves unclear (the protagonist's want and wound, the central conflict, the ending, tone, world, point of view, key relationships). Each question is one short, concrete sentence written in ${langName(story)}, the way a friendly film writer would ask it.\n\nReply with JSON only: {"questions": ["...", "..."]}`;
+  try {
+    const r = await AI.sample.json(prompt, { signal: ctrl.signal, modelTier: AI.tier("default") });
+    const qs = (r?.questions || []).filter(q => typeof q === "string" && q.trim()).slice(0, 6);
+    story.qa.push(...qs.map(q => ({ q: q.trim(), a: "" })));
+    if (!qs.length) msg = { text: "Claude didn't come back with any questions. Press “Ask me more” to try again, or go straight to the outline.", err: true };
+    persist();
+  } catch (e) { msg = { text: AI.errText(e), err: e?.code !== "cancelled" }; }
+  busy = null; render();
+}
+function renderInterview() {
+  const sec = h("section", { class: "sheet" }, h("h2", { text: "A few questions about your story" }),
+    h("p", { class: "muted", text: "Answer what you know, skip what you don't. Every answer goes into the outline and the draft." }));
+  const chat = h("div", { class: "chat" });
+  const i = story.qIndex;
+  story.qa.forEach((x, k) => {
+    if (k > i) return;
+    chat.append(h("div", { class: "bubble q", text: x.q }));
+    if (k < i) chat.append(h("div", { class: "bubble a" + (x.a ? "" : " skip"), text: x.a || "Skipped" }));
+  });
+  sec.append(chat);
+  if (busy) sec.append(busyRow());
+  else if (i < story.qa.length) {
+    const ta = h("textarea", { id: "answer", rows: 3, placeholder: "Your answer…" });
+    const answer = val => { story.qa[i].a = val; story.qIndex = i + 1; persist(); render(); document.getElementById("answer")?.focus(); };
+    ta.addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) answer(ta.value.trim()); });
+    sec.append(ta, h("div", { class: "row" },
+      i > 0 ? h("button", { class: "ghost", onclick: () => { story.qIndex = i - 1; ta.value = ""; persist(); render(); const t = document.getElementById("answer"); if (t) t.value = story.qa[i - 1].a; } }, "← Back") : null,
+      h("span", { class: "spacer" }),
+      h("button", { onclick: () => answer("") }, "Skip"),
+      h("button", { class: "primary", onclick: () => answer(ta.value.trim()) }, "Answer")));
+  } else {
+    sec.append(h("div", { class: "row" },
+      h("button", { disabled: !AI.sample, onclick: () => askQuestions(story.qa.length > 0) }, story.qa.length ? "Ask me more" : "Ask me questions"),
+      h("span", { class: "spacer" }),
+      h("button", { class: "primary", disabled: !AI.sample, onclick: () => { go("outline"); if (!story.outline) makeOutline(); } }, story.outline ? "Back to the outline →" : "Write the outline →")));
+  }
+  app.append(sec);
+}
+
+async function makeOutline(change) {
+  if (!AI.sample) return;
+  const ctrl = new AbortController(); busy = { label: change ? "Revising the outline…" : "Building the outline…", ctrl }; msg = null; render();
+  const n = partCount(story), f = fmtOf(story);
+  const hint = f.key === "web-series" ? ` The series has ${story.len.episodes} episodes; split them evenly and name each part with its episode, e.g. "Episode 1 · Part 1: ..."`
+    : f.key === "novel" || f.key === "long-story" ? " Each part is a chapter."
+    : f.group === "stage" ? " Each part follows the play's acts and scenes in order."
+    : f.group === "screen" ? " Each part is a sequence of consecutive scenes." : "";
+  let prompt = `You are an experienced story editor for Indian film, theatre and fiction.\n\n${bible(story)}\n`;
+  if (change && story.outline) prompt += `\nCURRENT OUTLINE (JSON):\n${JSON.stringify(story.outline)}\n\nRevise this outline with these changes from the writer:\n${change}\nKeep everything else that still works.\n`;
+  else prompt += `\nBuild the outline for the first draft.\n`;
+  prompt += `\nPlan exactly ${n} ${n === 1 ? "part" : "parts"} in story order.${hint} Each part summary is 2–4 sentences of what actually happens. Give the main characters (3–8) with a one-line description each. Then give exactly 3 concrete suggestions that would make this story stronger — changes to plot, character, structure, ending or format — each one or two sentences, specific to this story.\n\nWrite every text value in ${langName(story)}.\n\nReply with JSON only, in this shape:\n{"title": string, "logline": string, "characters": [{"name": string, "role": string}], "parts": [{"title": string, "summary": string}], "suggestions": [string]}`;
+  try {
+    const o = await AI.sample.json(prompt, { signal: ctrl.signal, modelTier: AI.tier("complex"), cache: false });
+    if (!o || !Array.isArray(o.parts) || !o.parts.length) throw { code: "invalid_json" };
+    story.outline = {
+      title: String(o.title || story.title || "Untitled"), logline: String(o.logline || ""),
+      characters: (o.characters || []).map(c => ({ name: String(c.name || ""), role: String(c.role || "") })),
+      parts: o.parts.map(p => ({ title: String(p.title || ""), summary: String(p.summary || "") })),
+      suggestions: (o.suggestions || []).map(String).slice(0, 5),
+    };
+    if (change) { parts = {}; }
+    persist();
+  } catch (e) { msg = { text: AI.errText(e), err: e?.code !== "cancelled" }; }
+  busy = null; render();
+}
+function renderOutline() {
+  const sec = h("section", { class: "sheet" });
+  const o = story.outline;
+  if (!o) {
+    sec.append(h("h2", { text: "Outline" }), busy ? busyRow() : h("div", { class: "row" }, h("button", { class: "primary", disabled: !AI.sample, onclick: () => makeOutline() }, "Write the outline")));
+    return app.append(sec);
+  }
+  const written = Object.keys(parts).length;
+  sec.append(h("h2", { text: "Outline" }),
+    h("p", { class: "muted", text: "Edit anything you like. Claude writes the draft from exactly what is here." + (written ? " Changing the outline doesn't rewrite parts you've already written." : "") }),
+    h("div", { class: "field" }, h("label", { for: "otitle" }, "Title"),
+      h("input", { id: "otitle", type: "text", value: o.title, oninput: e => { o.title = e.target.value; persistSoon(); } })),
+    h("div", { class: "field" }, h("label", { for: "logline" }, "Logline"),
+      h("textarea", { id: "logline", rows: 3, value: o.logline, oninput: e => { o.logline = e.target.value; persistSoon(); } })),
+    h("div", { class: "field" }, h("label", { for: "chars" }, "Characters (one per line: Name — description)"),
+      h("textarea", { id: "chars", rows: Math.max(3, o.characters.length + 1), value: o.characters.map(c => `${c.name} — ${c.role}`).join("\n"),
+        oninput: e => { o.characters = e.target.value.split("\n").filter(l => l.trim()).map(l => { const [n, ...r] = l.split(/\s+[—-]\s+/); return { name: n.trim(), role: r.join(" — ").trim() }; }); persistSoon(); } })),
+    h("span", { class: "label", text: `Parts (${o.parts.length})` }),
+    h("div", { class: "parts-edit" }, o.parts.map((p, k) => h("div", { class: "part-edit" },
+      h("input", { id: "pt" + k, type: "text", "aria-label": `Part ${k + 1} title`, value: p.title, oninput: e => { p.title = e.target.value; persistSoon(); } }),
+      h("textarea", { id: "ps" + k, "aria-label": `Part ${k + 1} summary`, value: p.summary, oninput: e => { p.summary = e.target.value; persistSoon(); } })))));
+  app.append(sec);
+
+  const sug = h("section", { class: "sheet" }, h("h2", { text: "Suggestions to make it stronger" }),
+    h("p", { class: "muted", text: "Tick the ones you like, add your own change if you want, and Claude revises the outline." }));
+  const box = h("div", { class: "suggest" }, (o.suggestions || []).map((t, k) =>
+    h("label", {}, h("input", { type: "checkbox", id: "sg" + k, value: String(k) }), h("span", { text: t }))));
+  const own = h("textarea", { id: "ownchange", rows: 2, placeholder: "Your own change, e.g. “Ending happy rakho” or “Make the mother the villain”" });
+  sug.append(box, h("div", { class: "field" }, h("label", { for: "ownchange" }, "Your change (optional)"), own),
+    busy ? busyRow() : h("div", { class: "row" },
+      h("button", { disabled: !AI.sample, onclick: () => {
+        const picked = [...box.querySelectorAll("input:checked")].map(i => o.suggestions[+i.value]);
+        const all = [...picked, own.value.trim()].filter(Boolean);
+        if (!all.length) { msg = { text: "Tick a suggestion or type your own change first.", err: true }; return render(); }
+        makeOutline(all.map(x => "- " + x).join("\n"));
+      } }, "Revise outline"),
+      h("button", { class: "ghost", disabled: !AI.sample, onclick: () => makeOutline() }, "Start over"),
+      h("span", { class: "spacer" }),
+      h("button", { class: "primary", onclick: () => { curPart = firstUnwritten(); go("draft"); } }, "Approve & write the draft →")));
+  app.append(sug);
+}
+
+// ---------- Draft ----------
+function firstUnwritten() {
+  const n = story?.outline?.parts.length || 0;
+  for (let i = 0; i < n; i++) if (!parts[i]?.text) return i;
+  return Math.max(0, n - 1);
+}
+async function writePart(i, mode, note) {
+  if (!AI.sample) return;
+  const o = story.outline, n = o.parts.length;
+  const ctrl = new AbortController();
+  busy = { label: mode === "continue" ? `Continuing part ${i + 1}…` : `Writing part ${i + 1} of ${n}…`, ctrl };
+  msg = null; curPart = i;
+  const target = Math.max(120, Math.min(3000, Math.round(totalWords(story) / n)));
+  const prevText = parts[i - 1]?.text || "";
+  const existing = parts[i]?.text || "";
+  let prompt = `You are a professional writer for Indian film, theatre and fiction, writing a first draft.\n\n${bible(story, true)}\nFULL OUTLINE:\n` +
+    o.parts.map((p, k) => `${k === i ? ">> " : ""}Part ${k + 1}: ${p.title} — ${p.summary}`).join("\n") +
+    `\n\nFORMAT:\n${formatRules(story)}\n\n`;
+  if (prevText) prompt += `The previous part ends like this (continue seamlessly from it, don't repeat it):\n"""\n${prevText.slice(-1800)}\n"""\n\n`;
+  if (mode === "continue") prompt += `Part ${i + 1} was cut off. Here is what has been written so far:\n"""\n${existing.slice(-2500)}\n"""\nContinue part ${i + 1} from exactly where it stops, to the end of the part. Output only the continuation.\n`;
+  else {
+    prompt += `Write part ${i + 1} of ${n} ("${o.parts[i].title}") in full, about ${target} words. Cover exactly what its summary says, end at a natural break, and don't run into the next part.\n`;
+    if (mode === "rewrite" && existing) prompt += `\nThis is a rewrite. The earlier version is below; keep what works and apply the writer's note.\nWRITER'S NOTE: ${note || "Make it better: sharper scenes, more specific detail, more natural dialogue."}\nEARLIER VERSION:\n"""\n${existing.slice(0, 6000)}\n"""\n`;
+  }
+  prompt += `\nOutput only the ${medium(story) === "page" ? "story text" : "script"} — no preamble, notes or commentary.`;
+  const base = mode === "continue" ? existing.replace(/\s+$/, "") + "\n\n" : "";
+  render();
+  const out = document.getElementById("pagebody");
+  let raf = 0, latest = "";
+  try {
+    const r = await AI.sample(prompt, {
+      signal: ctrl.signal, modelTier: AI.tier("complex"), cache: false,
+      onText: ({ text }) => { latest = text; if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (out) out.replaceChildren(renderText(base + latest)); }); },
+    });
+    parts[i] = { i, text: base + r.text.trim(), truncated: !!r.truncated, at: Date.now() };
+    await Store.savePart(story.id, parts[i]).catch(e => { msg = { text: "Couldn't save this part: " + (e?.message || e?.code) + ". Download it before leaving.", err: true }; });
+    persist();
+    if (r.truncated) msg = { text: "This part was cut short. Press “Continue this part” to finish it.", err: false };
+  } catch (e) {
+    if (e?.text && e.code === "cancelled" && (base + e.text).trim()) {
+      parts[i] = { i, text: base + e.text.trim(), truncated: true, at: Date.now() };
+      Store.savePart(story.id, parts[i]).catch(() => {});
+    }
+    msg = { text: AI.errText(e), err: e?.code !== "cancelled" };
+  }
+  busy = null; render();
+}
+
+function renderText(text) {
+  return medium(story) === "page" ? renderProse(text) : renderScript(text);
+}
+function renderProse(text) {
+  const box = h("div", { class: "prose" + (effLang(story) === "hindi" ? " hindi" : "") });
+  for (const block of text.split(/\n\s*\n/)) {
+    const t = block.trim(); if (!t) continue;
+    if (t.startsWith("#")) box.append(h("h3", { text: t.replace(/^#+\s*/, "") }));
+    else box.append(h("p", { text: t.replace(/\n/g, " ") }));
+  }
+  return box;
+}
+const isUpper = l => l === l.toUpperCase() && /[A-Z]/.test(l);
+function renderScript(text) {
+  const box = h("div", { class: "script" });
+  const stage = medium(story) === "stage";
+  const blocks = text.replace(/\r/g, "").split(/\n\s*\n/);
+  for (const block of blocks) {
+    const lines = block.split("\n").map(l => l.trimEnd()).filter(l => l.trim());
+    if (!lines.length) continue;
+    const first = lines[0].trim();
+    if (/^>.*<$/.test(first)) { box.append(h("div", { class: "center", text: first.replace(/^>\s*|\s*<$/g, "") })); continue; }
+    if (/^(INT|EXT|EST|INT\.?\/EXT|I\/E)[.\s]/i.test(first) || /^\.[A-Z]/.test(first)) { box.append(h("div", { class: "scene", text: first.replace(/^\./, "") })); lines.shift(); if (lines.length) box.append(h("div", { class: "action", text: lines.join("\n") })); continue; }
+    if (/^(ACT|SCENE|ANK|DRISHYA|EPISODE)\b/i.test(first) && isUpper(first)) { box.append(h("div", { class: "center", text: first })); continue; }
+    if (isUpper(first) && /TO:$/.test(first)) { box.append(h("div", { class: "trans", text: first })); continue; }
+    if (lines.length > 1 && isUpper(first.replace(/\(.*?\)/g, "")) && first.length < 50 && !/^\(/.test(first)) {
+      box.append(h("div", { class: "char", text: first }));
+      const rest = []; const flush = () => { if (rest.length) { box.append(h("div", { class: "dlg", text: rest.join("\n") })); rest.length = 0; } };
+      for (const l of lines.slice(1)) {
+        if (/^\s*\(.*\)\s*$/.test(l) && (!stage || l.length < 60)) { flush(); box.append(h("div", { class: "paren", text: l.trim() })); }
+        else rest.push(l.trim());
+      }
+      flush(); continue;
+    }
+    if (stage && /^\(/.test(first)) { box.append(h("div", { class: "stagedir", text: lines.join("\n") })); continue; }
+    box.append(h("div", { class: "action", text: lines.join("\n") }));
+  }
+  return box;
+}
+
+function renderDraft() {
+  const o = story.outline, n = o.parts.length;
+  if (curPart >= n) curPart = n - 1;
+  const p = parts[curPart];
+  const nav = h("nav", { class: "partnav", "aria-label": "Parts" }, o.parts.map((x, k) =>
+    h("button", { class: parts[k]?.text ? "written" : "", "aria-current": k === curPart ? "true" : null, disabled: !!busy, title: x.title, onclick: () => { curPart = k; msg = null; render(); } }, `Part ${k + 1}`)));
+  const head = h("div", { class: "row" }, h("div", { class: "spacer" },
+    h("span", { class: "label", text: `Part ${curPart + 1} of ${n}` }), h("h2", { text: o.parts[curPart].title }),
+    h("p", { class: "muted small", text: o.parts[curPart].summary })));
+  const body = h("div", { class: "page", id: "pagebody" });
+  if (p?.text) body.append(renderText(p.text));
+  else if (!busy) body.append(h("div", { class: "empty" }, curPart > 0 && !parts[curPart - 1]?.text ? "Tip: write the earlier parts first so this one can follow on from them." : "This part isn't written yet."));
+  const note = h("textarea", { id: "rewritenote", rows: 2, placeholder: "Note for a rewrite, e.g. “Zyada tension”, “Shorter dialogue”, “Add a flashback”" });
+  const actions = busy ? busyRow() : h("div", { class: "row" },
+    !p?.text ? h("button", { class: "primary", disabled: !AI.sample, onclick: () => writePart(curPart, "write") }, `Write part ${curPart + 1}`) : null,
+    p?.truncated ? h("button", { class: "primary", disabled: !AI.sample, onclick: () => writePart(curPart, "continue") }, "Continue this part") : null,
+    p?.text ? h("button", { disabled: !AI.sample, onclick: () => writePart(curPart, "rewrite", note.value.trim()) }, "Rewrite with note") : null,
+    h("span", { class: "spacer" }),
+    p?.text && curPart < n - 1 ? h("button", { class: p.truncated ? "" : "primary", disabled: !AI.sample, onclick: () => { curPart += 1; parts[curPart]?.text ? render() : writePart(curPart, "write"); } }, parts[curPart + 1]?.text ? "Next part →" : "Write next part →") : null);
+  const sec = h("section", { class: "sheet" }, nav, head, body, p?.text && !busy ? h("div", { class: "field" }, h("label", { for: "rewritenote" }, "Rewrite note (optional)"), note) : null, actions);
+  app.append(sec);
+  app.append(exportBar());
+}
+
+// ---------- Export ----------
+const slug = s => (s || "story").replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").slice(0, 60) || "story";
+function fullText() {
+  const o = story.outline;
+  return o.parts.map((p, k) => parts[k]?.text || "").filter(Boolean).join("\n\n");
+}
+function fountainText() {
+  const o = story.outline;
+  return `Title: ${o.title}\nCredit: First draft\nDraft date: ${new Date().toLocaleDateString("en-IN")}\n\n===\n\n` + fullText() + "\n";
+}
+let pdfLib = null;
+function loadPdfLib() {
+  if (pdfLib) return pdfLib;
+  pdfLib = new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+    s.onload = () => res(window.html2pdf); s.onerror = () => { pdfLib = null; rej(new Error("PDF tool didn't load")); };
+    document.head.append(s);
+  });
+  return pdfLib;
+}
+async function exportPdf(btn) {
+  const dl = await window.claude?.use?.("downloads");
+  if (!dl) return toast("Downloads aren't available in this view");
+  btn.disabled = true; btn.textContent = "Making PDF…";
+  try {
+    const html2pdf = await loadPdfLib();
+    await document.fonts.ready;
+    const o = story.outline;
+    const doc = h("div", { style: "background:#fff;color:#111;padding:0 4px;width:180mm;font-family:Mukta,sans-serif;--muted:#555;--ink:#111" },
+      h("div", { style: "text-align:center;padding:60mm 0 0;page-break-after:always" },
+        h("h1", { style: "font-family:'Bricolage Grotesque',Mukta,sans-serif;font-size:28pt;margin:0 0 12pt", text: o.title }),
+        h("p", { style: "font-size:12pt;color:#444;max-width:130mm;margin:0 auto 18pt", text: o.logline }),
+        h("p", { style: "font-size:10pt;color:#666", text: `${fmtOf(story).name} · First draft · ${new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}` })));
+    o.parts.forEach((p, k) => {
+      if (!parts[k]?.text) return;
+      const sec = h("div", { style: "page-break-before:" + (k ? "always" : "auto") });
+      if (medium(story) !== "page") sec.append(h("p", { style: "font-family:'Courier Prime',monospace;font-size:9pt;color:#888;margin:0 0 6pt", text: `${k + 1}. ${p.title}` }));
+      sec.append(renderText(parts[k].text));
+      doc.append(sec);
+    });
+    const blob = await html2pdf().set({
+      margin: [18, 15, 18, 15], html2canvas: { scale: 2, backgroundColor: "#ffffff" },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"], avoid: [".char", ".scene", "h3"] },
+    }).from(doc).outputPdf("blob");
+    await dl.save({ filename: slug(o.title) + ".pdf", data: blob });
+    toast("PDF ready");
+  } catch (e) {
+    if (e?.code !== "declined") toast(e?.code ? "Download failed: " + e.code : "Couldn't make the PDF: " + (e?.message || "unknown error"));
+  }
+  btn.disabled = false; btn.textContent = "Download PDF";
+}
+async function exportFountain() {
+  const dl = await window.claude?.use?.("downloads");
+  if (!dl) return toast("Downloads aren't available in this view");
+  try { await dl.save({ filename: slug(story.outline.title) + ".fountain.txt", data: fountainText() }); toast("Fountain file ready"); }
+  catch (e) { if (e?.code !== "declined") toast("Download failed: " + (e?.code || "unknown")); }
+}
+async function copyAll(btn) {
+  const t = (medium(story) === "page" ? "" : "") + fullText();
+  try { await navigator.clipboard.writeText(t); toast("Copied"); }
+  catch { const ta = h("textarea", { value: t, style: "position:fixed;opacity:0" }); document.body.append(ta); ta.select(); try { document.execCommand("copy"); toast("Copied"); } catch { toast("Select the text on the page to copy it"); } ta.remove(); }
+}
+function exportBar() {
+  const any = Object.values(parts).some(p => p?.text);
+  const written = story.outline.parts.filter((_, k) => parts[k]?.text).length;
+  const pdfBtn = h("button", { disabled: !any, onclick: e => exportPdf(e.currentTarget) }, "Download PDF");
+  return h("section", { class: "sheet" }, h("h3", { text: "Export" }),
+    h("p", { class: "muted small", text: `${written} of ${story.outline.parts.length} parts written. Exports include every written part, in order.` +
+      (medium(story) !== "page" ? " The Fountain file downloads as .txt; rename it to end in .fountain to open it in Final Draft, Highland or other screenwriting apps." : "") }),
+    h("div", { class: "row" }, pdfBtn,
+      medium(story) !== "page" ? h("button", { disabled: !any, onclick: exportFountain }, "Download Fountain") : null,
+      h("button", { class: "ghost", disabled: !any, onclick: e => copyAll(e.currentTarget) }, "Copy all text")));
+}
+
+// ---------- Boot ----------
+async function loadList() {
+  loading = true; render();
+  try { stories = await Promise.race([Store.list(), new Promise((_, rej) => setTimeout(() => rej(new Error("timed out")), 10000))]); }
+  catch (e) { stories = []; msg = null; toast("Couldn't load your stories: " + (e?.code || e?.message || "error")); }
+  loading = false; render();
+}
+render();
+(async () => {
+  await Promise.all([Store.init(), AI.init()]);
+  loadList();
+})();
+</script>
