@@ -1315,21 +1315,26 @@ function storyDash(s) {
 
 // ---------- Daily writing goal ----------
 const Goal = {
-  words: 100, loaded: false,
+  words: 100, remindAt: "20:00", remindOn: true, loaded: false,
   async load() {
     try {
-      if (Store.mode === "db") { const d = await Store.col().doc("_settings").get(); if (d.exists && d.data().goal) this.words = d.data().goal; }
-      else { const v = Store.localGet("pd.goal", null); if (v) this.words = v; }
+      let d = null;
+      if (Store.mode === "db") { const snap = await Store.col().doc("_settings").get(); if (snap.exists) d = snap.data(); }
+      else { d = Store.localGet("pd.settings", null); const old = Store.localGet("pd.goal", null); if (!d && old) d = { goal: old }; }
+      if (d?.goal) this.words = d.goal;
+      if (typeof d?.remindAt === "string" && /^\d{2}:\d{2}$/.test(d.remindAt)) this.remindAt = d.remindAt;
+      if (typeof d?.remindOn === "boolean") this.remindOn = d.remindOn;
     } catch {}
     this.loaded = true;
   },
-  async set(n) {
-    this.words = Math.max(50, Math.min(5000, Math.round(n / 50) * 50));
+  async save() {
+    const data = { goal: this.words, remindAt: this.remindAt, remindOn: this.remindOn };
     try {
-      if (Store.mode === "db") await Store.col().doc("_settings").set({ goal: this.words });
-      else Store.localSet("pd.goal", this.words);
-    } catch { toast("Couldn't save the goal"); }
+      if (Store.mode === "db") await Store.col().doc("_settings").set(data);
+      else Store.localSet("pd.settings", data);
+    } catch { toast("Couldn't save your goal settings"); }
   },
+  async set(n) { this.words = Math.max(50, Math.min(5000, Math.round(n / 50) * 50)); await this.save(); },
 };
 function dailyTotals() {
   const tot = {};
@@ -1363,8 +1368,52 @@ function goalCard() {
       h("h3", { text: headline }),
       h("p", { class: "muted small", text: streak ? `${streak}-day streak${met ? "" : " · write today to keep it"}` : "Hit your goal on consecutive days to build a streak." }),
       h("div", { class: "goal-days", role: "img", "aria-label": `Last 14 days: goal met on ${Object.keys(tot).filter(k => tot[k] >= g && k >= dayKey(new Date(Date.now() - 13 * 864e5))).length} days` }, days),
+      h("div", { class: "goal-set remind-row" }, h("label", { class: "remind" },
+          h("input", { type: "checkbox", id: "remindon", checked: Goal.remindOn ? "checked" : null, onchange: async e => { Goal.remindOn = e.target.checked; await Goal.save(); render(); } }), "Remind me after"),
+        h("input", { type: "time", id: "remindat", "aria-label": "Reminder time", value: Goal.remindAt, disabled: !Goal.remindOn,
+          onchange: async e => { if (/^\d{2}:\d{2}$/.test(e.target.value)) { Goal.remindAt = e.target.value; await Goal.save(); toast("Reminder set for " + fmtClock(Goal.remindAt)); render(); } } })),
       h("div", { class: "goal-set" }, "Goal",
         h("button", { "aria-label": "Lower goal by 50 words", disabled: g <= 50, onclick: async () => { await Goal.set(g - 50); render(); } }, "−"),
         h("b", { text: `${g} words/day` }),
         h("button", { "aria-label": "Raise goal by 50 words", disabled: g >= 5000, onclick: async () => { await Goal.set(g + 50); render(); } }, "+"))));
+}
+
+
+// ---------- Evening reminder ----------
+const fmtClock = hhmm => { const [H, M] = hhmm.split(":").map(Number); const d = new Date(); d.setHours(H, M, 0, 0); return d.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" }); };
+function nudgeDismissed() { try { return localStorage.getItem("pd.nudge") === dayKey(); } catch { return false; } }
+function continueTarget() {
+  const cands = stories.filter(s => s.outline && s.stats && (s.stats.written < s.stats.total || s.stats.open > 0));
+  if (!cands.length) return null;
+  const s = cands.slice().sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+  return { s, part: Number.isInteger(s.lastPart) ? s.lastPart : null };
+}
+function nudgeCard() {
+  if (!Goal.loaded || !Goal.remindOn || nudgeDismissed() || loading) return null;
+  const [H, M] = Goal.remindAt.split(":").map(Number), now = new Date();
+  if (now.getHours() * 60 + now.getMinutes() < H * 60 + M) return null;
+  const today = dailyTotals()[dayKey()] || 0;
+  if (today >= Goal.words) return null;
+  const tgt = continueTarget();
+  const short = Goal.words - today;
+  return h("section", { class: "sheet nudge", role: "status" },
+    h("div", { class: "nudge-text" },
+      h("span", { class: "label", text: "It's after " + fmtClock(Goal.remindAt) }),
+      h("h3", { text: today ? `${short.toLocaleString("en-IN")} more words to reach today's goal` : `Still time for today's ${Goal.words} words` }),
+      tgt ? h("p", { class: "muted small", text: `Pick up “${tgt.s.outline.title}” where you left off: ${tgt.s.stats.written} of ${tgt.s.stats.total} parts written` + (tgt.s.stats.open ? `, ${tgt.s.stats.open} lines to revise.` : ".") }) : h("p", { class: "muted small", text: "Start a new story, or add a few lines anywhere." })),
+    h("div", { class: "row" },
+      tgt ? h("button", { class: "primary", onclick: () => continueWhereLeft(tgt) }, "Continue where I left off")
+          : h("button", { class: "primary", onclick: () => { story = newStory(); parts = {}; render(); } }, "+ New story"),
+      h("button", { class: "ghost", onclick: () => { try { localStorage.setItem("pd.nudge", dayKey()); } catch {} render(); } }, "Not today")));
+}
+async function continueWhereLeft(tgt) {
+  await openStory(tgt.s);
+  if (story.outline) {
+    const n = story.outline.parts.length;
+    let k = tgt.part != null && tgt.part < n ? tgt.part : firstUnwritten();
+    // If the remembered part is already done and has nothing to revise, move to the first unwritten one.
+    if (parts[k]?.text && !(parts[k].marks || []).some(m => !m.done) && !parts[k].truncated) k = firstUnwritten();
+    story.stage = "draft"; curPart = k;
+  }
+  render(); window.scrollTo(0, 0);
 }
