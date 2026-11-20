@@ -1311,3 +1311,60 @@ function storyDash(s) {
       h("i", { style: `width:${st.total ? Math.round(100 * st.written / st.total) : 0}%` })),
     sparkline(st.daily));
 }
+
+
+// ---------- Daily writing goal ----------
+const Goal = {
+  words: 100, loaded: false,
+  async load() {
+    try {
+      if (Store.mode === "db") { const d = await Store.col().doc("_settings").get(); if (d.exists && d.data().goal) this.words = d.data().goal; }
+      else { const v = Store.localGet("pd.goal", null); if (v) this.words = v; }
+    } catch {}
+    this.loaded = true;
+  },
+  async set(n) {
+    this.words = Math.max(50, Math.min(5000, Math.round(n / 50) * 50));
+    try {
+      if (Store.mode === "db") await Store.col().doc("_settings").set({ goal: this.words });
+      else Store.localSet("pd.goal", this.words);
+    } catch { toast("Couldn't save the goal"); }
+  },
+};
+function dailyTotals() {
+  const tot = {};
+  for (const s of stories) for (const [k, v] of Object.entries(s.stats?.daily || {})) tot[k] = (tot[k] || 0) + v;
+  if (story?.stats?.daily && !stories.some(s => s.id === story.id)) for (const [k, v] of Object.entries(story.stats.daily)) tot[k] = (tot[k] || 0) + v;
+  return tot;
+}
+function streakOf(tot, goal) {
+  let n = 0; const today = dayKey();
+  let d = new Date();
+  if ((tot[today] || 0) < goal) d = new Date(d.getTime() - 864e5); // today still counts once you reach it
+  while ((tot[dayKey(d)] || 0) >= goal) { n++; d = new Date(d.getTime() - 864e5); }
+  return n;
+}
+function goalCard() {
+  const tot = dailyTotals(), g = Goal.words, today = tot[dayKey()] || 0;
+  const pct = Math.min(1, today / g), streak = streakOf(tot, g), met = today >= g;
+  const R = 36, C = 2 * Math.PI * R;
+  const ring = h("div", { class: "ring", role: "img", "aria-label": `${today} of ${g} words written today` });
+  ring.innerHTML = `<svg viewBox="0 0 84 84" aria-hidden="true"><circle class="track" cx="42" cy="42" r="${R}" fill="none" stroke-width="8"/><circle class="prog" cx="42" cy="42" r="${R}" fill="none" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}"${pct === 0 ? ' opacity="0"' : ""}/></svg>`;
+  ring.append(h("div", { class: "lbl" }, h("div", {}, h("b", { text: today.toLocaleString("en-IN") }), h("span", { text: `of ${g}` }))));
+  const days = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 864e5), v = tot[dayKey(d)] || 0;
+    days.push(h("span", { class: "goal-day" + (v >= g ? " met" : v > 0 ? " part" : "") + (i === 0 ? " today" : ""),
+      title: `${d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}: ${v.toLocaleString("en-IN")} words${v >= g ? " · goal met" : ""}` }));
+  }
+  const headline = met ? (today >= g * 2 ? "Double your goal today" : "Goal met for today") : today ? `${(g - today).toLocaleString("en-IN")} words to go today` : `Write ${g} words today`;
+  return h("section", { class: "sheet goal" }, ring,
+    h("div", { class: "goal-main" },
+      h("h3", { text: headline }),
+      h("p", { class: "muted small", text: streak ? `${streak}-day streak${met ? "" : " · write today to keep it"}` : "Hit your goal on consecutive days to build a streak." }),
+      h("div", { class: "goal-days", role: "img", "aria-label": `Last 14 days: goal met on ${Object.keys(tot).filter(k => tot[k] >= g && k >= dayKey(new Date(Date.now() - 13 * 864e5))).length} days` }, days),
+      h("div", { class: "goal-set" }, "Goal",
+        h("button", { "aria-label": "Lower goal by 50 words", disabled: g <= 50, onclick: async () => { await Goal.set(g - 50); render(); } }, "−"),
+        h("b", { text: `${g} words/day` }),
+        h("button", { "aria-label": "Raise goal by 50 words", disabled: g >= 5000, onclick: async () => { await Goal.set(g + 50); render(); } }, "+"))));
+}
