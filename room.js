@@ -1432,6 +1432,7 @@ function openSprint(k, minutes = 5) {
   const startText = p.text || "", startWords = wc(startText);
   const todayBefore = dailyTotals()[dayKey()] || 0;
   let end = Date.now() + minutes * 60000, done = false, saveTimer = 0, tick = 0, lastSaved = startText;
+  const startedAt = Date.now(); let logId = null;
   const root = h("div", { class: "reader sprint", role: "dialog", "aria-modal": "true", "aria-label": `Writing sprint: ${o.parts[k].title}` });
   const darkHost = matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light" || document.documentElement.dataset.theme === "dark";
   root.dataset.tone = readerPrefs.tone === "auto" ? (darkHost ? "night" : "day") : readerPrefs.tone;
@@ -1474,6 +1475,7 @@ function openSprint(k, minutes = 5) {
       p.made = `Sprint: +${n} words`;
       lastSaved = null; await save();
     }
+    logId = SprintLog.add({ at: startedAt, secs: Math.round((Date.now() - startedAt) / 1000), planned: minutes, storyId: story.id, story: o.title, part: k, partTitle: o.parts[k].title, words: n, early: !!early, polished: false });
     showSummary(n, early);
   }
   function showSummary(n, early) {
@@ -1557,6 +1559,7 @@ Reply with JSON only: {"edits": [{"original": "one sentence or line copied exact
       ta.value = before.slice(0, reg.start) + region + before.slice(reg.end); sizeTa();
       p.history = [...(p.history || []), { text: before, at: p.at || Date.now(), style: p.style || "", made: p.made || "" }].slice(-8);
       p.made = `Polished sprint (${changed} ${changed === 1 ? "change" : "changes"})`;
+      SprintLog.update(logId, { polished: true, changes: changed });
       lastSaved = null; await save();
       toast(`Kept ${changed} ${changed === 1 ? "change" : "changes"}. Your unpolished text is in the timeline.`);
       card.replaceChildren(h("span", { class: "label", text: "Polished" }), h("h2", { text: `${changed} ${changed === 1 ? "change" : "changes"} kept` }),
@@ -1586,4 +1589,64 @@ async function closeSprint(silent) {
   try { await el._save?.(); } catch {}
   el.remove(); document.body.style.overflow = "";
   if (!silent && tab === "stories" && story) render();
+}
+
+
+// ---------- Sprint log ----------
+const SprintLog = {
+  items: [], loaded: false,
+  async load() {
+    try {
+      if (Store.mode === "db") { const d = await Store.col().doc("_sprints").get(); if (d.exists) this.items = d.data().log || []; }
+      else this.items = Store.localGet("pd.sprints", []) || [];
+    } catch {}
+    this.loaded = true;
+  },
+  async save() {
+    this.items = this.items.slice(-300);
+    try {
+      if (Store.mode === "db") await Store.col().doc("_sprints").set({ log: this.items });
+      else Store.localSet("pd.sprints", this.items);
+    } catch {}
+  },
+  add(e) { const id = "sp" + Date.now().toString(36); this.items.push({ id, ...e }); this.save(); return id; },
+  update(id, patch) { const e = this.items.find(x => x.id === id); if (e) { Object.assign(e, patch); this.save(); } },
+};
+const BUCKETS = [["Morning", "5 am–12 pm", h => h >= 5 && h < 12], ["Afternoon", "12–5 pm", h => h >= 12 && h < 17], ["Evening", "5–9 pm", h => h >= 17 && h < 21], ["Night", "9 pm–5 am", h => h >= 21 || h < 5]];
+function sprintLogCard() {
+  const all = SprintLog.items.slice().reverse();
+  if (!SprintLog.loaded || !all.length) return null;
+  const stats = BUCKETS.map(([name, range, test]) => {
+    const xs = all.filter(e => test(new Date(e.at).getHours()));
+    const words = xs.reduce((a, e) => a + (e.words || 0), 0);
+    return { name, range, n: xs.length, words, avg: xs.length ? Math.round(words / xs.length) : 0 };
+  });
+  const used = stats.filter(b => b.n);
+  const best = used.length ? used.slice().sort((a, b) => b.avg - a.avg || b.n - a.n)[0] : null;
+  const maxAvg = Math.max(1, ...stats.map(b => b.avg));
+  const total = all.reduce((a, e) => a + (e.words || 0), 0);
+  const insight = !best ? "" : used.length === 1 ? `All your sprints so far were in the ${best.name.toLowerCase()}: ${best.avg} words a sprint on average.`
+    : `You write most in the ${best.name.toLowerCase()} (${best.range}): ${best.avg} words a sprint on average.`;
+  const bars = h("div", { class: "tod", role: "table", "aria-label": "Average words per sprint by time of day" },
+    stats.map(b => h("div", { class: "tod-row" + (best && b.name === best.name && used.length > 1 ? " best" : ""), role: "row", title: `${b.name} (${b.range}): ${b.n} ${b.n === 1 ? "sprint" : "sprints"}, ${b.words.toLocaleString("en-IN")} words` },
+      h("span", { class: "tod-name", role: "rowheader" }, b.name, h("small", { text: b.range })),
+      h("span", { class: "tod-track", role: "cell" }, h("i", { style: `width:${b.avg ? Math.max(3, 100 * b.avg / maxAvg) : 0}%` })),
+      h("span", { class: "tod-val", role: "cell", text: b.n ? `${b.avg} avg · ${b.n}×` : "—" }))));
+  const fmtWhen = at => new Date(at).toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  const showAll = sprintLogCard.all;
+  const rows = (showAll ? all : all.slice(0, 8)).map(e => h("li", {},
+    h("div", { class: "sl-main" },
+      h("span", { class: "sl-when", text: fmtWhen(e.at) }),
+      h("span", { class: "sl-what", text: `${e.story}${e.partTitle ? " · Part " + (e.part + 1) + ": " + e.partTitle : ""}` }),
+      h("span", { class: "sl-tags" },
+        e.polished ? h("span", { class: "chip", text: `Polished${e.changes ? " · " + e.changes : ""}` }) : null,
+        e.early ? h("span", { class: "chip gold", text: `Stopped at ${Math.floor(e.secs / 60)}:${String(e.secs % 60).padStart(2, "0")}` }) : null)),
+    h("b", { class: "sl-words" + (e.words ? "" : " zero"), text: `+${(e.words || 0).toLocaleString("en-IN")}` })));
+  return h("details", { class: "sheet sofar sprintlog", open: sprintLogCard.open ? true : null, ontoggle: e => sprintLogCard.open = e.currentTarget.open },
+    h("summary", {}, h("h3", { text: `Sprint log · ${all.length} ${all.length === 1 ? "sprint" : "sprints"}, ${total.toLocaleString("en-IN")} words` })),
+    insight ? h("p", { class: "sl-insight", text: insight }) : null,
+    used.length < 2 && all.length < 5 ? h("p", { class: "muted small", text: "Sprint at different times of day, and this will show when you write best." }) : null,
+    bars,
+    h("ul", { class: "sl-list" }, rows),
+    all.length > 8 ? h("button", { class: "ghost", onclick: () => { sprintLogCard.all = !showAll; sprintLogCard.open = true; render(); } }, showAll ? "Show fewer" : `Show all ${all.length}`) : null);
 }
