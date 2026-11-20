@@ -25,11 +25,12 @@ function tabsNav() {
     room: '<path d="M7 8h10"/><path d="M7 12h6"/><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
     books: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
     videos: '<rect x="2" y="5" width="15" height="14" rx="3"/><path d="m22 8-5 4 5 4z"/>' };
-  const tabs = [["stories", "Stories"], ["room", "Writers' Room"], ["books", "Books"], ["videos", "Videos"]];
+  I.sangam = '<path d="M4 3c0 6 8 6 8 12v6"/><path d="M20 3c0 6-8 6-8 12"/><circle cx="12" cy="15" r="1.2"/>';
+  const tabs = [["stories", "Stories"], ["sangam", "Sangam"], ["room", "Writers' Room"], ["books", "Books"], ["videos", "Videos"]];
   return h("nav", { class: "tabs", "aria-label": "Sections" }, tabs.map(([k, l]) => {
     const b = h("button", { "aria-current": tab === k ? "page" : null, onclick: () => gotoTab(k) });
     b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
-    b.append(h("span", { text: l }));
+    b.append(h("span", { class: "tab-full", text: l }), h("span", { class: "tab-short", text: k === "room" ? "Writers" : l }));
     return b;
   }));
 }
@@ -100,15 +101,17 @@ async function streamInto(el, prompt, opts = {}) {
 
 // ---------- Library storage (books and videos) ----------
 const Lib = {
-  books: [], videos: [], loaded: false, chunkCache: {}, pieceCache: {},
+  books: [], videos: [], seeds: [], loaded: false, chunkCache: {}, pieceCache: {},
   base() { return Store.col().doc("_lib"); },
   async load() {
     try {
       if (Store.mode === "db") {
         const [b, v] = await Promise.all([this.base().collection("books").get(), this.base().collection("videos").get()]);
         this.books = b.docs.map(d => d.data()); this.videos = v.docs.map(d => d.data());
-      } else { this.books = Store.localGet("pd.books", []) || []; this.videos = Store.localGet("pd.videos", []) || []; }
-    } catch (e) { this.books = this.books || []; this.videos = this.videos || []; }
+        const sd = await this.base().collection("seeds").get(); this.seeds = sd.docs.map(d => d.data());
+      } else { this.books = Store.localGet("pd.books", []) || []; this.videos = Store.localGet("pd.videos", []) || []; this.seeds = Store.localGet("pd.seeds", []) || []; }
+    } catch (e) { this.books = this.books || []; this.videos = this.videos || []; this.seeds = this.seeds || []; }
+    this.seeds = (this.seeds || []).sort((a, b) => b.at - a.at);
     this.books.sort((a, b) => b.createdAt - a.createdAt); this.videos.sort((a, b) => b.createdAt - a.createdAt);
     this.loaded = true;
   },
@@ -1432,7 +1435,7 @@ function openSprint(k, minutes = 5) {
   const startText = p.text || "", startWords = wc(startText);
   const todayBefore = dailyTotals()[dayKey()] || 0;
   let end = Date.now() + minutes * 60000, done = false, saveTimer = 0, tick = 0, lastSaved = startText;
-  const startedAt = Date.now(); let logId = null;
+  const startedAt = Date.now(); let logId = null, harvestDone = false, harvestCount = null;
   const root = h("div", { class: "reader sprint", role: "dialog", "aria-modal": "true", "aria-label": `Writing sprint: ${o.parts[k].title}` });
   const darkHost = matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.dataset.theme !== "light" || document.documentElement.dataset.theme === "dark";
   root.dataset.tone = readerPrefs.tone === "auto" ? (darkHost ? "night" : "day") : readerPrefs.tone;
@@ -1481,6 +1484,19 @@ function openSprint(k, minutes = 5) {
   function showSummary(n, early) {
     const today = todayBefore + n; // the stats update a moment later; show the result right away
     const g = Goal.words, met = today >= g;
+    const seedNote = h("div", { class: "seednote", style: "flex-basis:100%" });
+    if (n >= 15 && AI.sample) {
+      if (!harvestDone) {
+        harvestDone = true; seedNote.append(h("span", { class: "busy", style: "justify-content:center" }, h("span", { class: "dot" }), "Finding story seeds in what you wrote…"));
+        const reg = sprintRegion();
+        harvestSeeds(reg.text, k).then(c => { harvestCount = c; paintSeedNote(); }).catch(() => { harvestCount = -1; paintSeedNote(); });
+      } else paintSeedNote();
+    }
+    function paintSeedNote() {
+      seedNote.replaceChildren(harvestCount > 0
+        ? h("button", { class: "ghost", onclick: () => { closeSprint(true); gotoTab("sangam"); } }, `${harvestCount} new story ${harvestCount === 1 ? "seed" : "seeds"} → review in Sangam`)
+        : harvestCount === 0 ? h("span", { class: "small", style: "color:var(--r-muted)", text: "No new seeds this time." }) : h("span", { class: "small", style: "color:var(--r-muted)", text: "Couldn't look for seeds this time." }));
+    }
     summary.replaceChildren(
       h("div", { class: "sp-card" },
         h("span", { class: "label", text: early ? "Sprint stopped" : "Time's up" }),
@@ -1491,6 +1507,7 @@ function openSprint(k, minutes = 5) {
           h("i", { class: "before", style: `width:${Math.min(100, 100 * todayBefore / g)}%` }),
           h("i", { class: "now", style: `left:${Math.min(100, 100 * todayBefore / g)}%;width:${Math.max(0, Math.min(100, 100 * today / g) - Math.min(100, 100 * todayBefore / g))}%` })),
         h("div", { class: "row", style: "justify-content:center" },
+          seedNote,
           n && AI.sample ? h("button", { class: "primary polishbtn", onclick: () => polish() }, "Polish my sprint") : null,
           h("button", { class: n && AI.sample ? "" : "primary", onclick: () => { closeSprint(); openSprint(k, 5); } }, "Another 5 minutes"),
           h("button", { onclick: () => { summary.hidden = true; clock.textContent = "No timer"; bar.querySelector(".done").textContent = "Done"; ta.focus(); } }, "Keep writing"),
@@ -1649,4 +1666,155 @@ function sprintLogCard() {
     bars,
     h("ul", { class: "sl-list" }, rows),
     all.length > 8 ? h("button", { class: "ghost", onclick: () => { sprintLogCard.all = !showAll; sprintLogCard.open = true; render(); } }, showAll ? "Show fewer" : `Show all ${all.length}`) : null);
+}
+
+
+// ---------- Sangam: seeds from your writing, fused into new stories ----------
+const SEED_TYPES = { character: "Character", image: "Image", line: "Line", conflict: "Conflict", place: "Place", question: "Question" };
+const Seeds = {
+  async save(sd) {
+    if (Store.mode === "db") return Lib.base().collection("seeds").doc(sd.id).set(JSON.parse(JSON.stringify(sd)));
+    Lib.localStrict("pd.seeds", Lib.seeds);
+  },
+  async remove(id) {
+    Lib.seeds = Lib.seeds.filter(x => x.id !== id);
+    if (Store.mode === "db") return Lib.base().collection("seeds").doc(id).delete();
+    Lib.localStrict("pd.seeds", Lib.seeds);
+  },
+  async add(list) { for (const sd of list) { Lib.seeds.unshift(sd); try { await this.save(sd); } catch {} } if (Store.mode !== "db") try { Lib.localStrict("pd.seeds", Lib.seeds); } catch {} },
+};
+async function harvestSeeds(text, k) {
+  if (!AI.sample || !text?.trim() || !story?.outline) return 0;
+  const o = story.outline;
+  const lang = effLang(story) === "hindi" ? "Hindi (Devanagari)" : "Hinglish (Roman script)";
+  const prompt = `A writer just wrote this passage for their ${fmtOf(story).name} "${o.title}" (part: ${o.parts[k]?.title || ""}). Collect STORY SEEDS from it: small, reusable pieces of story material that could grow into other stories.\n\nPASSAGE:\n"""\n${text.slice(0, 8000)}\n"""\n\nFind 3 to 6 seeds, only ones really present in the passage. Types: character (a person and their defining trait), image (a vivid concrete picture), line (a striking line of dialogue or narration), conflict (a tension or dilemma), place (a specific setting), question (an open question the passage raises). Write each seed as one short line in ${lang}, phrased so it makes sense outside this story. Give 1–3 motifs per seed as single lowercase English words (for example waiting, debt, cold, trains, mothers, silence).\n\nReply with JSON only: {"seeds": [{"type": "character|image|line|conflict|place|question", "text": string, "quote": "the exact sentence from the passage it comes from", "motifs": [string]}]}`;
+  const r = await AI.sample.json(prompt, { modelTier: AI.tier("quick"), cache: false, fast: false });
+  const now = Date.now();
+  const list = (r?.seeds || []).filter(x => x && x.text && SEED_TYPES[x.type]).slice(0, 6).map((x, i) => ({
+    id: "sd" + now.toString(36) + i, type: x.type, text: String(x.text).trim(), quote: String(x.quote || "").slice(0, 400),
+    motifs: (x.motifs || []).map(m => String(m).toLowerCase().trim().replace(/[^a-z\- ]/g, "")).filter(Boolean).slice(0, 3),
+    storyId: story.id, story: o.title, part: k, partTitle: o.parts[k]?.title || "", at: now, status: "new", usedIn: [] }));
+  if (list.length) await Seeds.add(list);
+  return list.length;
+}
+const sg = { filter: "all", sel: [], results: null, err: "", mode: "" };
+function seedChip(sd, opts = {}) {
+  const on = sg.sel.includes(sd.id);
+  return h("button", { class: "seed" + (on ? " on" : "") + (opts.static ? " static" : ""), "aria-pressed": opts.static ? null : on ? "true" : "false", disabled: opts.static ? "disabled" : null,
+    onclick: opts.static ? null : () => { sg.sel = on ? sg.sel.filter(x => x !== sd.id) : [...sg.sel, sd.id].slice(-3); render(); } },
+    h("span", { class: "seed-type", text: SEED_TYPES[sd.type] || sd.type }), h("span", { class: "seed-text", text: sd.text }),
+    h("span", { class: "seed-src", text: sd.story + (sd.motifs?.length ? " · " + sd.motifs.join(", ") : "") }));
+}
+function renderSangam() {
+  const all = Lib.seeds || [];
+  if (!Lib.loaded) { app.append(h("div", { class: "empty" }, "Loading your seeds…")); return; }
+  const fresh = all.filter(x => x.status === "new"), kept = all.filter(x => x.status === "kept");
+  const storiesWith = new Set(kept.map(x => x.storyId));
+  app.append(h("section", { class: "sheet sangam-hero" },
+    h("h2", { text: "Sangam" }),
+    h("p", { class: "lead", text: "Where your stories meet. Every sprint leaves seeds (characters, images, lines, conflicts, places, questions), and Sangam fuses seeds from different stories into new ones." }),
+    h("div", { class: "row" }, h("span", { class: "chip", text: `${kept.length} kept ${kept.length === 1 ? "seed" : "seeds"}` }), h("span", { class: "chip gold", text: `from ${storiesWith.size} ${storiesWith.size === 1 ? "story" : "stories"}` }))));
+
+  if (fresh.length) app.append(h("section", { class: "sheet" },
+    h("div", { class: "row" }, h("h3", { class: "spacer", text: `New seeds · ${fresh.length}` }),
+      h("button", { class: "ghost", onclick: async () => { for (const x of fresh) { x.status = "kept"; try { await Seeds.save(x); } catch {} } render(); } }, "Keep all")),
+    h("p", { class: "muted small", text: "Found in your recent writing. Keep the ones worth growing." }),
+    h("div", { class: "inbox" }, fresh.map(x => h("div", { class: "inbox-item" }, seedChip(x, { static: true }),
+      x.quote ? h("p", { class: "seed-quote", text: "“" + x.quote + "”" }) : null,
+      h("div", { class: "row" },
+        h("button", { class: "primary", onclick: async () => { x.status = "kept"; try { await Seeds.save(x); } catch {} render(); } }, "Keep"),
+        h("button", { onclick: async () => { await Seeds.remove(x.id).catch(() => {}); render(); } }, "Discard")))))));
+
+  const canFuse = kept.length >= 2;
+  const fuse = h("section", { class: "sheet" }, h("h3", { text: "Fuse seeds into new stories" }),
+    h("p", { class: "muted small", text: sg.sel.length ? `${sg.sel.length} of 3 seeds picked below.` : "Let Claude pick seeds from different stories, collide two at random, or tap 2–3 seeds below to choose yourself." }),
+    errNote(sg.err),
+    roomBusy ? roomBusyRow() : h("div", { class: "row" },
+      h("button", { class: "primary", disabled: !AI.sample || !canFuse, onclick: () => runSangam(sg.sel.length >= 2 ? "picked" : "auto") }, sg.sel.length >= 2 ? `Fuse these ${sg.sel.length}` : "Fuse seeds"),
+      h("button", { disabled: !AI.sample || !canFuse, onclick: () => runSangam("takkar") }, "Chai pe Takkar"),
+      sg.sel.length ? h("button", { class: "ghost", onclick: () => { sg.sel = []; render(); } }, "Clear picks") : null),
+    !canFuse ? h("p", { class: "muted small", text: "Keep at least 2 seeds to start fusing. Seeds appear after sprints of 15 words or more, or tap “Find seeds” on any written part." }) : null);
+  app.append(fuse);
+
+  if (sg.results?.length) app.append(h("section", { class: "sheet" },
+    h("h3", { text: sg.mode === "takkar" ? "Chai pe Takkar" : "New premises" }),
+    h("div", { class: "premises" }, sg.results.map(pr => {
+      const used = pr.seeds.map(id => all.find(x => x.id === id)).filter(Boolean);
+      return h("article", { class: "premise" },
+        h("div", { class: "row" }, h("span", { class: "chip", text: fmtName(pr.format) })),
+        h("h3", { text: pr.title }), h("p", { class: "lead", text: pr.logline }), h("p", { text: pr.premise }),
+        pr.why ? h("p", { class: "muted small" }, h("b", { text: "Why these belong together: " }), pr.why) : null,
+        h("div", { class: "seedrow" }, used.map(x => seedChip(x, { static: true }))),
+        h("div", { class: "row" }, h("button", { class: "primary", onclick: () => plantPremise(pr) }, "Plant this story")));
+    }))));
+
+  const motifs = {}; kept.forEach(x => (x.motifs || []).forEach(m => { (motifs[m] = motifs[m] || new Set()).add(x.storyId); }));
+  const shared = Object.entries(motifs).filter(([, v]) => v.size > 1).sort((a, b) => b[1].size - a[1].size).map(([m]) => m);
+  const types = ["all", ...Object.keys(SEED_TYPES)];
+  const shown = kept.filter(x => sg.filter === "all" || x.type === sg.filter || (sg.filter.startsWith("m:") && x.motifs?.includes(sg.filter.slice(2))));
+  app.append(h("section", { class: "sheet" },
+    h("h3", { text: `Bhandaar · your seeds` }),
+    h("div", { class: "chips" }, types.map(t => h("button", { "aria-pressed": sg.filter === t ? "true" : "false", onclick: () => { sg.filter = t; render(); } }, t === "all" ? "All" : SEED_TYPES[t]))),
+    shared.length ? h("div", { class: "chips" }, h("span", { class: "muted small", style: "align-self:center", text: "Shared motifs:" }),
+      shared.slice(0, 8).map(m => h("button", { "aria-pressed": sg.filter === "m:" + m ? "true" : "false", onclick: () => { sg.filter = sg.filter === "m:" + m ? "all" : "m:" + m; render(); } }, `${m} · ${motifs[m].size}`))) : null,
+    shown.length ? h("div", { class: "seedgrid" }, shown.map(x => h("div", { class: "seedcell" }, seedChip(x),
+      h("button", { class: "ghost seed-del", "aria-label": "Delete seed", onclick: async () => { await Seeds.remove(x.id).catch(() => {}); sg.sel = sg.sel.filter(i => i !== x.id); render(); } }, "✕"))))
+      : h("div", { class: "empty" }, kept.length ? "No seeds of this kind yet." : "Your seeds will collect here. Write a sprint to grow the first ones.")));
+}
+const fmtName = key => FORMATS.find(f => f.key === key)?.name || "Story";
+async function runSangam(mode) {
+  const kept = (Lib.seeds || []).filter(x => x.status === "kept");
+  let pick;
+  if (mode === "picked") pick = kept.filter(x => sg.sel.includes(x.id));
+  else if (mode === "takkar") {
+    const a = kept[Math.floor(Math.random() * kept.length)];
+    const others = kept.filter(x => x.storyId !== a.storyId); const pool = others.length ? others : kept.filter(x => x.id !== a.id);
+    pick = [a, pool[Math.floor(Math.random() * pool.length)]];
+  } else pick = kept.slice(0, 60);
+  const ctrl = new AbortController(); roomBusy = { label: mode === "takkar" ? "Two seeds are meeting over chai…" : "Fusing your seeds…", ctrl }; sg.err = ""; render();
+  const list = pick.map(x => `[${x.id}] (${x.type}, from "${x.story}"; motifs: ${(x.motifs || []).join(", ")}) ${x.text}`).join("\n");
+  const formats = FORMATS.map(f => `${f.key} = ${f.name}`).join(", ");
+  const rule = mode === "auto" ? "Each premise must fuse 2–3 seeds, taken from at least two DIFFERENT stories whenever possible; prefer seeds that share a motif, but at least one premise should be a surprising pairing."
+    : mode === "takkar" ? "Use exactly these two seeds in every premise: make them collide in three different ways (one funny, one dark, one tender)."
+    : "Use all of these seeds in every premise.";
+  const prompt = `You are a story developer for Indian film, web series, theatre and fiction. The writer's own story seeds:\n${list}\n\n${rule} Each premise is a genuinely new story, not a sequel to the stories the seeds came from. ${HINGLISH}\n\nReply with JSON only: {"premises": [{"title": string, "logline": "one sentence", "premise": "3–4 sentences: who, what they want, what stands in the way, the turn", "format": one of these keys (${formats}), "why": "one sentence on why these seeds belong together", "seeds": ["seed ids used"]}]} with exactly 3 premises.`;
+  try {
+    const r = await AI.sample.json(prompt, { signal: ctrl.signal, modelTier: AI.tier("complex"), cache: false });
+    const ids = new Set(pick.map(x => x.id));
+    sg.results = (r?.premises || []).slice(0, 3).map(p => ({ title: String(p.title || "Untitled"), logline: String(p.logline || ""), premise: String(p.premise || ""),
+      format: FORMATS.some(f => f.key === p.format) ? p.format : "short-film", why: String(p.why || ""), seeds: (p.seeds || []).map(String).filter(id => ids.has(id)) }))
+      .map(p => (!p.seeds.length && mode !== "auto") ? { ...p, seeds: pick.map(x => x.id) } : p);
+    sg.mode = mode;
+    if (!sg.results.length) sg.err = "Claude didn't come back with premises. Try again.";
+  } catch (e) { if (e?.code !== "cancelled") sg.err = AI.errText(e); }
+  roomBusy = null; render();
+}
+async function plantPremise(pr) {
+  const used = pr.seeds.map(id => (Lib.seeds || []).find(x => x.id === id)).filter(Boolean);
+  const s = newStory();
+  s.title = pr.title; s.idea = `${pr.logline}\n\n${pr.premise}`;
+  const f = FORMATS.find(x => x.key === pr.format);
+  if (f) { s.formatKey = f.key; s.len = presetLength(f); s.screenCat = suggestCat(s); }
+  s.lang = "hinglish"; s.stage = "idea";
+  s.origin = { at: Date.now(), why: pr.why, seeds: used.map(x => ({ id: x.id, type: x.type, text: x.text, story: x.story, storyId: x.storyId })) };
+  for (const x of used) { x.usedIn = [...(x.usedIn || []), s.id]; try { await Seeds.save(x); } catch {} }
+  story = s; parts = {}; tab = "stories";
+  await Store.save(s).catch(() => {});
+  stories.unshift(s); toast("Planted. Check the idea, then pick its length.");
+  render(); window.scrollTo(0, 0);
+}
+function familyTree(s) {
+  if (!s?.origin?.seeds?.length) return null;
+  const srcs = [...new Set(s.origin.seeds.map(x => x.story))];
+  return h("div", { class: "family" },
+    h("span", { class: "label", text: "Family tree" }),
+    h("p", { class: "small", text: `Grew in Sangam from ${srcs.map(t => "“" + t + "”").join(" + ")}` + (s.origin.why ? `. ${s.origin.why}` : "") }),
+    h("div", { class: "seedrow" }, s.origin.seeds.map(x => seedChip({ ...x, motifs: [] }, { static: true }))));
+}
+async function findSeedsFor(k) {
+  const p = parts[k]; if (!p?.text) return;
+  const ctrl = new AbortController(); busy = { label: "Looking for story seeds…", ctrl }; render();
+  try { const c = await harvestSeeds(p.text, k); toast(c ? `${c} new ${c === 1 ? "seed" : "seeds"} in Sangam` : "No new seeds found"); }
+  catch (e) { toast(AI.errText(e)); }
+  busy = null; render();
 }
