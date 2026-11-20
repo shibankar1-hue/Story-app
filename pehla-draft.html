@@ -361,6 +361,12 @@ mark.hl.flash { background: color-mix(in srgb, var(--accent) 55%, transparent); 
 .imgidea b { font-family: var(--font-display); font-weight: 500; font-size: 1.15rem; color: var(--accent); }
 .imgidea[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--accent); background: var(--accent-soft); }
 .imgdesc { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+/* Rewrite notes */
+.notes-kept { display: flex; flex-direction: column; gap: 6px; }
+.notechip { display: flex; align-items: center; gap: 8px; background: var(--accent-soft); border-radius: 12px; padding: 6px 6px 6px 12px; font-size: 0.92rem; }
+.notechip span { flex: 1; min-width: 0; }
+.notechip small { color: var(--accent); font-weight: 600; font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+.notechip button { min-height: 30px; min-width: 30px; padding: 2px 8px; background: transparent; color: var(--muted); }
 /* Sprint log */
 .sl-insight { font-family: var(--font-display); font-size: 1.15rem; }
 .tod { display: flex; flex-direction: column; gap: 8px; }
@@ -1063,13 +1069,17 @@ async function writePart(i, mode, note) {
     o.parts.map((p, k) => `${k === i ? ">> " : ""}Part ${k + 1}: ${p.title} — ${p.summary}`).join("\n") +
     `\n\nFORMAT:\n${formatRules(story)}\n` + await storyStyleBlock(story, o.parts[i].title + " " + o.parts[i].summary) + `\n`;
   const sofar = storySoFar(i);
+  const standing = [...(story.notes || []).map(x => x.text + " (for the whole story)"), ...(parts[i]?.notes || []).map(x => x.text)].filter(x => !note || x.split(" (for the whole story)")[0] !== note);
   if (sofar) prompt += `STORY SO FAR (what has actually been written in the earlier parts; stay consistent with every name, fact and setup in it):\n${sofar}\n\n`;
   if (prevText) prompt += `The previous part ends like this (continue seamlessly from it, don't repeat it):\n"""\n${prevText.slice(-1800)}\n"""\n\n`;
   if (mode === "continue") prompt += `Part ${i + 1} was cut off. Here is what has been written so far:\n"""\n${existing.slice(-2500)}\n"""\nContinue part ${i + 1} from exactly where it stops, to the end of the part. Output only the continuation.\n`;
   else {
     prompt += `Write part ${i + 1} of ${n} ("${o.parts[i].title}") in full, about ${target} words. Cover exactly what its summary says, end at a natural break, and don't run into the next part.\n`;
-    if (mode === "rewrite" && existing) prompt += `\nThis is a rewrite. The earlier version is below; keep what works and apply the writer's note.\nWRITER'S NOTE: ${note || "Make it better: sharper scenes, more specific detail, more natural dialogue."}\nEARLIER VERSION:\n"""\n${existing.slice(0, 6000)}\n"""\n`;
+    if (mode === "rewrite" && existing) prompt += `\nThis is a rewrite. The earlier version is below; keep what works and apply ${standing.length ? "ALL of the writer's notes" : "the writer's note"}.\n` +
+      (note ? `NEW NOTE (apply now): ${note}\n` : (!standing.length ? `WRITER'S NOTE: Make it better: sharper scenes, more specific detail, more natural dialogue.\n` : "")) +
+      `EARLIER VERSION:\n"""\n${existing.slice(0, 6000)}\n"""\n`;
   }
+  if (standing.length && mode !== "continue") prompt += `\nTHE WRITER'S STANDING NOTES — they still apply; follow every one of them in this version, don't undo any:\n${standing.map((x, j) => `${j + 1}. ${x}`).join("\n")}\n`;
   prompt += `\nOutput only the ${medium(story) === "page" ? "story text" : "script"} — no preamble, notes or commentary.`;
   const base = mode === "continue" ? existing.replace(/\s+$/, "") + "\n\n" : "";
   render();
@@ -1087,14 +1097,14 @@ async function writePart(i, mode, note) {
     const made = mode === "continue" ? (old?.made || "First draft") + " · continued"
       : mode === "rewrite" ? "Rewrite" + (note ? ": " + note : "") + (sty ? " · " + sty : "")
       : old?.text ? "Rewritten" + (sty ? " · " + sty : "") : "First draft" + (sty ? " · " + sty : "");
-    parts[i] = { i, text: base + r.text.trim(), truncated: !!r.truncated, at: Date.now(), style: sty, made, history: history.slice(-8), marks: old?.marks || [] };
+    parts[i] = { i, text: base + r.text.trim(), truncated: !!r.truncated, at: Date.now(), style: sty, made, history: history.slice(-8), marks: old?.marks || [], notes: old?.notes || [] };
     await Store.savePart(story.id, parts[i]).catch(e => { msg = { text: "Couldn't save this part: " + (e?.message || e?.code) + ". Download it before leaving.", err: true }; });
     persist();
     if (!r.truncated && n > 1) summarise(i);
     if (r.truncated) msg = { text: "This part was cut short. Press “Continue this part” to finish it.", err: false };
   } catch (e) {
     if (e?.text && e.code === "cancelled" && (base + e.text).trim()) {
-      parts[i] = { i, text: base + e.text.trim(), truncated: true, at: Date.now(), style: styleLabel(story.style), history: parts[i]?.history || [], marks: parts[i]?.marks || [] };
+      parts[i] = { i, text: base + e.text.trim(), truncated: true, at: Date.now(), style: styleLabel(story.style), history: parts[i]?.history || [], marks: parts[i]?.marks || [], notes: parts[i]?.notes || [] };
       Store.savePart(story.id, parts[i]).catch(() => {});
     }
     msg = { text: AI.errText(e), err: e?.code !== "cancelled" };
@@ -1202,12 +1212,12 @@ function renderDraft() {
   const actions = busy ? busyRow() : h("div", { class: "row" },
     !p?.text ? h("button", { class: "primary", disabled: !AI.sample, onclick: () => writePart(curPart, "write") }, `Write part ${curPart + 1}`) : null,
     p?.truncated ? h("button", { class: "primary", disabled: !AI.sample, onclick: () => writePart(curPart, "continue") }, "Continue this part") : null,
-    p?.text ? h("button", { disabled: !AI.sample, onclick: () => writePart(curPart, "rewrite", note.value.trim()) }, story.style?.a ? "Rewrite in chosen style" : "Rewrite with note") : null,
+    p?.text ? h("button", { disabled: !AI.sample, onclick: () => { const v = note.value.trim(); if (v) saveNote(curPart, v, document.getElementById("noteall")?.checked); writePart(curPart, "rewrite", v); } }, story.style?.a ? "Rewrite in chosen style" : (hasNotes(curPart) ? "Rewrite with notes" : "Rewrite with note")) : null,
     p?.text ? h("button", { onclick: () => { room.critique = { ...room.critique, text: p.text, label: `${o.title} · Part ${curPart + 1}`, lens: story.style?.a || "", marks: [], out: "", rewrite: "", err: "", fixes: [], source: { storyId: story.id, ks: [curPart] } }; gotoRoom("critique"); } }, "Critique") : null,
     p?.history?.length ? h("button", { title: "Compare with the previous version", onclick: () => { const prev = p.history[p.history.length - 1]; openCompare(prev.text, p.text, "Previous version" + (prev.style ? " · " + prev.style : ""), "Current version" + (p.style ? " · " + p.style : "")); } }, icon(ICON_COMPARE), "Compare versions") : null,
     h("span", { class: "spacer" }),
     p?.text && curPart < n - 1 ? h("button", { class: p.truncated ? "" : "primary", disabled: !AI.sample, onclick: () => { curPart += 1; parts[curPart]?.text ? render() : writePart(curPart, "write"); } }, parts[curPart + 1]?.text ? "Next part →" : "Write next part →") : null);
-  const sec = h("section", { class: "sheet" }, nav, head, p?.history?.length && !busy ? timeline(curPart) : null, body, p?.text && !busy ? h("div", { class: "field" }, h("label", { for: "rewritenote" }, "Rewrite note (optional)"), note) : null, actions);
+  const sec = h("section", { class: "sheet" }, nav, head, p?.history?.length && !busy ? timeline(curPart) : null, body, p?.text && !busy ? notesField(curPart, note) : null, actions);
   app.append(stylePanel());
   app.append(sec);
   const rv = revisionPanel(); if (rv) app.append(rv);
@@ -3322,6 +3332,32 @@ function ideaImageBox() {
     ideaImg.err ? h("div", { class: "note err", role: "alert", text: ideaImg.err }) : null,
     ideaImg.options?.length ? h("div", { class: "imgideas" }, h("span", { class: "label", text: "Stories in this image · tap one to use it" }),
       ideaImg.options.map((o, i) => h("button", { class: "imgidea", "aria-pressed": ideaImg.picked === i ? "true" : "false", onclick: () => useImageIdea(i) }, h("b", { text: o.title }), h("span", { text: o.idea })))) : null);
+}
+
+
+// ---------- Remembered rewrite notes ----------
+const hasNotes = k => !!((story.notes || []).length || (parts[k]?.notes || []).length);
+function saveNote(k, text, whole) {
+  const n = { text: text.slice(0, 300), at: Date.now() };
+  if (whole) { story.notes = [...(story.notes || []).filter(x => x.text !== n.text), n].slice(-12); persist(); }
+  else if (parts[k]) { parts[k].notes = [...(parts[k].notes || []).filter(x => x.text !== n.text), n].slice(-12); }
+}
+async function dropNote(k, text, whole) {
+  if (whole) { story.notes = (story.notes || []).filter(x => x.text !== text); persist(); }
+  else if (parts[k]) { parts[k].notes = (parts[k].notes || []).filter(x => x.text !== text); await Store.savePart(story.id, parts[k]).catch(() => {}); }
+  render();
+}
+function notesField(k, noteEl) {
+  const whole = story.notes || [], mine = parts[k]?.notes || [];
+  const chip = (x, w) => h("div", { class: "notechip" }, h("span", { text: x.text }), w ? h("small", { text: "All parts" }) : null,
+    h("button", { "aria-label": "Remove this note", title: "Stop applying this note", onclick: () => dropNote(k, x.text, w) }, "✕"));
+  return h("div", { class: "field" },
+    whole.length || mine.length ? h("div", { class: "notes-kept" },
+      h("span", { class: "label", text: "Notes Claude keeps following" }),
+      ...whole.map(x => chip(x, true)), ...mine.map(x => chip(x, false)),
+      h("p", { class: "muted small", text: "Every rewrite follows all of these. Tap ✕ to drop one." })) : null,
+    h("label", { for: "rewritenote" }, whole.length || mine.length ? "Add another note (optional)" : "Rewrite note (optional)"), noteEl,
+    h("label", { class: "checkline" }, h("input", { type: "checkbox", id: "noteall" }), "Use this note for all parts, including new ones"));
 }
 
 /*ROOM:END*/

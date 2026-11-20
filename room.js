@@ -2030,3 +2030,29 @@ function ideaImageBox() {
     ideaImg.options?.length ? h("div", { class: "imgideas" }, h("span", { class: "label", text: "Stories in this image · tap one to use it" }),
       ideaImg.options.map((o, i) => h("button", { class: "imgidea", "aria-pressed": ideaImg.picked === i ? "true" : "false", onclick: () => useImageIdea(i) }, h("b", { text: o.title }), h("span", { text: o.idea })))) : null);
 }
+
+
+// ---------- Remembered rewrite notes ----------
+const hasNotes = k => !!((story.notes || []).length || (parts[k]?.notes || []).length);
+function saveNote(k, text, whole) {
+  const n = { text: text.slice(0, 300), at: Date.now() };
+  if (whole) { story.notes = [...(story.notes || []).filter(x => x.text !== n.text), n].slice(-12); persist(); }
+  else if (parts[k]) { parts[k].notes = [...(parts[k].notes || []).filter(x => x.text !== n.text), n].slice(-12); }
+}
+async function dropNote(k, text, whole) {
+  if (whole) { story.notes = (story.notes || []).filter(x => x.text !== text); persist(); }
+  else if (parts[k]) { parts[k].notes = (parts[k].notes || []).filter(x => x.text !== text); await Store.savePart(story.id, parts[k]).catch(() => {}); }
+  render();
+}
+function notesField(k, noteEl) {
+  const whole = story.notes || [], mine = parts[k]?.notes || [];
+  const chip = (x, w) => h("div", { class: "notechip" }, h("span", { text: x.text }), w ? h("small", { text: "All parts" }) : null,
+    h("button", { "aria-label": "Remove this note", title: "Stop applying this note", onclick: () => dropNote(k, x.text, w) }, "✕"));
+  return h("div", { class: "field" },
+    whole.length || mine.length ? h("div", { class: "notes-kept" },
+      h("span", { class: "label", text: "Notes Claude keeps following" }),
+      ...whole.map(x => chip(x, true)), ...mine.map(x => chip(x, false)),
+      h("p", { class: "muted small", text: "Every rewrite follows all of these. Tap ✕ to drop one." })) : null,
+    h("label", { for: "rewritenote" }, whole.length || mine.length ? "Add another note (optional)" : "Rewrite note (optional)"), noteEl,
+    h("label", { class: "checkline" }, h("input", { type: "checkbox", id: "noteall" }), "Use this note for all parts, including new ones"));
+}
