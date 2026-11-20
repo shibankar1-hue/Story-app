@@ -153,6 +153,52 @@ textarea { resize: vertical; min-height: 120px; }
 .sofar > * + * { margin-top: 14px; }
 .sofar summary { cursor: pointer; list-style-position: outside; }
 .sofar summary h3 { display: inline; }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tabs button { min-height: 38px; padding: 6px 12px; border-radius: 999px; background: transparent; border-color: transparent; color: var(--muted); }
+.tabs button[aria-current="page"] { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-soft); }
+.ic { display: inline-flex; vertical-align: -3px; margin-right: 6px; }
+.tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.tool { text-align: left; display: flex; flex-direction: column; gap: 4px; font-weight: 400; padding: 14px; }
+.tool b { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; color: var(--accent); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chips button { min-height: 34px; padding: 4px 12px; border-radius: 999px; font-size: 0.85rem; }
+.chips button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.lead { font-size: 1.1rem; color: var(--muted); }
+.techs { display: flex; flex-direction: column; gap: 10px; }
+.tech { display: flex; gap: 12px; align-items: center; border-left: 3px solid var(--accent); padding-left: 12px; }
+.tech p { margin-top: 2px; }
+.tech button { flex: none; }
+.excerpt { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.excerpt blockquote, .md blockquote { margin: 0; padding: 14px 18px; border-left: 3px solid var(--marigold); background: var(--paper); border-radius: 0 10px 10px 0; white-space: pre-wrap; }
+.excerpt blockquote.hindi { font-size: 1.08rem; line-height: 1.8; }
+.excerpt figcaption { font-size: 0.85rem; color: var(--muted); }
+.excerpt a, .md a { color: var(--accent); }
+.checks { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.checks label, .checkline { display: inline-flex; align-items: center; gap: 6px; font-size: 0.92rem; cursor: pointer; }
+.checks input, .checkline input { width: 18px; height: 18px; }
+.md { display: flex; flex-direction: column; gap: 0.7em; max-width: 70ch; }
+.md h3 { margin-top: 0.6em; font-size: 1.1rem; }
+.md h4 { margin-top: 0.4em; font-size: 1rem; font-family: var(--font-display); }
+.md ul, .md ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 0.3em; }
+.mdpage { padding: 22px clamp(16px, 4vw, 32px); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; font-size: 0.92rem; min-width: 100%; }
+th, td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+th { background: var(--paper); }
+table.stats td { font-variant-numeric: tabular-nums; }
+.two, .sbs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.sbscol { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sbscol .page { padding: 18px; }
+.labelinput { font-weight: 700; }
+.diff { white-space: pre-wrap; line-height: 1.7; }
+ins { background: var(--accent-soft); color: var(--ink); text-decoration: none; border-radius: 3px; box-shadow: inset 0 -2px 0 var(--accent); }
+del { color: var(--danger); text-decoration: line-through; opacity: 0.85; }
+.upload { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; border: 2px dashed var(--line); border-radius: 12px; padding: 18px; cursor: pointer; }
+.upload input { font: inherit; max-width: 100%; }
+.sheet.inner { background: var(--paper); }
+.player { width: 100%; max-height: 70vh; border-radius: 10px; background: #000; }
+.transcript summary { cursor: pointer; font-weight: 600; }
+.transcript > * + * { margin-top: 10px; }
 .busy { display: flex; gap: 10px; align-items: center; color: var(--muted); }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--marigold); animation: pulse 1s infinite ease-in-out; }
 @keyframes pulse { 50% { opacity: 0.25; transform: scale(0.7); } }
@@ -160,6 +206,9 @@ textarea { resize: vertical; min-height: 120px; }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--paper); padding: 10px 18px; border-radius: 999px; font-weight: 600; z-index: 20; max-width: calc(100% - 32px); text-align: center; }
 </style>
 
+<script type="application/json" id="writers-data">
+<!--DATA:BEGIN-->[{"id": "premchand", "name": "Premchand", "group": "hindi", "era": "1880–1936", "pd": true, "line": "Village India, money and dignity, told in plain Hindustani with a moral sting.", "signature": "Premchand writes ordinary people (farmers, children, widows, clerks) caught between need and self-respect. The narrator talks to you like an elder, comments on the characters, and lets irony do the hurting. Big emotion arrives through small objects: a pair of tongs, a shroud, a blanket.", "techniques": [{"name": "The small object that carries the theme", "how": "Hang the whole story on one cheap, concrete thing (Hamid's chimta) and let every character react to it."}, {"name": "Narrator as a warm commentator", "how": "The narrator steps in with a line of judgement or wit, then steps back into the scene."}, {"name": "Lists of everyday detail", "how": "Open with a rush of village activity (buttons, shoes, oxen) to put us inside the day before the plot starts."}, {"name": "Child's-eye logic", "how": "Let a child argue like a lawyer; his innocent reasoning exposes the adults' world."}], "works": ["Idgah", "Kafan", "Poos ki Raat", "Bade Bhai Sahab", "Shatranj ke Khiladi", "Godaan (novel)"], "excerpts": [{"work": "Idgah (opening)", "lang": "hi", "text": "रमज़ान के पूरे तीस रोज़ के बाद आज ईद आई है। कितना मनोहर; कितना सुहावना प्रभात है। वृक्षों पर कुछ अजीब हरियाली है, खेतों में कुछ अजीब रौनक है, आसमान पर कुछ अजीब लालिमा है। आज का सूर्य देखो, कितना प्यारा, कितना शीतल है, मानों संसार को ईद की बधाई दे रहा है। गाँव में कितनी हलचल है। ईदगाह जाने की तैयारियाँ हो रही हैं। किसी के कुरते में बटन नहीं है। पड़ोस के घर से सुई-तागा लेने दौड़ा जा रहा है। किसी के जूते कड़े हो गये हैं, उनमें तेल डालने के लिए तेली के घर भागा जाता है। जल्दी-जल्दी बैलों की सानी-पानी दे दें। ईदगाह से लौटते-लौटते दोपहर हो जायेगा। तीन कोस का पैदल रास्ता, फिर सैकड़ों आदमियों से मिलना-भेंटना। दोपहर के पहले लौटना असम्भव है। लड़के सबसे ज़्यादा प्रसन्न हैं। किसी ने एक रोज़ा रखा है, वह भी दोपहर तक, किसी ने वह भी नहीं है लेकिन ईदगाह जाने की खुशी उनके हिस्से की चीज़ हैं। रोज़े बड़े-बूढ़े के लिए होंगे। इनके लिए तो ईद है।", "source": "Mansarovar 1 (1947), Hindi Wikisource", "url": "https://hi.wikisource.org/wiki/%E0%A4%AE%E0%A4%BE%E0%A4%A8%E0%A4%B8%E0%A4%B0%E0%A5%8B%E0%A4%B5%E0%A4%B0_%E0%A5%A7/%E0%A4%88%E0%A4%A6%E0%A4%97%E0%A4%BE%E0%A4%B9", "note": "A rush of tiny village details (a missing button, stiff shoes, oxen to feed) puts us inside Eid morning before any plot. Notice the narrator's asides: 'रोज़े बड़े-बूढ़े के लिए होंगे। इनके लिए तो ईद है।'"}, {"work": "Poos ki Raat (ending)", "lang": "hi", "text": "दोनों खेत की दशा देख रहे थे। मुन्नी के मुख पर उदासी छाई थी; पर हल्कू प्रसन्न था।\nमुन्नी ने चिंतित होकर कहा --- अब मजूरी करके मालगुजारी भरनी पड़ेगी।\nहल्कू ने प्रसन्न-मुख से कहा --- रात की ठण्ड में यहां सोना तो न पड़ेगा।", "source": "Mansarovar 1 (1947), Hindi Wikisource", "url": "https://hi.wikisource.org/wiki/%E0%A4%AE%E0%A4%BE%E0%A4%A8%E0%A4%B8%E0%A4%B0%E0%A5%8B%E0%A4%B5%E0%A4%B0_%E0%A5%A7/%E0%A4%AA%E0%A5%82%E0%A4%B8_%E0%A4%95%E0%A5%80_%E0%A4%B0%E0%A4%BE%E0%A4%A4", "note": "The ironic ending: the crop is destroyed, the wife despairs, and Halku is happy because he won't have to sleep in the cold field again. One line of dialogue reverses the whole story's meaning."}]}, {"id": "prasad", "name": "Jaishankar Prasad", "group": "hindi", "era": "1889–1937", "pd": true, "line": "Lyrical, Sanskrit-rich prose of history, romance and sacrifice.", "signature": "A Chhayavaad poet writing prose: long musical sentences, nature as a mirror of feeling, and heroes and heroines torn between love and duty, often against a historical backdrop. Endings are usually renunciation, not victory.", "techniques": [{"name": "Landscape as emotion", "how": "Describe sea, night or lamp-light so it tells us what the character feels before they speak."}, {"name": "Love against duty", "how": "Put the lovers on opposite sides of a loyalty (nation, family, vow) so the choice costs something."}, {"name": "Elevated diction", "how": "Choose tatsam words and rhythmic phrasing for a heightened, poetic register."}], "works": ["Aakashdeep", "Puraskar", "Mamta", "Chandragupta (play)", "Dhruvswamini (play)"], "excerpts": [{"work": "Aakashdeep (opening)", "lang": "hi", "text": "\"बन्दी!\"\n\"क्या है? सोने दो।\"\n\"मुक्त होना चाहते हो?\"\n\"अभी नहीं, निद्रा खुलने पर, चुप रहो।\"\n\"फिर अवसर न मिलेगा।\"\n\"बड़ा शीत है, कहीं से एक कम्बल डालकर कोई शीत से मुक्त करता।\"\n\"आँधी की सम्भावना है। यही अवसर है। आज मेरे बन्धन शिथिल हैं।\"\n\"तो क्या तुम भी बन्दी हो?\"\n\"हाँ, धीरे बोलो, इस नाव पर केवल दस नाविक और प्रहरी हैं।\"\n\"शस्त्र मिलेगा?\"\n\"मिल जाएगा। पोत से सम्बद्ध रज्जु काट सकोगे?\"\n\"हाँ।\"", "source": "Jaishankar Prasad ki Shreshth Kahaniyan, Hindi Wikisource", "url": "https://hi.wikisource.org/wiki/%E0%A4%9C%E0%A4%AF%E0%A4%B6%E0%A4%82%E0%A4%95%E0%A4%B0_%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%B8%E0%A4%BE%E0%A4%A6_%E0%A4%95%E0%A5%80_%E0%A4%B6%E0%A5%8D%E0%A4%B0%E0%A5%87%E0%A4%B7%E0%A5%8D%E0%A4%A0_%E0%A4%95%E0%A4%B9%E0%A4%BE%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE%E0%A4%82/%E0%A4%86%E0%A4%95%E0%A4%BE%E0%A4%B6%E0%A4%A6%E0%A5%80%E0%A4%AA", "note": "The story opens in pure dialogue, in the dark: two prisoners, no names, no description. Tension first, landscape later. When the storm arrives, it mirrors their escape."}]}, {"id": "manto", "name": "Saadat Hasan Manto", "group": "hindi", "era": "1912–1955", "pd": false, "line": "Partition, sex workers, madness: told flatly, ending with a shock.", "signature": "Manto writes like a reporter at a crime scene: short sentences, no sermon, no tears. He goes where polite literature won't (riots, brothels, asylums) and ends on one devastating line or image that flips everything before it.", "techniques": [{"name": "The last-line punch", "how": "Build quietly, then end on one line or gesture that reveals the true horror or irony."}, {"name": "Clinical tone for terrible events", "how": "Describe violence plainly; the reader supplies the emotion."}, {"name": "Compassion for the outcast", "how": "Give the 'immoral' character the most human moment in the story."}], "works": ["Toba Tek Singh", "Thanda Gosht", "Khol Do", "Kaali Shalwar", "Siyah Hashiye (vignettes)"], "excerpts": []}, {"id": "chughtai", "name": "Ismat Chughtai", "group": "hindi", "era": "1915–1991", "pd": false, "line": "Bold, funny, intimate stories of women inside middle-class Muslim homes.", "signature": "Chughtai writes in the chatty, idiomatic speech of women at home: gossip, teasing, taunts. Under the comedy are desire, loneliness and power within the family. A child or young girl often narrates what she half understands.", "techniques": [{"name": "Begumati zubaan", "how": "Use women's household idiom, proverbs and taunts as the music of the prose."}, {"name": "The half-understanding narrator", "how": "A child narrates; the reader understands more than she does."}, {"name": "Comedy hiding pain", "how": "Keep the surface funny so the dark truth lands harder."}], "works": ["Lihaaf", "Tedhi Lakeer (novel)", "Chauthi ka Joda", "Gainda"], "excerpts": []}, {"id": "parsai", "name": "Harishankar Parsai", "group": "hindi", "era": "1924–1995", "pd": false, "line": "Hindi satire (vyangya): deadpan, short and merciless about hypocrisy.", "signature": "Parsai takes an absurd premise (a policeman sent to the moon, a dead man's soul stuck in government files) and narrates it with a straight face. Every sentence carries a jab at bureaucracy, politics or religion.", "techniques": [{"name": "Absurd premise, serious tone", "how": "State something impossible as plain fact and follow its logic to the end."}, {"name": "Bureaucratic language as a weapon", "how": "Let officials speak in jargon that exposes their emptiness."}, {"name": "One target per piece", "how": "Pick one hypocrisy and hit it from every angle."}], "works": ["Bholaram ka Jeev", "Inspector Matadeen Chand Par", "Viklang Shraddha ka Daur"], "excerpts": []}, {"id": "renu", "name": "Phanishwar Nath Renu", "group": "hindi", "era": "1921–1977", "pd": false, "line": "Regional (aanchalik) fiction full of folk song, dialect and sound.", "signature": "Renu makes a region, rural Purnia in Bihar, the hero. His pages are full of sounds, folk songs, local words and festivals. Plot is loose; atmosphere and community carry the story.", "techniques": [{"name": "Sound on the page", "how": "Write the dhol, bells and calls as words, so the reader hears the village."}, {"name": "Folk song as commentary", "how": "Drop in a song whose lines comment on the scene."}, {"name": "Dialect as character", "how": "Let each character's local speech show class and place."}], "works": ["Maila Aanchal (novel)", "Maare Gaye Gulfam (Teesri Kasam)", "Panchlight"], "excerpts": []}, {"id": "mannu", "name": "Mannu Bhandari", "group": "hindi", "era": "1931–2021", "pd": false, "line": "Quiet, sharp stories of modern marriages and women's choices.", "signature": "Bhandari writes urban middle-class women deciding between two men, a career and a family, honesty and comfort. The prose is plain, the drama inward, and the endings often leave the choice uncomfortably open.", "techniques": [{"name": "Diary-like interiority", "how": "Let the heroine's thoughts contradict what she says aloud."}, {"name": "The undramatic crisis", "how": "Make a phone call or a letter the turning point, not a fight."}, {"name": "Open ending", "how": "Stop at the moment of choice and let the reader decide."}], "works": ["Yahi Sach Hai (filmed as Rajnigandha)", "Aapka Bunty (novel)", "Mahabhoj (novel)"], "excerpts": []}, {"id": "nirmal", "name": "Nirmal Verma", "group": "hindi", "era": "1929–2005", "pd": false, "line": "Lyrical, inward prose of memory, silence and loneliness.", "signature": "Verma's stories happen mostly inside people: in pauses, in rooms at dusk, in what they don't say. Hill stations and European cities, fog and rain; long sentences that drift like memory.", "techniques": [{"name": "Silence as dialogue", "how": "Let the most important line go unsaid; write the pause around it."}, {"name": "Weather as mood", "how": "Fog, rain and dusk set the emotional key of the scene."}, {"name": "Memory folding into the present", "how": "Slide between now and then without a hard break."}], "works": ["Parinde", "Ve Din (novel)", "Kavve aur Kala Pani"], "excerpts": []}, {"id": "salim-javed", "name": "Salim–Javed", "group": "film", "era": "1970s–80s", "pd": false, "line": "The angry young man, mythic plots and dialogue that becomes a proverb.", "signature": "Salim Khan and Javed Akhtar built larger-than-life heroes with a wound (a tattooed insult, a murdered father), a clear enemy and a moral choice. Every big line is set up earlier, so when it comes it lands like thunder. Mother, brother, and law versus loyalty are the engines.", "techniques": [{"name": "Setup and payoff dialogue", "how": "Plant a phrase or object early; pay it off in the climax with a twist in meaning."}, {"name": "The hero's wound", "how": "Show the childhood injustice in the first minutes; everything after is the hero answering it."}, {"name": "Two brothers, two paths", "how": "Split one moral question between two characters who love each other."}, {"name": "The quotable line", "how": "Short, rhythmic, a contrast in two halves, built on character, not decoration."}], "works": ["Zanjeer", "Deewaar", "Sholay", "Trishul", "Don"], "excerpts": []}, {"id": "gulzar", "name": "Gulzar", "group": "film", "era": "b. 1934", "pd": false, "line": "Poet-filmmaker: everyday images made strange, relationships told softly.", "signature": "Gulzar joins senses that don't usually go together (a fragrance you can see, a voice you can touch) and finds poetry in small household things. His films are about relationships breaking and mending, often told out of order through memory.", "techniques": [{"name": "Synaesthetic image", "how": "Describe one sense with another to make a familiar feeling new."}, {"name": "Non-linear memory", "how": "Tell a relationship through flashbacks triggered by objects or places."}, {"name": "Restraint in dialogue", "how": "Characters say less than they feel; one soft line carries the scene."}], "works": ["Ijaazat", "Aandhi", "Mausam", "Koshish", "Masoom (screenplay)"], "excerpts": []}, {"id": "hrishikesh", "name": "Hrishikesh Mukherjee", "group": "film", "era": "1922–2006", "pd": false, "line": "Warm middle-class comedies and dramas about decent people.", "signature": "Mukherjee's films (written with collaborators like Gulzar and Rajinder Singh Bedi) find drama in everyday middle-class life: a job interview, a new cook, a dying friend. Comedy comes from character and misunderstanding, never cruelty.", "techniques": [{"name": "Comedy of deception", "how": "One small lie snowballs; the fun is watching it be maintained."}, {"name": "The outsider who heals a house", "how": "A newcomer (cook, patient, guest) quietly fixes a broken family."}, {"name": "Gentle stakes", "how": "Keep the stakes human-sized so warmth, not spectacle, drives the story."}], "works": ["Anand", "Golmaal", "Chupke Chupke", "Bawarchi", "Abhimaan"], "excerpts": []}, {"id": "kashyap", "name": "Anurag Kashyap", "group": "film", "era": "b. 1972", "pd": false, "line": "Gritty small-town crime, dark humour and raw Hindi.", "signature": "Kashyap's stories are messy and alive: gangs, obsession, revenge across generations, told with street dialogue, sudden violence and dark jokes. Structure often breaks into chapters or jumps in time.", "techniques": [{"name": "Violence with a joke beside it", "how": "Put an absurd or funny beat right next to brutality to unsettle the audience."}, {"name": "Dialect and swearing as truth", "how": "Let characters speak exactly as they would in their town."}, {"name": "Generational revenge", "how": "Spread one feud across fathers and sons so history drives the plot."}], "works": ["Black Friday", "Gangs of Wasseypur (co-written)", "Dev.D", "Ugly"], "excerpts": []}, {"id": "juhi", "name": "Juhi Chaturvedi", "group": "film", "era": "b. 1975", "pd": false, "line": "Slice-of-life family stories with quiet, specific humour.", "signature": "Chaturvedi finds stories in topics nobody films (sperm donation, constipation, a comatose co-worker, an old landlord) and plays them through family bickering and small rituals. Low plot, high texture; feeling arrives sideways.", "techniques": [{"name": "The unglamorous premise", "how": "Build a film on an everyday or awkward subject people really live with."}, {"name": "Family argument as music", "how": "Overlapping, repetitive bickering that reveals love."}, {"name": "Emotion through routine", "how": "Show change through a habit that shifts (a morning walk, a tea order)."}], "works": ["Vicky Donor", "Piku", "October", "Gulabo Sitabo"], "excerpts": []}, {"id": "varun", "name": "Varun Grover", "group": "film", "era": "b. 1980", "pd": false, "line": "Poetic realism, satire and the small towns of North India.", "signature": "A lyricist and satirist, Grover writes characters trapped by caste, family or exams who reach for dignity. Banaras ghats, coaching cities, poetry inside working-class lives; humour that cuts.", "techniques": [{"name": "Poetry in ordinary mouths", "how": "Give a working-class character a line of real poetry that changes the scene."}, {"name": "System as antagonist", "how": "Let caste, exams or the law be the real villain, not one person."}, {"name": "Satire without a sermon", "how": "Make the absurdity visible and let the audience judge."}], "works": ["Masaan (screenplay)", "Sacred Games (co-writer)", "All India Rank"], "excerpts": []}, {"id": "bhardwaj", "name": "Vishal Bhardwaj", "group": "film", "era": "b. 1965", "pd": false, "line": "Shakespeare in the Indian hinterland, with dialect and music.", "signature": "Bhardwaj moves classic tragedies into Mumbai's underworld, UP's badlands and Kashmir, keeping the structure and changing the soul. Earthy dialects, black humour, songs that do plot work.", "techniques": [{"name": "Classic structure, local skin", "how": "Keep a proven plot skeleton; rebuild every detail from a real Indian place."}, {"name": "Dialect as world-building", "how": "Characters' speech (Khari Boli, Kashmiri-Urdu) tells us where we are."}, {"name": "Songs that move plot", "how": "A song should change a relationship, not pause the story."}], "works": ["Maqbool", "Omkara", "Haider", "Kaminey"], "excerpts": []}, {"id": "raghavan", "name": "Sriram Raghavan", "group": "film", "era": "b. 1963", "pd": false, "line": "Noir thrillers with twists, dark comedy and film-buff homage.", "signature": "Raghavan builds thrillers where one wrong decision spirals: crime that goes wrong, revenge that rots, liars cornered. Twists are fair (clues are on screen), and dark comedy keeps tension crackling.", "techniques": [{"name": "The decision that spirals", "how": "One choice early on traps the hero in consequences that keep multiplying."}, {"name": "Fair-play twist", "how": "Show every clue on screen; the twist reframes what we already saw."}, {"name": "Comedy inside suspense", "how": "Let an absurd interruption stretch the tension of a dangerous scene."}], "works": ["Johnny Gaddaar", "Badlapur", "Andhadhun", "Merry Christmas"], "excerpts": []}, {"id": "chekhov", "name": "Anton Chekhov", "group": "world", "era": "1860–1904", "pd": true, "line": "Ordinary lives, precise details, endings that stay open.", "signature": "Chekhov watches people without judging them. He picks a few exact details (a beret, a white dog, a slice of watermelon) and lets them carry character. Stories end not with resolution but with the realisation that the hardest part is just beginning.", "techniques": [{"name": "The telling detail", "how": "Choose one or two specific, slightly odd details instead of a full description."}, {"name": "No villain, no verdict", "how": "Show people as they are; let the reader judge, or not."}, {"name": "The open ending", "how": "End at a moment of understanding, not of resolution."}, {"name": "Chekhov's gun", "how": "Anything you show prominently must matter later; cut what doesn't."}], "works": ["The Lady with the Dog", "Ward No. 6", "The Bet", "The Seagull (play)", "The Cherry Orchard (play)"], "excerpts": [{"work": "The Lady with the Dog (opening)", "lang": "en", "text": "It was said that a new person had appeared on the sea-front: a lady with a little dog. Dmitri Dmitritch Gurov, who had by then been a fortnight at Yalta, and so was fairly at home there, had begun to take an interest in new arrivals. Sitting in Verney's pavilion, he saw, walking on the sea-front, a fair-haired young lady of medium height, wearing a beret; a white Pomeranian dog was running behind her.\n\nAnd afterwards he met her in the public gardens and in the square several times a day. She was walking alone, always wearing the same beret, and always with the same white dog; no one knew who she was, and every one called her simply \"the lady with the dog.\"\n\n\"If she is here alone without a husband or friends, it wouldn't be amiss to make her acquaintance,\" Gurov reflected.", "source": "The Tales of Chekhov, vol. 3, tr. Constance Garnett (1917), English Wikisource", "url": "https://en.wikisource.org/wiki/The_Tales_of_Chekhov/Volume_3/The_Lady_with_the_Dog", "note": "Three details make her a person: a beret, a white Pomeranian, always alone. Gurov's cynical thought in one line gives us his whole character."}, {"work": "The Lady with the Dog (ending)", "lang": "en", "text": "Then they spent a long while taking counsel together, talked of how to avoid the necessity for secrecy, for deception, for living in different towns and not seeing each other for long at a time. How could they be free from this intolerable bondage?\n\n\"How? How?\" he asked, clutching his head. \"How?\"\n\nAnd it seemed as though in a little while the solution would be found, and then a new and splendid life would begin; and it was clear to both of them that they had still a long, long road before them, and that the most complicated and difficult part of it was only just beginning.", "source": "The Tales of Chekhov, vol. 3, tr. Constance Garnett (1917), English Wikisource", "url": "https://en.wikisource.org/wiki/The_Tales_of_Chekhov/Volume_3/The_Lady_with_the_Dog", "note": "The famous open ending: no solution, only the realisation that 'the most complicated and difficult part of it was only just beginning.'"}]}, {"id": "ohenry", "name": "O. Henry", "group": "world", "era": "1862–1910", "pd": true, "line": "City stories with a playful narrator and a twist ending.", "signature": "O. Henry's narrator chats with the reader, makes jokes and long, showy words, then springs an ironic twist in the last lines that turns the story into a parable.", "techniques": [{"name": "The twist ending", "how": "Plant the twist's ingredients openly; reveal how they combine only at the end."}, {"name": "A narrator with personality", "how": "Let the narrator joke and comment like a storyteller at a tea stall."}, {"name": "A precise money detail", "how": "Ground the story in an exact, small sum or price."}], "works": ["The Gift of the Magi", "The Last Leaf", "The Ransom of Red Chief", "After Twenty Years"], "excerpts": [{"work": "The Gift of the Magi (opening)", "lang": "en", "text": "ONE dollar and eighty-seven cents. That was all. And sixty cents of it was in pennies. Pennies saved one and two at a time by bulldozing the grocer and the vegetable man and the butcher until one’s cheeks burned with the silent imputation of parsimony that such close dealing implied. Three times Della counted it. One dollar and eighty-seven cents. And the next day would be Christmas.", "source": "The Four Million (A. L. Burt), English Wikisource", "url": "https://en.wikisource.org/wiki/The_Four_Million/The_Gift_of_the_Magi", "note": "An exact sum, repeated, as the first line and the last but one. The money detail is the whole conflict, stated before we know who Della is."}, {"work": "The Gift of the Magi (ending)", "lang": "en", "text": "The magi, as you know, were wise men—wonderfully wise men—who brought gifts to the Babe in the manger. They invented the art of giving Christmas presents. Being wise, their gifts were no doubt wise ones, possibly bearing the privilege of exchange in case of duplication. And here I have lamely related to you the uneventful chronicle of two foolish children in a flat who most unwisely sacrificed for each other the greatest treasures of their house. But in a last word to the wise of these days let it be said that of all who give gifts these two were the wisest. Of all who give and receive gifts, such as they are wisest. Everywhere they are wisest. They are the magi.", "source": "The Four Million (A. L. Burt), English Wikisource", "url": "https://en.wikisource.org/wiki/The_Four_Million/The_Gift_of_the_Magi", "note": "After the twist, the chatty narrator steps forward and turns the story into a parable: 'They are the magi.'"}]}, {"id": "tagore", "name": "Rabindranath Tagore", "group": "world", "era": "1861–1941", "pd": true, "line": "Tender, humane stories of bonds across class and distance.", "signature": "Tagore's short stories, translated into English in his lifetime, find deep feeling in unlikely friendships (a little girl and an Afghan fruit-seller) and in the cost of social rules. A gentle narrator, often a father or observer, and endings that ache rather than shock.", "techniques": [{"name": "Friendship across worlds", "how": "Pair two people separated by age, class or country, and let their bond grow through small rituals."}, {"name": "The observer narrator", "how": "A father or neighbour watches and understands slowly, with us."}, {"name": "Ending in quiet sacrifice", "how": "Resolve with a small, costly generous act rather than a dramatic event."}], "works": ["The Cabuliwallah (Kabuliwala)", "The Postmaster", "Subha", "The Hungry Stones"], "excerpts": [{"work": "The Cabuliwallah (opening)", "lang": "en", "text": "My five years' old daughter Mini cannot live without chattering. I really believe that in all her life she has not wasted a minute in silence. Her mother is often vexed at this, and would stop her prattle, but I would not. To see Mini quiet is unnatural, and I cannot bear it long. And so my own talk with her is always lively.\n\nOne morning, for instance, when I was in the midst of the seventeenth chapter of my new novel, my little Mini stole into the room, and putting her hand into mine, said: \"Father! Ramdayal the door-keeper calls a crow a krow! He doesn't know anything, does he?\"", "source": "The Hungry Stones and Other Stories (1916), tr. Sister Nivedita, English Wikisource", "url": "https://en.wikisource.org/wiki/The_Hungry_Stones_and_Other_Stories/The_Cabuliwallah", "note": "Character through speech: Mini is introduced by her chatter, and the father-narrator by his indulgence and his unfinished novel."}, {"work": "The Cabuliwallah (ending)", "lang": "en", "text": "The marriage-pipes sounded, and the mild autumn sun streamed round us. But Rahmun sat in the little Calcutta lane, and saw before him the barren mountains of Afghanistan.\n\nI took out a bank-note, and gave it to him, saying: \"Go back to your own daughter, Rahmun, in your own country, and may the happiness of your meeting bring good fortune to my child!\"\n\nHaving made this present, I had to curtail some of the festivities. I could not have the electric lights I had intended, nor the military band, and the ladies of the house were despondent at it. But to me the wedding feast was all the brighter for the thought that in a distant land a long-lost father met again with his only child.", "source": "The Hungry Stones and Other Stories (1916), tr. Sister Nivedita, English Wikisource", "url": "https://en.wikisource.org/wiki/The_Hungry_Stones_and_Other_Stories/The_Cabuliwallah", "note": "A quiet, costly gift resolves the story. The image of the barren mountains inside a Calcutta wedding lane holds both fathers' longing."}]}, {"id": "hemingway", "name": "Ernest Hemingway", "group": "world", "era": "1899–1961", "pd": false, "line": "Short, plain sentences; the real story under the surface.", "signature": "Hemingway's 'iceberg' method: show only a little of what is going on and leave the rest underwater. Simple words, repeated phrases, dialogue where people talk around the real subject.", "techniques": [{"name": "The iceberg", "how": "Know everything about the situation, write a fraction, and trust the reader to feel the rest."}, {"name": "Dialogue around the subject", "how": "Characters never name the real problem; they argue about drinks and hills."}, {"name": "Plain declarative rhythm", "how": "Short sentences joined with 'and'; few adjectives."}], "works": ["Hills Like White Elephants", "The Old Man and the Sea", "A Clean, Well-Lighted Place"], "excerpts": []}, {"id": "marquez", "name": "Gabriel García Márquez", "group": "world", "era": "1927–2014", "pd": false, "line": "Magical realism: wonders told as plain fact, time folding on itself.", "signature": "Márquez narrates miracles and plagues with the calm of a grandmother telling family history. Opening lines jump across time; long, rolling sentences mix the absurd, the tragic and the funny.", "techniques": [{"name": "The marvellous stated flatly", "how": "Describe an impossible event in the same tone as breakfast."}, {"name": "Time-folding first line", "how": "Open with a future moment that looks back to a past one."}, {"name": "Family as a town's history", "how": "Let one family's generations stand for a nation."}], "works": ["One Hundred Years of Solitude", "Chronicle of a Death Foretold", "A Very Old Man with Enormous Wings"], "excerpts": []}, {"id": "carver", "name": "Raymond Carver", "group": "world", "era": "1938–1988", "pd": false, "line": "Minimalist stories of working-class couples, endings left hanging.", "signature": "Carver strips scenes to kitchen-table talk, drinks and silences. Nothing seems to happen, yet a marriage or a life shifts. Endings stop abruptly, leaving the reader inside the tension.", "techniques": [{"name": "Kitchen-table scene", "how": "Put two or three people at a table and let talk reveal a crisis."}, {"name": "Cut, cut, cut", "how": "Remove every sentence that explains; keep only what we can see and hear."}, {"name": "The hanging ending", "how": "Stop just after the turn, before anyone reacts."}], "works": ["Cathedral", "What We Talk About When We Talk About Love", "A Small, Good Thing"], "excerpts": []}, {"id": "shakespeare", "name": "William Shakespeare", "group": "theatre", "era": "1564–1616", "pd": true, "line": "Soliloquy, poetry under pressure, comedy beside tragedy.", "signature": "Shakespeare lets characters think aloud in verse, turning private doubt into public drama. Plots braid a main and a sub-plot; clowns and gravediggers comment on kings. Images (poison, gardens, sleep) repeat across a play to build meaning.", "techniques": [{"name": "The soliloquy", "how": "Let a character alone on stage argue with themselves; the audience becomes their confidant."}, {"name": "Comic relief that cuts deep", "how": "Put a joking low-life character in the darkest scene; his jokes carry the truth."}, {"name": "Image patterns", "how": "Repeat one image family across the play so it gathers meaning."}], "works": ["Hamlet", "Macbeth", "Othello", "King Lear", "Twelfth Night"], "excerpts": [{"work": "Hamlet, Act III, Scene 1", "lang": "en", "text": "To be, or not to be: that is the question:\nWhether 'tis nobler in the mind to suffer\nThe slings and arrows of outrageous fortune,\nOr to take arms against a sea of troubles,\nAnd by opposing end them? To die: to sleep;\nNo more; and, by a sleep to say we end\nThe heart-ache and the thousand natural shocks\nThat flesh is heir to, 'tis a consummation\nDevoutly to be wish'd. To die, to sleep;\nTo sleep: perchance to dream: ay, there's the rub;\nFor in that sleep of death what dreams may come\nWhen we have shuffled off this mortal coil,\nMust give us pause. There's the respect\nThat makes calamity of so long life;", "source": "Hamlet (Yale Shakespeare, 1917), English Wikisource", "url": "https://en.wikisource.org/wiki/Hamlet_%281917%29_Yale/Text/Act_III", "note": "A soliloquy is an argument with yourself: question, option one, option two, a complication ('ay, there's the rub'). Notice how 'to die, to sleep' repeats and turns."}]}, {"id": "ibsen", "name": "Henrik Ibsen", "group": "theatre", "era": "1828–1906", "pd": true, "line": "Realist drama: a respectable home, a hidden secret, a reckoning.", "signature": "Ibsen sets plays in ordinary drawing rooms where a secret from the past (a forged signature, a disease, a lie) slowly comes out. Each act tightens the screw; the climax is a conversation, not a fight.", "techniques": [{"name": "The past breaking into the present", "how": "Build the plot on a secret already done before the play begins."}, {"name": "The confrontation scene", "how": "Sit two characters down and let them finally say everything."}, {"name": "The door that closes", "how": "End on one decisive action that changes a life."}], "works": ["A Doll's House", "Ghosts", "Hedda Gabler", "An Enemy of the People"], "excerpts": [{"work": "A Doll's House, Act III (ending)", "lang": "en", "text": "HELMER\nNora—can I never be anything more than a stranger to you?\n\nNORA\n[taking her bag] Ah, Torvald, the most wonderful thing of all would have to happen.\n\nHELMER\nTell me what that would be!\n\nNORA\nBoth you and I would have to be so changed that—. Oh, Torvald, I don't believe any longer in wonderful things happening.\n\nHELMER\nBut I will believe in it. Tell me! So changed that—?\n\nNORA\nThat our life together would be a real wedlock. Goodbye. [She goes out through the hall.]\n\nHELMER\n[sinks down on a chair at the door and buries his face in his hands] Nora! Nora! [Looks round, and rises.] Empty. She is gone. [A hope flashes across his mind.] The most wonderful thing of all—?\n\n[The sound of a door shutting is heard from below.]", "source": "English Wikisource (translator not named there; public-domain translation)", "url": "https://en.wikisource.org/wiki/A_Doll%27s_House/Act_III", "note": "The climax is a conversation and then a sound. Nora's refusals get shorter and shorter; the slammed door does what no speech could."}]}, {"id": "tendulkar", "name": "Vijay Tendulkar", "group": "theatre", "era": "1928–2008", "pd": false, "line": "Marathi theatre of power, cruelty and hypocrisy.", "signature": "Tendulkar exposes violence hidden in respectable society: a mock trial that turns into a real hunt, a power-hungry official, a man who 'keeps' women. Games and rituals on stage turn into cruelty.", "techniques": [{"name": "The game that turns real", "how": "Start with play-acting or a mock event that slowly becomes an actual trial or attack."}, {"name": "Hypocrisy under a polite surface", "how": "Let respectable characters reveal brutality through small remarks."}, {"name": "Chorus and folk form", "how": "Use a chorus or folk performance style to comment on power."}], "works": ["Shantata! Court Chalu Ahe", "Ghashiram Kotwal", "Sakharam Binder", "Kamala"], "excerpts": []}, {"id": "rakesh", "name": "Mohan Rakesh", "group": "theatre", "era": "1925–1972", "pd": false, "line": "Modern Hindi drama of incomplete people and broken homes.", "signature": "Rakesh writes lonely characters who want more than life gives: an artist who leaves his village love, a family where everyone is 'half complete'. Long silences, interrupted speech and one room that traps everyone.", "techniques": [{"name": "Broken-off speech", "how": "Characters start sentences they can't finish; the gaps hold the feeling."}, {"name": "One trapping room", "how": "Keep the whole play in one space so pressure builds."}, {"name": "Desire for completeness", "how": "Every character wants something the others can't give."}], "works": ["Aashadh Ka Ek Din", "Aadhe Adhure", "Lehron Ke Rajhans"], "excerpts": []}, {"id": "tanvir", "name": "Habib Tanvir", "group": "theatre", "era": "1923–2009", "pd": false, "line": "Folk theatre: Chhattisgarhi Nacha, songs and village actors.", "signature": "Tanvir built plays with folk performers from Chhattisgarh, using their songs, improvisation and direct address to the audience. Stories are fables with sharp political edges, and comedy carries the message.", "techniques": [{"name": "Direct address", "how": "Characters talk to the audience, sing commentary and break the fourth wall."}, {"name": "Fable with a sting", "how": "A simple folk tale whose moral turns against the powerful."}, {"name": "Songs as structure", "how": "Songs open, link and close scenes."}], "works": ["Charandas Chor", "Agra Bazar", "Mitti ki Gaadi"], "excerpts": []}, {"id": "sircar", "name": "Badal Sircar", "group": "theatre", "era": "1925–2011", "pd": false, "line": "Third Theatre: no stage, no sets, actors among the audience.", "signature": "Sircar left the proscenium for open spaces, bodies and voices only. His plays are about the trapped urban middle class, repeating patterns and the search for meaning, staged so close that the audience is part of the scene.", "techniques": [{"name": "The body as set", "how": "Actors become walls, trains and crowds; no props needed."}, {"name": "Repetition as theme", "how": "Repeat the same scene with small changes to show a life stuck in a loop."}, {"name": "Audience inside the play", "how": "Stage it in the round so spectators are witnesses."}], "works": ["Evam Indrajit", "Pagla Ghoda", "Michhil"], "excerpts": []}, {"id": "karnad", "name": "Girish Karnad", "group": "theatre", "era": "1938–2019", "pd": false, "line": "Myth and history retold to ask modern questions.", "signature": "Karnad takes a myth, folktale or historical king and uses it to ask about identity, power and desire today. He borrows folk forms (Yakshagana, a narrator-Bhagavata, masks) and mixes the comic with the tragic.", "techniques": [{"name": "Old story, new question", "how": "Retell a known myth or history so it asks something urgent now."}, {"name": "The Bhagavata narrator", "how": "A narrator figure introduces, comments on and even enters the play."}, {"name": "Masks and doubles", "how": "Swap heads, bodies or identities to dramatise a split self."}], "works": ["Tughlaq", "Hayavadana", "Naga-Mandala", "Yayati"], "excerpts": []}, {"id": "pinter", "name": "Harold Pinter", "group": "theatre", "era": "1930–2008", "pd": false, "line": "Menace, pauses and power games in ordinary rooms.", "signature": "Pinter's characters fight for territory with small talk. Threat comes from what is not said; famous pauses and silences shift power. In Betrayal he tells an affair backwards.", "techniques": [{"name": "The pause", "how": "Write silences as beats where power changes hands."}, {"name": "Menace from the ordinary", "how": "A stranger's polite questions become a threat."}, {"name": "Reverse chronology", "how": "Tell the story backwards so the audience watches innocence return."}], "works": ["The Birthday Party", "The Homecoming", "Betrayal", "The Caretaker"], "excerpts": []}, {"id": "aristotle", "name": "Aristotle, Poetics", "group": "craft", "area": "Screenwriting", "era": "c. 335 BCE", "pd": true, "line": "The first book on story: plot as soul, reversal and recognition.", "signature": "The oldest surviving study of drama. Aristotle argues that plot (the arrangement of events) matters more than character, that a story needs a beginning, middle and end bound by probability, and that the strongest moments are a reversal of fortune and a recognition.", "techniques": [{"name": "Plot is the soul", "how": "Arrange events so each follows from the last by probability or necessity."}, {"name": "Reversal (peripeteia)", "how": "An action meant to help produces the opposite result."}, {"name": "Recognition (anagnorisis)", "how": "A character moves from ignorance to knowledge, ideally at the moment of reversal."}, {"name": "Pity and fear", "how": "A good-but-flawed person falling through an error moves us most."}], "works": ["Poetics (S. H. Butcher translation, 1902)"], "excerpts": [{"work": "Poetics, part VI: the definition of tragedy", "lang": "en", "text": "Tragedy, then, is an imitation of an action that is serious, complete, and of a certain magnitude; in language embellished with each kind of artistic ornament, the several kinds being found in separate parts of the play; in the form of action, not of narrative; through pity and fear effecting the proper purgation of these emotions.", "source": "The Poetics, tr. S. H. Butcher, English Wikisource", "url": "https://en.wikisource.org/wiki/The_Poetics_translated_by_S._H._Butcher/Whole_text", "note": "'Action, not narrative': drama shows, it doesn't tell. 'Complete' means a real beginning, middle and end."}, {"work": "Poetics, part VI: plot as the soul", "lang": "en", "text": "The plot, then, is the first principle, and, as it were, the soul of a tragedy; Character holds the second place. A similar fact is seen in painting. The most beautiful colors, laid on confusedly, will not give as much pleasure as the chalk outline of a portrait. Thus Tragedy is the imitation of an action, and of the agents mainly with a view to the action.", "source": "The Poetics, tr. S. H. Butcher, English Wikisource", "url": "https://en.wikisource.org/wiki/The_Poetics_translated_by_S._H._Butcher/Whole_text", "note": "Aristotle's chalk-outline comparison: a clear plot shape matters more than beautiful details laid on confusedly."}, {"work": "Poetics, part XI: reversal and recognition", "lang": "en", "text": "Reversal of the Situation is a change by which the action veers round to its opposite, subject always to our rule of probability or necessity. Thus in the Oedipus, the messenger comes to cheer Oedipus and free him from his alarms about his mother, but by revealing who he is, he produces the opposite effect.\n\nRecognition, as the name indicates, is a change from ignorance to knowledge, producing love or hate between the persons destined by the poet for good or bad fortune The best form of recognition is coincident with a Reversal of the Situation, as in the Oedipus.", "source": "The Poetics, tr. S. H. Butcher, English Wikisource", "url": "https://en.wikisource.org/wiki/The_Poetics_translated_by_S._H._Butcher/Whole_text", "note": "The messenger means to comfort Oedipus and destroys him: the purest reversal. Best of all when the recognition arrives at that same moment."}]}, {"id": "natyashastra", "name": "Bharata, Natyashastra", "group": "craft", "area": "Acting", "era": "c. 200 BCE – 200 CE", "pd": false, "line": "Indian theory of rasa: the audience tastes emotion through bhava.", "signature": "The Sanskrit treatise on performance. Its core idea: a performance creates rasa (an aesthetic 'flavour' such as shringara, karuna, vira, hasya) in the audience, built from the actor's bhava (emotion), its causes (vibhava), its expressions (anubhava) and passing feelings (vyabhichari bhava). Original Sanskrit is ancient; English translations here are cited by idea.", "techniques": [{"name": "Pick the dominant rasa", "how": "Decide which rasa the scene should leave the audience tasting; make every element serve it."}, {"name": "Vibhava → anubhava", "how": "Show the cause of the emotion, then its outward signs (tears, trembling), not a statement of it."}, {"name": "Passing feelings", "how": "Layer brief contrary moods (doubt, shame, hope) over the main emotion to make it real."}], "works": ["Natyashastra, chapters 6–7 (rasa and bhava)"], "excerpts": []}, {"id": "freytag", "name": "Gustav Freytag, Technique of the Drama", "group": "craft", "area": "Screenwriting", "era": "1863", "pd": true, "line": "The pyramid: exposition, rise, climax, fall, catastrophe.", "signature": "Freytag analysed five-act tragedies and drew drama as a pyramid: introduction, rising action, climax, falling action and catastrophe, with an 'exciting force' that starts the rise. Cited here by idea.", "techniques": [{"name": "The exciting force", "how": "One event early on starts the conflict moving."}, {"name": "Climax in the middle", "how": "In tragedy, the peak of the hero's power comes mid-play; the rest is the fall."}, {"name": "The force of the last suspense", "how": "Just before the catastrophe, offer a glimmer of escape."}], "works": ["Die Technik des Dramas (1863), translated by E. J. MacEwan (1895)"], "excerpts": []}, {"id": "field", "name": "Syd Field, Screenplay", "group": "craft", "area": "Screenwriting", "era": "1979", "pd": false, "line": "Three acts and two plot points: the 'paradigm'.", "signature": "Field's paradigm: Act I setup (about a quarter), Act II confrontation (half), Act III resolution (a quarter), turned by Plot Point I and Plot Point II, events that hook into the story and spin it in a new direction. Cited by idea.", "techniques": [{"name": "Plot Point I", "how": "Around the end of Act I, an event locks the hero into the story's conflict."}, {"name": "The midpoint", "how": "A central event that splits Act II and raises the stakes."}, {"name": "Plot Point II", "how": "The event that launches the final act and the resolution."}], "works": ["Screenplay: The Foundations of Screenwriting"], "excerpts": []}, {"id": "mckee", "name": "Robert McKee, Story", "group": "craft", "area": "Screenwriting", "era": "1997", "pd": false, "line": "Scenes turn on values; the gap between expectation and result.", "signature": "McKee: every scene should turn a value (love/hate, safe/danger) from positive to negative or the reverse. A character acts expecting one result, the world answers differently, and that gap creates story. Cited by idea.", "techniques": [{"name": "The turning scene", "how": "Name the value at stake; make sure it changes by the end of the scene, or cut the scene."}, {"name": "The gap", "how": "The character expects A, gets B; the next action must be bigger."}, {"name": "Controlling idea", "how": "State the story's meaning in one sentence: value + cause."}], "works": ["Story: Substance, Structure, Style and the Principles of Screenwriting"], "excerpts": []}, {"id": "snyder", "name": "Blake Snyder, Save the Cat!", "group": "craft", "area": "Screenwriting", "era": "2005", "pd": false, "line": "A 15-beat sheet and a likeable hero.", "signature": "Snyder's beat sheet maps a film into 15 beats (Opening Image, Theme Stated, Catalyst, Break into Two, Midpoint, All Is Lost, Finale, and more) and recommends a 'save the cat' moment that makes us like the hero early. Cited by idea.", "techniques": [{"name": "Save the cat", "how": "Early on, let the hero do one kind or brave act so we root for them."}, {"name": "Catalyst", "how": "Something happens to the hero that knocks their life off course."}, {"name": "All is lost", "how": "Near the end of Act II, the hero loses what mattered most; hint at a 'whiff of death'."}], "works": ["Save the Cat! The Last Book on Screenwriting You'll Ever Need"], "excerpts": []}, {"id": "egri", "name": "Lajos Egri, The Art of Dramatic Writing", "group": "craft", "area": "Screenwriting", "era": "1946", "pd": false, "line": "Start from a premise; build characters in three dimensions.", "signature": "Egri argues every play needs a premise (for example 'great love defies even death') and characters built from physiology, sociology and psychology, orchestrated so opposites clash. Cited by idea.", "techniques": [{"name": "The premise", "how": "Write the story's argument in one line: character + conflict + conclusion."}, {"name": "Three-dimensional character", "how": "Define body, social world and inner psychology; they explain every choice."}, {"name": "Orchestration", "how": "Cast characters who are sharply different so conflict is built in."}], "works": ["The Art of Dramatic Writing"], "excerpts": []}, {"id": "mackendrick", "name": "Alexander Mackendrick, On Film-making", "group": "craft", "area": "Directing", "era": "2004 (lectures from the 1970s–90s)", "pd": false, "line": "The director's grammar: show, don't say; build scenes from cause and effect.", "signature": "Mackendrick, director of The Ladykillers and Sweet Smell of Success, taught at CalArts that cinema works below words. A film should be understandable with the sound off: tell the story through what characters do and see, not what they say. He stresses cause and effect between shots, the audience anticipating what will happen next, dramatic irony, and dialogue as action rather than explanation. Cited by idea.", "techniques": [{"name": "Sound-off test", "how": "Could the audience follow the scene with no dialogue? If not, move the story into behaviour, objects and looks."}, {"name": "Dialogue as action", "how": "Every line should be a character doing something to another (pleading, trapping, testing), never information for the audience."}, {"name": "Anticipation and dramatic irony", "how": "Let the audience know something the character doesn't, so they lean forward waiting for it to land."}, {"name": "Cause and effect between shots", "how": "Each shot or beat should prompt a question the next one answers."}], "works": ["On Film-making: An Introduction to the Craft of the Director (ed. Paul Cronin)"], "excerpts": []}, {"id": "yorke", "name": "John Yorke, Into the Woods", "group": "craft", "area": "Screenwriting", "era": "2013", "pd": false, "line": "Five-act shape, the midpoint, and change as the heart of every story.", "signature": "Yorke, who ran drama at the BBC and Channel 4, argues that all stories share one shape: a character with a flaw goes 'into the woods' and comes out changed. He maps it as five acts with a midpoint where the protagonist gets what they want or learns the truth, and shows the same shape repeating at the level of the act, the scene and even the beat. Want versus need, and the fractal structure of scenes, are his key tools. Cited by idea.", "techniques": [{"name": "Into the woods", "how": "Send the hero from a known world into an unknown one that forces them to face their flaw."}, {"name": "The midpoint", "how": "At the centre, the hero gets what they want or discovers the truth, and the story turns."}, {"name": "Want versus need", "how": "Give the hero a conscious want; let the story reveal the deeper need that contradicts it."}, {"name": "Fractal scenes", "how": "Each scene should have its own set-up, turn and change, the whole story's shape in miniature."}], "works": ["Into the Woods: How Stories Work and Why We Tell Them"], "excerpts": []}, {"id": "stanislavski", "name": "Konstantin Stanislavski, An Actor Prepares", "group": "craft", "area": "Acting", "era": "1936", "pd": false, "line": "Given circumstances, objectives and the 'magic if'.", "signature": "Stanislavski's system asks the actor (and the writer) what the character wants in each moment (the objective), what stands in the way, under what given circumstances, and 'what would I do if…'. Under the lines runs subtext. Cited by idea.", "techniques": [{"name": "Objective in every scene", "how": "Give each character a playable want ('to make her stay'), not a feeling."}, {"name": "Given circumstances", "how": "Fix who, where, when and what just happened before the scene starts."}, {"name": "Subtext", "how": "Write lines that say one thing while the character wants another."}], "works": ["An Actor Prepares", "Building a Character"], "excerpts": []}, {"id": "hagen", "name": "Uta Hagen, Respect for Acting", "group": "craft", "area": "Acting", "era": "1973", "pd": false, "line": "Real behaviour, substitution and the questions an actor asks.", "signature": "Hagen teaches actors to find truthful behaviour by asking: who am I, what are my circumstances, what do I want, what's in my way, what do I do to get it. Writers can use the same questions to test every scene. Cited by idea.", "techniques": [{"name": "The actor's questions", "how": "Who, where, when, what do I want, what's in my way, how do I get it: answer them for each character."}, {"name": "Substitution", "how": "Use a real memory as the source of a character's emotion, to make the reaction specific."}, {"name": "Physical destination", "how": "Give characters a task with their hands while they talk."}], "works": ["Respect for Acting", "A Challenge for the Actor"], "excerpts": []}, {"id": "mchekhov", "name": "Michael Chekhov, To the Actor", "group": "craft", "area": "Acting", "era": "1953", "pd": false, "line": "Psychological gesture and atmosphere.", "signature": "Michael Chekhov (Anton's nephew) gave actors the psychological gesture, one strong physical movement that captures a character's inner drive, and the idea that each scene has an atmosphere the actors must play with or against. Cited by idea.", "techniques": [{"name": "Psychological gesture", "how": "Find one physical action that sums up the character (grasping, pushing away)."}, {"name": "Atmosphere", "how": "Decide the scene's air (dread, celebration) and let a character fight it."}], "works": ["To the Actor: On the Technique of Acting"], "excerpts": []}, {"id": "lumet", "name": "Sidney Lumet, Making Movies", "group": "craft", "area": "Directing", "era": "1995", "pd": false, "line": "First decide what the movie is about; every choice follows.", "signature": "Lumet's practical account of directing: once you know what the story is really about (its theme, not its plot), that answer decides casting, lenses, light and pace. Cited by idea.", "techniques": [{"name": "What is it about?", "how": "Write the theme in one line and test every scene against it."}, {"name": "Visual progression", "how": "Change lenses or light gradually across the film to match the theme (rooms closing in)."}], "works": ["Making Movies"], "excerpts": []}, {"id": "mamet", "name": "David Mamet, On Directing Film", "group": "craft", "area": "Directing", "era": "1991", "pd": false, "line": "Tell the story in cuts of simple, uninflected images.", "signature": "Mamet: the director's job is to tell the story through a juxtaposition of plain shots, each one only showing what it must. Ask what the protagonist wants, and what each scene's beat is. Cited by idea.", "techniques": [{"name": "Uninflected images", "how": "Each shot shows one simple thing; meaning comes from the cut."}, {"name": "What does the hero want?", "how": "State the protagonist's want for every scene; cut what doesn't serve it."}], "works": ["On Directing Film"], "excerpts": []}, {"id": "murch", "name": "Walter Murch, In the Blink of an Eye", "group": "craft", "area": "Directing", "era": "1995", "pd": false, "line": "Editing: emotion first, the 'rule of six'.", "signature": "Murch ranks the reasons to cut: emotion first (by far), then story, rhythm, eye-trace and spatial rules. Writers can use it to judge where scenes should start and end. Cited by idea.", "techniques": [{"name": "Emotion first", "how": "Cut a scene where the feeling peaks, even if information is incomplete."}, {"name": "Late in, early out", "how": "Enter a scene as late as possible and leave as early as possible."}], "works": ["In the Blink of an Eye"], "excerpts": []}, {"id": "eisenstein", "name": "Sergei Eisenstein, Film Form", "group": "craft", "area": "Directing", "era": "1920s–40s", "pd": false, "line": "Montage: two shots colliding create a third meaning.", "signature": "Eisenstein argued that meaning in film comes from the collision of shots: put two images side by side and the audience makes an idea neither contains. Cited by idea.", "techniques": [{"name": "Collision montage", "how": "Cut between two unrelated images so the audience draws a conclusion (a feast, a hungry child)."}, {"name": "Rhythmic montage", "how": "Shorten shots as tension rises."}], "works": ["Film Form", "The Film Sense"], "excerpts": []}, {"id": "brook", "name": "Peter Brook, The Empty Space", "group": "craft", "area": "Theatre craft", "era": "1968", "pd": false, "line": "Deadly, holy, rough and immediate theatre.", "signature": "Brook: any empty space can be a stage if someone walks across it while someone else watches. He names four theatres (deadly, holy, rough and immediate) and pushes for theatre that's alive tonight, not dutiful. Cited by idea.", "techniques": [{"name": "The empty space", "how": "Strip the scene to actors and audience; add only what's essential."}, {"name": "Rough theatre", "how": "Use popular, noisy, funny forms to reach truth."}], "works": ["The Empty Space"], "excerpts": []}]<!--DATA:END-->
+</script>
 <div class="wrap" id="app"></div>
 <div class="toast" id="toast" hidden></div>
 
@@ -258,7 +307,7 @@ const Store = {
   async list() {
     if (this.mode === "db") {
       const snap = await this.col().orderBy("updatedAt", "desc").limit(200).get();
-      return snap.docs.map(d => d.data());
+      return snap.docs.map(d => d.data()).filter(x => x && x.idea !== undefined && !String(x.id).startsWith("_"));
     }
     return Object.values(this.localGet("pd.stories", {})).sort((a, b) => b.updatedAt - a.updatedAt);
   },
@@ -416,11 +465,12 @@ function canReach(stage) {
 function render() {
   app.replaceChildren();
   const top = h("header", { class: "top" },
-    h("div", { class: "brand" }, h("h1", { text: "Pehla Draft" }), h("span", { class: "hi", text: "पहला ड्राफ़्ट" })),
-    story ? h("button", { class: "ghost", onclick: () => { story = null; view = "home"; msg = null; loadList(); } }, "← All stories") : null);
+    h("div", { class: "brand" }, h("h1", { text: "Pehla Draft" }), h("span", { class: "hi", text: "पहला ड्राफ़्ट" })), tabsNav());
   app.append(top);
   if (!AI.sample && AI.ready) app.append(h("div", { class: "note" }, "Writing with Claude works when this page is open on claude.ai or in the Claude app while you're signed in. You can still browse and export saved stories."));
+  if (tab !== "stories") return ({ room: renderRoom, books: renderBooks, videos: renderVideos })[tab]();
   if (!story) return renderHome();
+  app.append(h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => { story = null; view = "home"; msg = null; loadList(); } }, "← All stories")));
   app.append(stepBar());
   if (msg) app.append(h("div", { class: "note" + (msg.err ? " err" : ""), role: msg.err ? "alert" : "status" }, msg.text));
   ({ idea: renderIdea, format: renderFormat, interview: renderInterview, outline: renderOutline, draft: renderDraft })[story.stage]();
@@ -666,7 +716,7 @@ async function writePart(i, mode, note) {
   const existing = parts[i]?.text || "";
   let prompt = `You are a professional writer for Indian film, theatre and fiction, writing a first draft.\n\n${bible(story, true)}\nFULL OUTLINE:\n` +
     o.parts.map((p, k) => `${k === i ? ">> " : ""}Part ${k + 1}: ${p.title} — ${p.summary}`).join("\n") +
-    `\n\nFORMAT:\n${formatRules(story)}\n\n`;
+    `\n\nFORMAT:\n${formatRules(story)}\n` + await storyStyleBlock(story, o.parts[i].title + " " + o.parts[i].summary) + `\n`;
   const sofar = storySoFar(i);
   if (sofar) prompt += `STORY SO FAR (what has actually been written in the earlier parts; stay consistent with every name, fact and setup in it):\n${sofar}\n\n`;
   if (prevText) prompt += `The previous part ends like this (continue seamlessly from it, don't repeat it):\n"""\n${prevText.slice(-1800)}\n"""\n\n`;
@@ -685,14 +735,17 @@ async function writePart(i, mode, note) {
       signal: ctrl.signal, modelTier: AI.tier("complex"), cache: false,
       onText: ({ text }) => { latest = text; if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (out) out.replaceChildren(renderText(base + latest)); }); },
     });
-    parts[i] = { i, text: base + r.text.trim(), truncated: !!r.truncated, at: Date.now() };
+    const old = parts[i];
+    const history = (old?.history || []).slice();
+    if (mode !== "continue" && old?.text) history.push({ text: old.text, at: old.at || Date.now(), style: old.style || "" });
+    parts[i] = { i, text: base + r.text.trim(), truncated: !!r.truncated, at: Date.now(), style: styleLabel(story.style), history: history.slice(-4) };
     await Store.savePart(story.id, parts[i]).catch(e => { msg = { text: "Couldn't save this part: " + (e?.message || e?.code) + ". Download it before leaving.", err: true }; });
     persist();
     if (!r.truncated && n > 1) summarise(i);
     if (r.truncated) msg = { text: "This part was cut short. Press “Continue this part” to finish it.", err: false };
   } catch (e) {
     if (e?.text && e.code === "cancelled" && (base + e.text).trim()) {
-      parts[i] = { i, text: base + e.text.trim(), truncated: true, at: Date.now() };
+      parts[i] = { i, text: base + e.text.trim(), truncated: true, at: Date.now(), style: styleLabel(story.style), history: parts[i]?.history || [] };
       Store.savePart(story.id, parts[i]).catch(() => {});
     }
     msg = { text: AI.errText(e), err: e?.code !== "cancelled" };
@@ -795,10 +848,13 @@ function renderDraft() {
   const actions = busy ? busyRow() : h("div", { class: "row" },
     !p?.text ? h("button", { class: "primary", disabled: !AI.sample, onclick: () => writePart(curPart, "write") }, `Write part ${curPart + 1}`) : null,
     p?.truncated ? h("button", { class: "primary", disabled: !AI.sample, onclick: () => writePart(curPart, "continue") }, "Continue this part") : null,
-    p?.text ? h("button", { disabled: !AI.sample, onclick: () => writePart(curPart, "rewrite", note.value.trim()) }, "Rewrite with note") : null,
+    p?.text ? h("button", { disabled: !AI.sample, onclick: () => writePart(curPart, "rewrite", note.value.trim()) }, story.style?.a ? "Rewrite in chosen style" : "Rewrite with note") : null,
+    p?.text ? h("button", { onclick: () => { room.critique = { ...room.critique, text: p.text, label: `${o.title} · Part ${curPart + 1}`, lens: story.style?.a || "", out: "", rewrite: "", err: "" }; gotoRoom("critique"); } }, "Critique") : null,
+    p?.history?.length ? h("button", { title: "Compare with the previous version", onclick: () => { const prev = p.history[p.history.length - 1]; openCompare(prev.text, p.text, "Previous version" + (prev.style ? " · " + prev.style : ""), "Current version" + (p.style ? " · " + p.style : "")); } }, icon(ICON_COMPARE), "Compare versions") : null,
     h("span", { class: "spacer" }),
     p?.text && curPart < n - 1 ? h("button", { class: p.truncated ? "" : "primary", disabled: !AI.sample, onclick: () => { curPart += 1; parts[curPart]?.text ? render() : writePart(curPart, "write"); } }, parts[curPart + 1]?.text ? "Next part →" : "Write next part →") : null);
   const sec = h("section", { class: "sheet" }, nav, head, body, p?.text && !busy ? h("div", { class: "field" }, h("label", { for: "rewritenote" }, "Rewrite note (optional)"), note) : null, actions);
+  app.append(stylePanel());
   app.append(sec);
   const sf = sofarPanel(); if (sf) app.append(sf);
   app.append(exportBar());
@@ -879,6 +935,805 @@ function exportBar() {
       h("button", { class: "ghost", disabled: !any, onclick: e => copyAll(e.currentTarget) }, "Copy all text")));
 }
 
+/*ROOM:BEGIN*/
+// ---------- Writers' Room, Books, Videos, Compare ----------
+const WRITERS = JSON.parse(document.getElementById("writers-data").textContent.replace(/<!--DATA:(BEGIN|END)-->/g, ""));
+const GROUP_LABEL = { hindi: "Hindi & Urdu", film: "Indian film & series", world: "World classics", theatre: "Theatre", craft: "Craft books" };
+let tab = "stories";
+const room = {
+  view: "home", filter: "all", q: "", writerId: null, tech: null, imit: {}, imitLang: "hinglish",
+  critique: { text: "", label: "", lens: "", craft: ["aristotle", "mckee", "stanislavski"], useLib: true, out: "", rewrite: "", err: "" },
+  lesson: { out: "", answer: "", check: "", err: "" },
+  sbs: { text: "", ids: [], outs: {}, err: "" },
+  compare: { a: "", b: "", aLabel: "Draft A", bLabel: "Draft B", out: "", err: "", shown: false },
+};
+let roomBusy = null;
+const put = (el, ...kids) => { for (const k of kids.flat()) if (k != null && k !== false) el.append(k); };
+const ICON_COMPARE = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v13"/><path d="M3 13l4 4 4-4"/><path d="M17 20V7"/><path d="M13 11l4-4 4 4"/></svg>';
+const icon = svg => { const s = document.createElement("span"); s.className = "ic"; s.innerHTML = svg; return s; };
+
+function gotoTab(t) {
+  if (t === tab) { if (t === "room") room.view = "home"; if (t === "books") books.view = "list"; if (t === "videos") vids.view = "list"; }
+  tab = t; msg = null; render(); window.scrollTo(0, 0);
+}
+function gotoRoom(view, extra) { tab = "room"; room.view = view; Object.assign(room, extra || {}); render(); window.scrollTo(0, 0); }
+function tabsNav() {
+  const tabs = [["stories", "Stories"], ["room", "Writers' Room"], ["books", "Books"], ["videos", "Videos"]];
+  return h("nav", { class: "tabs", "aria-label": "Sections" }, tabs.map(([k, l]) =>
+    h("button", { "aria-current": tab === k ? "page" : null, onclick: () => gotoTab(k) }, l)));
+}
+function roomBusyRow() {
+  if (!roomBusy) return null;
+  return h("div", { class: "busy", role: "status" }, h("span", { class: "dot" }), roomBusy.label,
+    h("button", { class: "ghost", onclick: () => roomBusy?.ctrl.abort() }, "Stop"));
+}
+function errNote(t) { return t ? h("div", { class: "note err", role: "alert" }, t) : null; }
+
+// ---------- Markdown (safe, small) ----------
+function inlineMd(s) {
+  const frag = document.createDocumentFragment();
+  for (const part of s.split(/(\*\*[^*]+\*\*|\*[^*\s][^*]*\*)/g)) {
+    if (!part) continue;
+    if (/^\*\*[^*]+\*\*$/.test(part)) frag.append(h("strong", { text: part.slice(2, -2) }));
+    else if (/^\*[^*]+\*$/.test(part)) frag.append(h("em", { text: part.slice(1, -1) }));
+    else frag.append(document.createTextNode(part));
+  }
+  return frag;
+}
+function md(text) {
+  const box = h("div", { class: "md" });
+  const lines = (text || "").replace(/\r/g, "").split("\n");
+  let list = null, para = [], quote = [], table = [];
+  const flush = () => {
+    if (para.length) { const p = h("p"); p.append(inlineMd(para.join(" "))); box.append(p); para = []; }
+    if (quote.length) { const q = h("blockquote"); q.append(inlineMd(quote.join(" "))); box.append(q); quote = []; }
+    if (table.length) {
+      const rows = table.filter(r => !/^\|?\s*:?-{2,}/.test(r.replace(/\|/g, "|").trim()) || /[A-Za-zऀ-ॿ]/.test(r.replace(/[-|:\s]/g, "")));
+      const cells = r => r.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+      const wrap = h("div", { class: "tablewrap" }), t = h("table");
+      rows.forEach((r, i) => { const tr = h("tr"); cells(r).forEach(c => { const td = h(i === 0 ? "th" : "td"); td.append(inlineMd(c)); tr.append(td); }); t.append(tr); });
+      wrap.append(t); box.append(wrap); table = [];
+    }
+    list = null;
+  };
+  for (const raw of lines) {
+    const l = raw.trimEnd();
+    if (!l.trim()) { flush(); continue; }
+    if (/^\s*\|/.test(l)) { if (para.length || quote.length) { const keep = table; table = []; flush(); table = keep; } table.push(l); continue; }
+    else if (table.length) flush();
+    const hm = l.match(/^(#{1,4})\s+(.*)/);
+    if (hm) { flush(); const el = h(hm[1].length <= 2 ? "h3" : "h4"); el.append(inlineMd(hm[2])); box.append(el); continue; }
+    const li = l.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)/);
+    if (li) {
+      if (para.length || quote.length) { const p = para, q = quote; para = []; quote = []; if (p.length) { const e = h("p"); e.append(inlineMd(p.join(" "))); box.append(e); } if (q.length) { const e = h("blockquote"); e.append(inlineMd(q.join(" "))); box.append(e); } }
+      if (!list) { list = h(/^\s*\d/.test(l) ? "ol" : "ul"); box.append(list); }
+      const item = h("li"); item.append(inlineMd(li[1])); list.append(item); continue;
+    }
+    const bq = l.match(/^\s*>\s?(.*)/);
+    if (bq) { if (para.length) { const e = h("p"); e.append(inlineMd(para.join(" "))); box.append(e); para = []; } list = null; quote.push(bq[1]); continue; }
+    if (quote.length) { const e = h("blockquote"); e.append(inlineMd(quote.join(" "))); box.append(e); quote = []; }
+    list = null; para.push(l.trim());
+  }
+  flush();
+  return box;
+}
+// Stream Claude into an element, rendering Markdown as it arrives.
+async function streamInto(el, prompt, opts = {}) {
+  let raf = 0, latest = "";
+  const r = await AI.sample(prompt, { cache: false, modelTier: AI.tier(opts.tier || "default"), signal: opts.signal,
+    onText: ({ text }) => { latest = text; if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (el) el.replaceChildren(md(latest)); }); } });
+  return r.text;
+}
+
+// ---------- Library storage (books and videos) ----------
+const Lib = {
+  books: [], videos: [], loaded: false, chunkCache: {}, pieceCache: {},
+  base() { return Store.col().doc("_lib"); },
+  async load() {
+    try {
+      if (Store.mode === "db") {
+        const [b, v] = await Promise.all([this.base().collection("books").get(), this.base().collection("videos").get()]);
+        this.books = b.docs.map(d => d.data()); this.videos = v.docs.map(d => d.data());
+      } else { this.books = Store.localGet("pd.books", []) || []; this.videos = Store.localGet("pd.videos", []) || []; }
+    } catch (e) { this.books = this.books || []; this.videos = this.videos || []; }
+    this.books.sort((a, b) => b.createdAt - a.createdAt); this.videos.sort((a, b) => b.createdAt - a.createdAt);
+    this.loaded = true;
+  },
+  localStrict(k, v) { localStorage.setItem(k, JSON.stringify(v)); },
+  async saveBook(b) {
+    if (Store.mode === "db") return this.base().collection("books").doc(b.id).set(JSON.parse(JSON.stringify(b)));
+    const all = (Store.localGet("pd.books", []) || []).filter(x => x.id !== b.id); all.unshift(b); this.localStrict("pd.books", all);
+  },
+  async saveChunks(id, chunks, onProgress) {
+    if (Store.mode === "db") {
+      const col = this.base().collection("books").doc(id).collection("chunks");
+      for (let i = 0; i < chunks.length; i++) { await col.doc("c" + i).set(chunks[i]); onProgress?.(i + 1, chunks.length); }
+    } else this.localStrict("pd.chunks." + id, chunks);
+    this.chunkCache[id] = chunks;
+  },
+  async chunks(id) {
+    if (this.chunkCache[id]) return this.chunkCache[id];
+    let cs;
+    if (Store.mode === "db") { const snap = await this.base().collection("books").doc(id).collection("chunks").get(); cs = snap.docs.map(d => d.data()).sort((a, b) => a.n - b.n); }
+    else cs = Store.localGet("pd.chunks." + id, []) || [];
+    return (this.chunkCache[id] = cs);
+  },
+  async removeBook(id) {
+    if (Store.mode === "db") {
+      const col = this.base().collection("books").doc(id).collection("chunks"); const snap = await col.get();
+      for (const d of snap.docs) await col.doc(d.id).delete();
+      await this.base().collection("books").doc(id).delete();
+    } else { this.localStrict("pd.books", (Store.localGet("pd.books", []) || []).filter(x => x.id !== id)); try { localStorage.removeItem("pd.chunks." + id); } catch {} }
+    this.books = this.books.filter(b => b.id !== id); delete this.chunkCache[id]; delete this.pieceCache["book:" + id];
+  },
+  async saveVideo(v) {
+    if (Store.mode === "db") return this.base().collection("videos").doc(v.id).set(JSON.parse(JSON.stringify(v)));
+    const all = (Store.localGet("pd.videos", []) || []).filter(x => x.id !== v.id); all.unshift(v); this.localStrict("pd.videos", all);
+  },
+  async removeVideo(v) {
+    if (v.assetId) { try { const a = await claude.use("assets"); await a?.delete(v.assetId); } catch {} }
+    if (Store.mode === "db") await this.base().collection("videos").doc(v.id).delete();
+    else this.localStrict("pd.videos", (Store.localGet("pd.videos", []) || []).filter(x => x.id !== v.id));
+    this.videos = this.videos.filter(x => x.id !== v.id); delete this.pieceCache["video:" + v.id];
+  },
+};
+
+// ---------- Search over the person's library ----------
+const STOP = new Set("the and that with this from have for was were are but not you your they them their his her she him its what when which into there then than been will would could should about also just like one all can had has our out who how hai hain aur nahi kya kar raha rahi tha thi the ki ka ke ko se mein par bhi woh yeh koi kuch".split(" "));
+const tok = s => ((s || "").toLowerCase().match(/[\p{L}\p{M}\p{N}]{3,}/gu) || []).filter(w => !STOP.has(w));
+function windows(text, label, size = 1800) {
+  const out = [];
+  for (let i = 0; i < text.length; i += size) out.push({ label, text: text.slice(i, i + size + 200) });
+  return out;
+}
+async function piecesFor(id) {
+  if (Lib.pieceCache[id]) return Lib.pieceCache[id];
+  let ps = [];
+  if (id.startsWith("book:")) {
+    const b = Lib.books.find(x => "book:" + x.id === id); if (!b) return [];
+    for (const c of await Lib.chunks(b.id)) for (const p of c.pages) if (p.t) ps.push(...windows(p.t, `${b.title}, p. ${p.p}`));
+  } else {
+    const v = Lib.videos.find(x => "video:" + x.id === id); if (!v?.transcript) return [];
+    ps = windows(v.transcript, `Video: ${v.title}${v.person ? " (" + v.person + ")" : ""}`);
+  }
+  ps.forEach(p => { const tf = new Map(); for (const w of tok(p.text)) tf.set(w, (tf.get(w) || 0) + 1); p.tf = tf; p.len = [...tf.values()].reduce((a, b) => a + b, 0) || 1; });
+  return (Lib.pieceCache[id] = ps);
+}
+async function libraryPassages(query, k = 4, ids) {
+  const all = ids || [...Lib.books.map(b => "book:" + b.id), ...Lib.videos.filter(v => v.transcript).map(v => "video:" + v.id)];
+  let pieces = [];
+  for (const id of all) { try { pieces = pieces.concat(await piecesFor(id)); } catch {} }
+  if (!pieces.length) return [];
+  const q = [...new Set(tok(query))].slice(0, 300);
+  const df = new Map(); for (const w of q) { let n = 0; for (const p of pieces) if (p.tf.has(w)) n++; df.set(w, n); }
+  const N = pieces.length;
+  const scored = pieces.map(p => { let s = 0; for (const w of q) { const f = p.tf.get(w); if (f) s += (f / (f + 1.2 * (0.25 + 0.75 * p.len / 300))) * Math.log(1 + N / (df.get(w) || 1)); } return { p, s }; })
+    .filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, k);
+  return scored.map(x => ({ label: x.p.label, text: x.p.text }));
+}
+const libraryIds = () => [...Lib.books.map(b => "book:" + b.id), ...Lib.videos.filter(v => v.transcript).map(v => "video:" + v.id)];
+
+// ---------- Prompt pieces ----------
+function writerById(id) {
+  if (id && id.startsWith("book:")) {
+    const b = Lib.books.find(x => "book:" + x.id === id);
+    return b && { id, name: (b.author ? b.author + ", " : "") + b.title + " (your library)", group: "library", book: b, techniques: [], excerpts: [] };
+  }
+  return WRITERS.find(w => w.id === id);
+}
+const styleChoices = () => [...WRITERS.filter(w => w.group !== "craft"), ...Lib.books.filter(b => b.kind === "fiction").map(b => writerById("book:" + b.id))];
+async function styleBrief(id, query) {
+  const w = writerById(id); if (!w) return "";
+  if (w.book) {
+    const ps = await libraryPassages(query || w.book.title, 2, [id]);
+    return `STYLE: the writing in "${w.book.title}"${w.book.author ? " by " + w.book.author : ""}, a book the writer uploaded to study.\nStyle notes: ${w.book.card?.style_notes || w.book.card?.summary || "(none yet)"}\nReference passages from that book (study the technique; never copy its sentences):\n` + ps.map(p => `[${p.label}]\n${p.text}`).join("\n\n");
+  }
+  let t = `STYLE: ${w.name} (${w.era}). ${w.signature}\nSignature techniques:\n` + w.techniques.map(x => `- ${x.name}: ${x.how}`).join("\n");
+  if (w.excerpts?.length) t += `\nPublic-domain passages by ${w.name} (study the technique; don't copy sentences):\n` + w.excerpts.map(e => `[${e.work}]\n${e.text}`).join("\n\n");
+  else t += `\n${w.name}'s work is under copyright: imitate the techniques only. Never reproduce, quote or closely paraphrase their actual sentences, dialogue or lyrics.`;
+  return t;
+}
+function craftBrief(ids) {
+  const cs = ids.map(id => WRITERS.find(w => w.id === id)).filter(Boolean);
+  if (!cs.length) return "";
+  return "CRAFT BOOKS TO DRAW ON:\n" + cs.map(c => `* ${c.name} (${c.era}): ${c.signature}\n  Key ideas: ${c.techniques.map(t => t.name + " — " + t.how).join(" | ")}` +
+    (c.excerpts?.length ? `\n  Exact public-domain quotes you may cite: ${c.excerpts.map(e => `[${e.work}] "${e.text.slice(0, 600)}"`).join(" ")}` : `\n  (Cite this book by idea and title only; never invent quotes or page numbers.)`)).join("\n");
+}
+async function storyStyleBlock(s, query) {
+  const st = s.style; if (!st?.a) return "";
+  let t = "\nWRITING STYLE FOR THIS DRAFT:\n" + await styleBrief(st.a, query);
+  if (st.b) t += `\n\nBLEND THE STYLE: about ${st.mix}% the style above and ${100 - st.mix}% this second style:\n` + await styleBrief(st.b, query);
+  return t + "\nApply the style through technique (rhythm, imagery, structure, dialogue habits) while keeping the required language and format exactly.\n";
+}
+function styleLabel(st) {
+  if (!st?.a) return "";
+  const a = writerById(st.a)?.name || st.a, b = st.b ? writerById(st.b)?.name || st.b : "";
+  return b ? `${st.mix}% ${a} + ${100 - st.mix}% ${b}` : a;
+}
+const HINGLISH = "Write in Hinglish (Hindi in Roman letters mixed naturally with English); use English craft terms where they're clearer.";
+const MENTOR = "You are an honest writing mentor and script doctor who has taught Indian film, theatre and fiction writers. Be direct and specific, never harsh. Every criticism comes with a concrete fix. Always name at least one thing that genuinely works.";
+
+// ---------- Room screens ----------
+function renderRoom() {
+  ({ home: roomHome, writer: roomWriter, critique: roomCritique, lesson: roomLesson, sbs: roomSbs, compare: roomCompare })[room.view]();
+}
+function backToRoom() { return h("button", { class: "ghost", onclick: () => { room.view = "home"; render(); } }, "← Writers' Room"); }
+function roomHome() {
+  const tools = [
+    ["critique", "Critic", "Paste your writing or pick a draft part. Honest notes, line fixes and craft-book references."],
+    ["sbs", "Side by side", "One paragraph rewritten in 2–3 writers' styles, next to each other."],
+    ["compare", "Compare drafts", "Two drafts: every change highlighted, and the difference in story and style explained."],
+  ];
+  app.append(h("section", { class: "sheet" }, h("h2", { text: "Writers' Room" }),
+    h("p", { class: "muted", text: "Learn from writers past and present, get critiques, and co-write in their styles. Pick a writer below for lessons, or open a tool." }),
+    h("div", { class: "tools" }, tools.map(([v, t, d]) => h("button", { class: "tool", onclick: () => gotoRoom(v) },
+      h("b", {}, v === "compare" ? icon(ICON_COMPARE) : null, t), h("span", { class: "muted small", text: d }))))));
+  const groups = ["all", ...Object.keys(GROUP_LABEL)];
+  const list = WRITERS.filter(w => (room.filter === "all" || w.group === room.filter) &&
+    (!room.q || (w.name + " " + w.line + " " + w.works.join(" ")).toLowerCase().includes(room.q.toLowerCase())));
+  const sec = h("section", { class: "sheet" },
+    h("div", { class: "row" }, h("h2", { class: "spacer", text: "Style library" }),
+      h("input", { id: "wsearch", type: "text", placeholder: "Search writers or works", value: room.q, style: "max-width:240px",
+        oninput: e => { room.q = e.target.value; clearTimeout(roomHome.t); roomHome.t = setTimeout(() => { render(); const el = document.getElementById("wsearch"); el?.focus(); el?.setSelectionRange(el.value.length, el.value.length); }, 250); } })),
+    h("div", { class: "chips" }, groups.map(g => h("button", { "aria-pressed": room.filter === g ? "true" : "false", onclick: () => { room.filter = g; render(); } }, g === "all" ? "All" : GROUP_LABEL[g]))),
+    list.length ? h("div", { class: "stories" }, list.map(w => h("div", { class: "card", tabindex: "0", role: "button",
+      onclick: () => gotoRoom("writer", { writerId: w.id }), onkeydown: e => { if (e.key === "Enter") gotoRoom("writer", { writerId: w.id }); } },
+      h("span", { class: "t", text: w.name }), h("span", { class: "muted small", text: w.era + (w.area ? " · " + w.area : "") }),
+      h("p", { class: "small", text: w.line }),
+      h("span", { class: "chip" + (w.excerpts.length ? " gold" : ""), text: w.excerpts.length ? "Real passages" : "Style notes" }))))
+      : h("div", { class: "empty" }, "No writer matches that search."),
+    h("p", { class: "muted small", text: "“Real passages” are out-of-copyright texts copied from Wikisource, with the source named. Writers still under copyright have style notes, and any example Claude writes for them is labelled as an imitation." }));
+  app.append(sec);
+}
+function roomWriter() {
+  const w = writerById(room.writerId); if (!w) { room.view = "home"; return roomHome(); }
+  const craft = w.group === "craft";
+  const sec = h("section", { class: "sheet" }, h("div", { class: "row" }, backToRoom()),
+    h("span", { class: "label", text: (GROUP_LABEL[w.group] || "") + " · " + w.era + (w.area ? " · " + w.area : "") }),
+    h("h2", { text: w.name }), h("p", { class: "lead", text: w.line }), h("p", { text: w.signature }),
+    h("h3", { text: craft ? "Key ideas" : "Signature techniques" }),
+    h("div", { class: "techs" }, w.techniques.map(t => h("div", { class: "tech" },
+      h("div", { class: "spacer" }, h("b", { text: t.name }), h("p", { class: "small", text: t.how })),
+      h("button", { disabled: !AI.sample, onclick: () => startLesson(w.id, t) }, "Teach me")))),
+    h("h3", { text: "Works to study" }), h("p", { class: "small", text: w.works.join(" · ") }));
+  if (w.excerpts.length) {
+    put(sec, h("h3", { text: "Real passages" }));
+    for (const e of w.excerpts) put(sec, h("figure", { class: "excerpt" },
+      h("blockquote", { class: e.lang === "hi" ? "hindi" : "", lang: e.lang, text: e.text }),
+      h("figcaption", {}, h("b", { text: e.work }), " · ", h("a", { href: e.url, target: "_blank", rel: "noopener" }, e.source)),
+      h("p", { class: "note small" }, h("b", { text: "What to notice: " }), e.note)));
+    if (w.id === "premchand" || w.id === "prasad") put(sec, h("p", { class: "muted small", text: "Hindi Wikisource texts are scanned and typed by volunteers; one obvious scanning typo was corrected (ज़्यादा)." }));
+  }
+  if (!craft) {
+    const im = room.imit[w.id];
+    const out = h("div", { class: "page", id: "imitout" }); if (im) out.append(h("div", { class: "prose", text: im }));
+    put(sec, h("h3", { text: "An example in this style" }),
+      h("p", { class: "muted small", text: "Claude writes a short original scene using these techniques. It is an imitation, not the writer's own words." }),
+      h("div", { class: "row" },
+        h("select", { id: "imitlang", "aria-label": "Language", style: "max-width:180px", onchange: e => room.imitLang = e.target.value },
+          [["hinglish", "Hinglish"], ["hindi", "Hindi"], ["english", "English"]].map(([v, l]) => h("option", { value: v, selected: room.imitLang === v ? "selected" : null }, l))),
+        h("button", { disabled: !AI.sample || !!roomBusy, onclick: () => imitate(w) }, im ? "Write another" : "Write an imitation")),
+      roomBusyRow(), (im || roomBusy) ? h("div", {}, h("span", { class: "chip", text: "Imitation by Claude" }), out) : null);
+  }
+  put(sec, h("div", { class: "row" },
+    h("button", { onclick: () => gotoRoom("critique", { critique: { ...room.critique, lens: craft ? room.critique.lens : w.id, craft: craft ? [...new Set([...room.critique.craft, w.id])] : room.critique.craft } }) }, craft ? "Critique with this book" : "Critique my writing in this lens"),
+    !craft ? h("button", { onclick: () => { if (!room.sbs.ids.includes(w.id)) room.sbs.ids = [...room.sbs.ids, w.id].slice(-3); gotoRoom("sbs"); } }, "Add to side by side") : null));
+  app.append(sec);
+}
+async function imitate(w) {
+  const ctrl = new AbortController(); roomBusy = { label: "Writing an imitation…", ctrl }; render();
+  const lang = room.imitLang === "hindi" ? "Hindi in Devanagari" : room.imitLang === "english" ? "English" : "Hinglish (Roman script)";
+  const prompt = `${await styleBrief(w.id, w.line)}\n\nWrite an ORIGINAL short scene (about 150–200 words) that shows these techniques clearly, set in present-day India, in ${lang}. Pick your own small situation. Do not quote or reproduce any real text by this writer. After the scene, add one line starting "Techniques used:" naming the 2–3 techniques you used.`;
+  try { const el = document.getElementById("imitout"); room.imit[w.id] = await streamInto(el, prompt, { signal: ctrl.signal }); }
+  catch (e) { toast(AI.errText(e)); }
+  roomBusy = null; render();
+}
+
+// Lesson
+function startLesson(id, tech) { room.lesson = { out: "", answer: "", check: "", err: "" }; gotoRoom("lesson", { writerId: id, tech }); runLesson(); }
+async function runLesson() {
+  const w = writerById(room.writerId), t = room.tech; if (!w || !AI.sample) return;
+  const ctrl = new AbortController(); roomBusy = { label: "Preparing the lesson…", ctrl }; render();
+  const lib = room.critique.useLib && libraryIds().length ? await libraryPassages(`${t.name} ${t.how} ${w.name}`, 3) : [];
+  const src = w.group === "craft" ? craftBrief([w.id]) : await styleBrief(w.id, t.name);
+  const prompt = `You are a warm, exacting writing teacher for an Indian screenwriter and novelist. ${HINGLISH}\n\n${src}\n\n` +
+    (lib.length ? `PASSAGES FROM THE STUDENT'S OWN LIBRARY (books and video transcripts; cite as [label] if you use them):\n${lib.map(p => `[${p.label}]\n${p.text}`).join("\n\n")}\n\n` : "") +
+    `Teach ONE technique: "${t.name}" — ${t.how}\n\nStructure the lesson in Markdown:\n## Technique kya hai\n(2–4 sentences)\n## Kyun kaam karti hai\n(the effect on the reader or audience)\n## Example\n${w.excerpts?.length ? "Quote 1–3 short lines EXACTLY from the public-domain passages above and explain what they do." : "Write a short ORIGINAL example (label it 'Imitation'); never quote this writer's real copyrighted text."}\n## Indian screen/stage pe kaise use karein\n(one concrete idea for a Hindi film, web series or play scene)\n## Galtiyan jo log karte hain\n(2–3 bullets)\n${lib.length ? "## Aapki library se\n(what the student's own books or videos add, with [label] citations)\n" : ""}## Exercise\n(one exercise the student can do in 10–15 minutes, with clear constraints)`;
+  const el = document.getElementById("lessonout");
+  try { room.lesson.out = await streamInto(el, prompt, { signal: ctrl.signal }); }
+  catch (e) { room.lesson.err = AI.errText(e); }
+  roomBusy = null; render();
+}
+async function checkExercise() {
+  const w = writerById(room.writerId), t = room.tech;
+  const ctrl = new AbortController(); roomBusy = { label: "Reading your exercise…", ctrl }; render();
+  const prompt = `${MENTOR} ${HINGLISH}\n\nThe student just had this lesson:\n"""\n${room.lesson.out.slice(0, 6000)}\n"""\nTechnique: ${t.name} (${w.name}).\n\nTheir exercise attempt:\n"""\n${room.lesson.answer}\n"""\n\nGive feedback in Markdown:\n## Score\n(x/10 for how well the technique is used, one line why)\n## Kya kaam kiya\n## Kya sudhaarna hai\n(2–3 points, each with a fix)\n## Ek line ka upgrade\n(quote one of their lines with "> " and show the improved version)\n## Agla step`;
+  try { room.lesson.check = await streamInto(document.getElementById("checkout"), prompt, { signal: ctrl.signal }); }
+  catch (e) { room.lesson.err = AI.errText(e); }
+  roomBusy = null; render();
+}
+function roomLesson() {
+  const w = writerById(room.writerId), L = room.lesson;
+  const sec = h("section", { class: "sheet" },
+    h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => gotoRoom("writer") }, "← " + w.name)),
+    h("span", { class: "label", text: "Lesson · " + w.name }), h("h2", { text: room.tech.name }),
+    errNote(L.err), h("div", { class: "page mdpage", id: "lessonout" }, L.out ? md(L.out) : null),
+    !L.out ? roomBusyRow() : null);
+  if (L.out && !(roomBusy && !L.check && roomBusy.label.startsWith("Preparing"))) {
+    const ta = h("textarea", { id: "exercise", rows: 8, placeholder: "Write your exercise here…", value: L.answer, oninput: e => L.answer = e.target.value });
+    put(sec, h("div", { class: "field" }, h("label", { for: "exercise" }, "Your exercise"), ta),
+      roomBusy ? roomBusyRow() : h("div", { class: "row" },
+        h("button", { class: "ghost", disabled: !AI.sample, onclick: () => { L.out = ""; L.check = ""; runLesson(); } }, "New version of this lesson"),
+        h("span", { class: "spacer" }),
+        h("button", { class: "primary", disabled: !AI.sample, onclick: () => { if (!L.answer.trim()) return toast("Write your exercise first"); checkExercise(); } }, "Check my exercise")),
+      h("div", { class: "page mdpage", id: "checkout", hidden: !L.check && !(roomBusy && roomBusy.label.startsWith("Reading")) }, L.check ? md(L.check) : null));
+  }
+  app.append(sec);
+}
+
+// Critic
+function partPicker(onPick, label = "Load from my stories") {
+  const wrap = h("div", { class: "row" });
+  const sSel = h("select", { "aria-label": "Story", style: "max-width:260px" }, h("option", { value: "" }, label + "…"),
+    stories.filter(s => s.outline).map(s => h("option", { value: s.id }, s.outline.title || s.title || "Untitled")));
+  const pSel = h("select", { "aria-label": "Part", style: "max-width:260px", hidden: true });
+  let ps = {}, st = null;
+  sSel.onchange = async () => {
+    st = stories.find(s => s.id === sSel.value); pSel.hidden = true; if (!st) return;
+    ps = await Store.parts(st.id).catch(() => ({}));
+    const opts = [];
+    st.outline.parts.forEach((p, k) => {
+      if (!ps[k]?.text) return;
+      opts.push(h("option", { value: k + ":cur" }, `Part ${k + 1}: ${p.title} (current)`));
+      (ps[k].history || []).slice().reverse().forEach((v, j, arr) => opts.push(h("option", { value: k + ":h" + (arr.length - 1 - j) }, `Part ${k + 1}: earlier version ${arr.length - j}${v.style ? " · " + v.style : ""}`)));
+    });
+    pSel.replaceChildren(h("option", { value: "" }, opts.length ? "Pick a part…" : "No written parts yet"), ...opts); pSel.hidden = false;
+  };
+  pSel.onchange = () => {
+    if (!pSel.value || !st) return;
+    const [k, v] = pSel.value.split(":"); const p = ps[+k];
+    const text = v === "cur" ? p.text : p.history[+v.slice(1)].text;
+    onPick(text, `${st.outline.title} · Part ${+k + 1}${v === "cur" ? "" : " (earlier version)"}`, { story: st, i: +k });
+  };
+  wrap.append(sSel, pSel);
+  return wrap;
+}
+function roomCritique() {
+  const C = room.critique;
+  const lensSel = h("select", { id: "lens", onchange: e => C.lens = e.target.value },
+    h("option", { value: "" }, "No style lens"), styleChoices().map(w => h("option", { value: w.id, selected: C.lens === w.id ? "selected" : null }, w.name)));
+  const crafts = WRITERS.filter(w => w.group === "craft");
+  const hasLib = libraryIds().length > 0;
+  const ta = h("textarea", { id: "crittext", rows: 10, placeholder: "Paste a scene, chapter or script pages…", value: C.text, oninput: e => C.text = e.target.value });
+  const sec = h("section", { class: "sheet" }, h("div", { class: "row" }, backToRoom()), h("h2", { text: "Critic" }),
+    h("p", { class: "muted", text: "Honest-mentor notes in Hinglish: what works, the biggest problems with fixes, line-by-line improvements, and what the craft books say." }),
+    partPicker((text, label) => { C.text = text; C.label = label; render(); }),
+    C.label ? h("p", { class: "small muted", text: "Loaded: " + C.label }) : null,
+    h("div", { class: "field" }, h("label", { for: "crittext" }, "Text to critique"), ta),
+    h("div", { class: "field" }, h("label", { for: "lens" }, "Style lens (optional)"), lensSel),
+    h("div", { class: "field" }, h("span", { class: "label", text: "Craft books" }),
+      h("div", { class: "checks" }, crafts.map(c => h("label", {}, h("input", { type: "checkbox", checked: C.craft.includes(c.id) ? "checked" : null,
+        onchange: e => { C.craft = e.target.checked ? [...C.craft, c.id] : C.craft.filter(x => x !== c.id); } }), c.name.split(",")[0])))),
+    hasLib ? h("label", { class: "checkline" }, h("input", { type: "checkbox", checked: C.useLib ? "checked" : null, onchange: e => C.useLib = e.target.checked }), "Also draw on my books and videos") : null,
+    errNote(C.err),
+    roomBusy ? roomBusyRow() : h("div", { class: "row end" }, h("button", { class: "primary", disabled: !AI.sample, onclick: runCritique }, "Critique")),
+    h("div", { class: "page mdpage", id: "critout", hidden: !C.out && !roomBusy }, C.out ? md(C.out) : null));
+  if (C.out && !roomBusy) put(sec, h("div", { class: "row" },
+    h("button", { disabled: !AI.sample, onclick: rewriteFromCritique }, "Rewrite using this critique"),
+    C.rewrite ? h("button", { onclick: () => openCompare(C.text, C.rewrite, "Your original", "Rewrite after critique") }, icon(ICON_COMPARE), "Compare original and rewrite") : null));
+  if (C.rewrite || (roomBusy && roomBusy.label.startsWith("Rewriting"))) put(sec, h("h3", { text: "Rewrite" }), h("div", { class: "page", id: "rewriteout" }, C.rewrite ? h("div", { class: "prose", text: C.rewrite }) : null));
+  app.append(sec);
+}
+async function runCritique() {
+  const C = room.critique;
+  if (!C.text.trim()) { C.err = "Paste some writing or load a part first."; return render(); }
+  C.err = ""; C.out = ""; C.rewrite = "";
+  const ctrl = new AbortController(); roomBusy = { label: "Reading closely…", ctrl }; render();
+  const text = C.text.slice(0, 40000);
+  const lens = C.lens ? await styleBrief(C.lens, text.slice(0, 3000)) : "";
+  const lib = C.useLib && libraryIds().length ? await libraryPassages(text.slice(0, 4000) + " " + C.craft.join(" "), 4) : [];
+  const lensName = C.lens ? writerById(C.lens)?.name : "";
+  const prompt = `${MENTOR} ${HINGLISH}\n\n${lens ? "STYLE LENS THE WRITER CHOSE:\n" + lens + "\n\n" : ""}${craftBrief(C.craft)}\n\n` +
+    (lib.length ? `PASSAGES FROM THE WRITER'S OWN LIBRARY (their uploaded books and video transcripts). Cite them as [label] and recommend specific pages or moments to revisit:\n${lib.map(p => `[${p.label}]\n${p.text}`).join("\n\n")}\n\n` : "") +
+    `THE WRITER'S TEXT:\n"""\n${text}\n"""\n\nWrite the critique in Markdown with these headings:\n## Kya kaam kar raha hai\n## Sabse badi 3 problems\n(for each: what it is, why it hurts the reader or audience, and a concrete fix)\n## Line-by-line fixes\n(quote 3–6 original lines, each on its own line starting "> ", then the improved line and a few words on why)\n` +
+    (lensName ? `## Style lens: ${lensName}\n(how close the text is to this style, which 2–3 techniques to borrow and where; refer to the passages above when they exist)\n` : "") +
+    `## Craft books kya kehti hain\n(2–4 points, each naming the book and the idea; quote only the exact public-domain quotes given above; never invent quotes or page numbers)\n` +
+    (lib.length ? `## Aapki library se\n(what their own books/videos suggest here, with [label] citations and what to re-read or re-watch)\n` : "") + `## Agla exercise\n(one short exercise aimed at the biggest problem)`;
+  try { C.out = await streamInto(document.getElementById("critout"), prompt, { signal: ctrl.signal, tier: "complex" }); }
+  catch (e) { C.err = AI.errText(e); }
+  roomBusy = null; render();
+}
+async function rewriteFromCritique() {
+  const C = room.critique;
+  const ctrl = new AbortController(); roomBusy = { label: "Rewriting with the critique…", ctrl }; render();
+  const lens = C.lens ? await styleBrief(C.lens, C.text.slice(0, 3000)) : "";
+  const prompt = `You are a skilled co-writer. Rewrite the writer's text applying the critique below. Keep the same language, script format, characters and events unless the critique says to change them. ${lens ? "\n\n" + lens : ""}\n\nCRITIQUE:\n"""\n${C.out}\n"""\n\nORIGINAL TEXT:\n"""\n${C.text.slice(0, 30000)}\n"""\n\nOutput only the rewritten text.`;
+  let raf = 0;
+  try {
+    const r = await AI.sample(prompt, { signal: ctrl.signal, cache: false, modelTier: AI.tier("complex"),
+      onText: ({ text }) => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; const el = document.getElementById("rewriteout"); if (el) el.replaceChildren(h("div", { class: "prose", text })); }); } });
+    C.rewrite = r.text.trim();
+  } catch (e) { C.err = AI.errText(e); }
+  roomBusy = null; render();
+}
+
+// Side by side
+function roomSbs() {
+  const S = room.sbs;
+  const choices = styleChoices();
+  const sec = h("section", { class: "sheet" }, h("div", { class: "row" }, backToRoom()), h("h2", { text: "Side by side" }),
+    h("p", { class: "muted", text: "The same passage rewritten in up to three styles, so you can see how each writer would handle it. Every version is an imitation by Claude." }),
+    partPicker(text => { S.text = text.slice(0, 4000); render(); }),
+    h("div", { class: "field" }, h("label", { for: "sbstext" }, "Passage (best under 300 words)"),
+      h("textarea", { id: "sbstext", rows: 6, value: S.text, oninput: e => S.text = e.target.value })),
+    h("div", { class: "field" }, h("span", { class: "label", text: `Styles (${S.ids.length} of 3)` }),
+      h("div", { class: "checks" }, choices.map(w => h("label", {}, h("input", { type: "checkbox", checked: S.ids.includes(w.id) ? "checked" : null,
+        disabled: !S.ids.includes(w.id) && S.ids.length >= 3 ? "disabled" : null,
+        onchange: e => { S.ids = e.target.checked ? [...S.ids, w.id] : S.ids.filter(x => x !== w.id); render(); } }), w.name)))),
+    errNote(S.err),
+    roomBusy ? roomBusyRow() : h("div", { class: "row end" }, h("button", { class: "primary", disabled: !AI.sample || S.ids.length < 1, onclick: runSbs }, "Write side by side")));
+  const ids = Object.keys(S.outs);
+  if (ids.length || roomBusy) {
+    put(sec, h("div", { class: "sbs" }, S.ids.map(id => h("div", { class: "sbscol" },
+      h("span", { class: "chip", text: "Imitation: " + (writerById(id)?.name || id) }),
+      h("div", { class: "page", id: "sbs-" + id }, S.outs[id] ? h("div", { class: "prose", text: S.outs[id] }) : null)))));
+    if (ids.length >= 2 && !roomBusy) put(sec, h("div", { class: "row" }, h("button", { onclick: () => openCompare(S.outs[S.ids[0]], S.outs[S.ids[1]], writerById(S.ids[0])?.name, writerById(S.ids[1])?.name) }, icon(ICON_COMPARE), "Compare the first two")));
+  }
+  app.append(sec);
+}
+async function runSbs() {
+  const S = room.sbs;
+  if (!S.text.trim()) { S.err = "Paste a passage first."; return render(); }
+  S.err = ""; S.outs = {};
+  const ctrl = new AbortController(); roomBusy = { label: "Writing in each style…", ctrl }; render();
+  await Promise.all(S.ids.map(async id => {
+    const prompt = `${await styleBrief(id, S.text)}\n\nRewrite the passage below in this style. Keep the same events, characters and language (Hindi stays Hindi, Hinglish stays Hinglish, English stays English) and roughly the same length. Output only the rewritten passage.\n\nPASSAGE:\n"""\n${S.text.slice(0, 6000)}\n"""`;
+    try {
+      const r = await AI.sample(prompt, { signal: ctrl.signal, cache: false, modelTier: AI.tier("default"),
+        onText: ({ text }) => { const el = document.getElementById("sbs-" + id); if (el) el.replaceChildren(h("div", { class: "prose", text })); } });
+      S.outs[id] = r.text.trim();
+    } catch (e) { if (e?.code !== "cancelled") S.err = AI.errText(e); }
+  }));
+  roomBusy = null; render();
+}
+
+// Compare drafts
+function openCompare(a, b, aLabel, bLabel) { room.compare = { a: a || "", b: b || "", aLabel: aLabel || "Draft A", bLabel: bLabel || "Draft B", out: "", err: "", shown: true }; gotoRoom("compare"); }
+function textStats(t) {
+  const words = (t.match(/\S+/g) || []).length;
+  const sentences = Math.max(1, (t.match(/[^.!?।]+[.!?।]+/g) || []).length || 1);
+  const paras = t.split(/\n\s*\n/).filter(x => x.trim()).length;
+  const quoted = (t.match(/["“][^"”]*["”]/g) || []).join("").length;
+  const lines = t.split("\n"); let dlg = 0;
+  for (let i = 1; i < lines.length; i++) if (isUpper(lines[i - 1].trim().replace(/\(.*?\)/g, "")) && lines[i - 1].trim().length < 50 && lines[i].trim() && !isUpper(lines[i].trim())) dlg += lines[i].length;
+  return { words, sentences, avg: Math.round(words / sentences * 10) / 10, paras, dialogue: Math.round(100 * Math.min(1, (quoted + dlg) / Math.max(1, t.length))) };
+}
+function wordDiff(a, b) {
+  const A = a.match(/\S+\s*/g) || [], B = b.match(/\S+\s*/g) || [];
+  const n = A.length, m = B.length;
+  if (n * m > 12e6) return null;
+  const key = s => s.trim();
+  const dp = new Uint32Array((n + 1) * (m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+    dp[i * (m + 1) + j] = key(A[i]) === key(B[j]) ? dp[(i + 1) * (m + 1) + j + 1] + 1 : Math.max(dp[(i + 1) * (m + 1) + j], dp[i * (m + 1) + j + 1]);
+  const out = []; let i = 0, j = 0;
+  const push = (t, s) => { const last = out[out.length - 1]; if (last && last.t === t) last.s += s; else out.push({ t, s }); };
+  while (i < n && j < m) {
+    if (key(A[i]) === key(B[j])) { push("same", B[j]); i++; j++; }
+    else if (dp[(i + 1) * (m + 1) + j] >= dp[i * (m + 1) + j + 1]) { push("del", A[i]); i++; }
+    else { push("ins", B[j]); j++; }
+  }
+  while (i < n) push("del", A[i++]); while (j < m) push("ins", B[j++]);
+  return out;
+}
+function roomCompare() {
+  const C = room.compare;
+  const side = (k, label) => h("div", { class: "field" },
+    h("input", { type: "text", "aria-label": "Name of draft " + k.toUpperCase(), value: C[k + "Label"], oninput: e => C[k + "Label"] = e.target.value, class: "labelinput" }),
+    partPicker((text, l) => { C[k] = text; C[k + "Label"] = l; C.out = ""; render(); }, "Load"),
+    h("textarea", { id: "cmp" + k, rows: 8, value: C[k], placeholder: "Paste " + label + "…", oninput: e => { C[k] = e.target.value; } }));
+  const sec = h("section", { class: "sheet" }, h("div", { class: "row" }, backToRoom()),
+    h("h2", {}, icon(ICON_COMPARE), " Compare drafts"),
+    h("p", { class: "muted", text: "Every word that changed is highlighted, the numbers compare the two, and Claude explains the difference in story, characters and writing style." }),
+    h("div", { class: "two" }, side("a", "the first draft"), side("b", "the second draft")),
+    errNote(C.err),
+    roomBusy ? roomBusyRow() : h("div", { class: "row end" }, h("button", { class: "primary", disabled: !AI.sample && false, onclick: runCompare }, "Compare")));
+  if (C.shown && C.a.trim() && C.b.trim()) {
+    const sa = textStats(C.a), sb = textStats(C.b);
+    const row = (l, x, y, u = "") => h("tr", {}, h("th", { text: l }), h("td", { text: x + u }), h("td", { text: y + u }));
+    put(sec, h("h3", { text: "At a glance" }), h("div", { class: "tablewrap" }, h("table", { class: "stats" },
+      h("tr", {}, h("th"), h("th", { text: C.aLabel }), h("th", { text: C.bLabel })),
+      row("Words", sa.words, sb.words), row("Sentences", sa.sentences, sb.sentences), row("Words per sentence", sa.avg, sb.avg),
+      row("Paragraphs / blocks", sa.paras, sb.paras), row("Dialogue share (approx.)", sa.dialogue, sb.dialogue, "%"))));
+    const d = wordDiff(C.a, C.b);
+    const diffBox = h("div", { class: "page diff" });
+    if (d) d.forEach(x => diffBox.append(x.t === "same" ? document.createTextNode(x.s) : h(x.t === "ins" ? "ins" : "del", { text: x.s })));
+    else diffBox.append(h("p", { class: "muted", text: "These drafts are too long to highlight word by word. The explanation below still covers them in full." }));
+    put(sec, h("h3", { text: "Every change" }), h("p", { class: "muted small" }, h("del", { text: "struck through" }), " = only in " + C.aLabel + " · ", h("ins", { text: "highlighted" }), " = only in " + C.bLabel), diffBox);
+  }
+  put(sec, h("div", { class: "page mdpage", id: "cmpout", hidden: !C.out && !roomBusy }, C.out ? md(C.out) : null));
+  app.append(sec);
+}
+async function runCompare() {
+  const C = room.compare;
+  if (!C.a.trim() || !C.b.trim()) { C.err = "Add both drafts first."; return render(); }
+  C.err = ""; C.shown = true; C.out = "";
+  if (!AI.sample) return render();
+  const ctrl = new AbortController(); roomBusy = { label: "Comparing the drafts…", ctrl }; render();
+  const sa = textStats(C.a), sb = textStats(C.b);
+  const names = WRITERS.filter(w => w.group !== "craft").map(w => w.name).join(", ");
+  const prompt = `You are a senior story editor. Compare two drafts of the same piece and explain the differences thoroughly. ${HINGLISH}\n\nMeasured numbers — ${C.aLabel}: ${sa.words} words, ${sa.avg} words/sentence, ${sa.dialogue}% dialogue. ${C.bLabel}: ${sb.words} words, ${sb.avg} words/sentence, ${sb.dialogue}% dialogue.\n\nDRAFT A — "${C.aLabel}":\n"""\n${C.a.slice(0, 30000)}\n"""\n\nDRAFT B — "${C.bLabel}":\n"""\n${C.b.slice(0, 30000)}\n"""\n\nAnswer in Markdown with these headings:\n## Ek line mein farq\n## Kahani mein kya badla\n(events, information order, what's added or cut, the ending)\n## Characters aur dialogue\n(how each character reads differently; quote short lines with "> ")\n## Writing style ka farq\n(sentence rhythm, word choice, imagery, point of view, tense, show vs tell, pacing; use the numbers above. Say which writers each draft's style is closest to, choosing from: ${names}, and why)\n## Kaun kis cheez mein behtar\n(a Markdown table: | Aspect | ${C.aLabel} | ${C.bLabel} | covering hook, clarity, emotion, dialogue, pacing, originality, style consistency)\n## Recommendation\n(which draft to keep as the base, and exactly what to bring over from the other)`;
+  try { C.out = await streamInto(document.getElementById("cmpout"), prompt, { signal: ctrl.signal, tier: "complex" }); }
+  catch (e) { C.err = AI.errText(e); }
+  roomBusy = null; render();
+}
+
+// ---------- Books ----------
+const books = { view: "list", id: null, pending: null, progress: "", err: "", ask: {} };
+let pdfjsP = null;
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("Couldn't load " + src)); document.head.append(s); }); }
+function loadPdfJs() {
+  if (!pdfjsP) pdfjsP = (async () => {
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"); // runs in the page (no web worker needed)
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+    return window.pdfjsLib;
+  })().catch(e => { pdfjsP = null; throw e; });
+  return pdfjsP;
+}
+async function readPdf(file) {
+  const pdfjs = await loadPdfJs();
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false, disableFontFace: true }).promise;
+  const meta = await doc.getMetadata().catch(() => null);
+  const pages = [];
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i); const tc = await page.getTextContent();
+    const t = tc.items.map(it => it.str + (it.hasEOL ? "\n" : " ")).join("").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+    pages.push({ p: i, t }); page.cleanup?.();
+    if (i % 5 === 0 || i === doc.numPages) { books.progress = `Reading page ${i} of ${doc.numPages}…`; const el = document.getElementById("bookprog"); if (el) el.textContent = books.progress; }
+  }
+  return { pages, title: meta?.info?.Title || "", author: meta?.info?.Author || "" };
+}
+async function onPdfChosen(file) {
+  books.err = ""; books.pending = null;
+  if (!file) return;
+  if (file.size > 80 * 1024 * 1024) { books.err = "That PDF is over 80 MB. Split it into smaller files first."; return render(); }
+  books.progress = "Opening the PDF…"; render();
+  try {
+    const r = await readPdf(file);
+    const chars = r.pages.reduce((a, p) => a + p.t.length, 0);
+    if (chars < 200) { books.err = "This PDF has almost no selectable text (it's probably scanned images), so it can't be read. Try a PDF where you can select the words."; books.progress = ""; return render(); }
+    books.pending = { pages: r.pages, chars, title: r.title || file.name.replace(/\.pdf$/i, ""), author: r.author, kind: "craft", area: "Screenwriting" };
+  } catch (e) { books.err = "Couldn't read that PDF: " + (e?.message || "unknown error"); }
+  books.progress = ""; render();
+}
+async function saveBook() {
+  const P = books.pending; if (!P) return;
+  const id = "b" + Date.now().toString(36);
+  const chunks = []; let cur = { n: 0, pages: [] }, size = 0;
+  for (const p of P.pages) { if (size + p.t.length > 50000 && cur.pages.length) { chunks.push(cur); cur = { n: chunks.length, pages: [] }; size = 0; } cur.pages.push({ p: p.p, t: p.t.slice(0, 50000) }); size += p.t.length; }
+  if (cur.pages.length) chunks.push(cur);
+  const book = { id, title: P.title.trim() || "Untitled book", author: P.author.trim(), kind: P.kind, area: P.kind === "craft" ? P.area : "", pages: P.pages.length, chars: P.chars, docs: chunks.length, card: null, createdAt: Date.now() };
+  books.progress = "Saving…"; render();
+  try {
+    await Lib.saveChunks(id, chunks, (i, n) => { const el = document.getElementById("bookprog"); if (el) el.textContent = `Saving part ${i} of ${n}…`; });
+    await Lib.saveBook(book);
+    Lib.books.unshift(book); books.pending = null; books.view = "detail"; books.id = id; books.progress = "";
+    toast("Saved to your library"); render();
+    makeBookCard(book);
+  } catch (e) {
+    books.err = Store.mode === "db" ? "Couldn't save the book: " + (e?.message || e?.code) : "This browser ran out of space for the book. Open Pehla Draft signed in to Claude to save books to your account.";
+    books.progress = ""; render();
+  }
+}
+async function makeBookCard(book) {
+  if (!AI.sample) return;
+  const ctrl = new AbortController(); roomBusy = { label: "Reading the book and writing a summary card…", ctrl }; render();
+  const cs = await Lib.chunks(book.id);
+  const pages = cs.flatMap(c => c.pages);
+  const head = pages.slice(0, 12).map(p => `[p. ${p.p}] ${p.t}`).join("\n").slice(0, 14000);
+  const step = Math.max(1, Math.floor(pages.length / 10));
+  const samples = []; for (let i = 12; i < pages.length; i += step) samples.push(`[p. ${pages[i].p}] ${pages[i].t.slice(0, 1600)}`);
+  const prompt = `A writer uploaded this book to learn from: "${book.title}"${book.author ? " by " + book.author : ""} (${book.kind === "craft" ? "a craft book on " + book.area : "fiction, a script or poetry to study as a style reference"}). Below are its opening pages and sample pages.\n\n${head}\n\n${samples.join("\n\n").slice(0, 26000)}\n\nWrite a study card. ${HINGLISH}\nReply with JSON only: {"summary": string (3–5 sentences), "key_ideas": [{"idea": string, "pages": string}] (5–8 items; give page numbers only where you saw them above), "use_it_for": [string] (3–5 concrete situations where this book helps a screenwriter/novelist), "style_notes": string (${book.kind === "fiction" ? "how this author writes: sentence rhythm, imagery, dialogue, structure, with page references" : "empty string"})}`;
+  try {
+    const c = await AI.sample.json(prompt, { signal: ctrl.signal, modelTier: AI.tier("default") });
+    book.card = { summary: String(c.summary || ""), key_ideas: (c.key_ideas || []).map(k => ({ idea: String(k.idea || ""), pages: String(k.pages || "") })), use_it_for: (c.use_it_for || []).map(String), style_notes: String(c.style_notes || "") };
+    await Lib.saveBook(book).catch(() => {});
+  } catch (e) { books.err = "The book is saved, but the summary card failed: " + AI.errText(e); }
+  roomBusy = null; render();
+}
+async function askLibrary(state, ids, q, elId) {
+  const ctrl = new AbortController(); roomBusy = { label: "Searching and answering…", ctrl }; state.out = ""; render();
+  const ps = await libraryPassages(q, 6, ids);
+  const prompt = `${MENTOR} ${HINGLISH}\n\nThe writer asks: ${q}\n\nAnswer only from these passages of their own library. Cite each point as [label]. If the passages don't answer it, say so and suggest what to look for instead. End with "Kahan padhein/dekhein" listing the most useful [label] references.\n\n${ps.map(p => `[${p.label}]\n${p.text}`).join("\n\n") || "(no matching passages found)"}`;
+  try { state.out = await streamInto(document.getElementById(elId), prompt, { signal: ctrl.signal }); }
+  catch (e) { state.err = AI.errText(e); }
+  roomBusy = null; render();
+}
+function renderBooks() {
+  if (!Lib.loaded) { app.append(h("div", { class: "empty" }, "Loading your library…")); return; }
+  if (books.view === "detail") return bookDetail();
+  const P = books.pending;
+  const up = h("section", { class: "sheet" }, h("h2", { text: "Books" }),
+    h("p", { class: "muted", text: "Upload a PDF of a book you own: a craft book on screenwriting, acting or directing, or a novel or script whose style you want to study. Pehla Draft reads it, saves the text privately to your account, and draws on it in critiques, lessons and co-writing." }),
+    errNote(books.err),
+    books.progress ? h("div", { class: "busy", role: "status" }, h("span", { class: "dot" }), h("span", { id: "bookprog", text: books.progress })) :
+      !P ? h("label", { class: "upload" }, h("input", { type: "file", accept: "application/pdf,.pdf", id: "pdfin", onchange: e => onPdfChosen(e.target.files[0]) }), h("b", { text: "Choose a PDF" }), h("span", { class: "muted small", text: "PDFs with selectable text work. Scanned pages can't be read." })) : null);
+  if (P && !books.progress) up.append(h("div", { class: "sheet inner" },
+    h("p", { class: "small", text: `Read ${P.pages.length} pages (${P.chars.toLocaleString("en-IN")} characters).` }),
+    h("div", { class: "lengths" },
+      h("div", { class: "field" }, h("label", { for: "btitle" }, "Title"), h("input", { id: "btitle", type: "text", value: P.title, oninput: e => P.title = e.target.value })),
+      h("div", { class: "field" }, h("label", { for: "bauthor" }, "Author"), h("input", { id: "bauthor", type: "text", value: P.author, oninput: e => P.author = e.target.value }))),
+    h("div", { class: "field" }, h("label", { for: "bkind" }, "What kind of book is it?"),
+      h("select", { id: "bkind", onchange: e => { P.kind = e.target.value.split(":")[0]; P.area = e.target.value.split(":")[1] || ""; } },
+        ["craft:Screenwriting", "craft:Acting", "craft:Directing", "craft:Theatre craft", "fiction:"].map(v => h("option", { value: v, selected: (P.kind + ":" + (P.kind === "craft" ? P.area : "")) === v ? "selected" : null },
+          v === "fiction:" ? "Novel, story collection, script or poetry (style reference)" : "Craft book: " + v.split(":")[1])))),
+    h("div", { class: "row end" }, h("button", { class: "ghost", onclick: () => { books.pending = null; render(); } }, "Cancel"), h("button", { class: "primary", onclick: saveBook }, "Save to my library"))));
+  app.append(up);
+  const list = h("section", { class: "sheet" }, h("h3", { text: `Your books (${Lib.books.length})` }));
+  if (!Lib.books.length) list.append(h("div", { class: "empty" }, "Books you upload appear here, each with a summary card you can ask questions."));
+  else list.append(h("div", { class: "stories" }, Lib.books.map(b => h("div", { class: "card", tabindex: "0", role: "button", onclick: () => { books.view = "detail"; books.id = b.id; render(); }, onkeydown: e => { if (e.key === "Enter") { books.view = "detail"; books.id = b.id; render(); } } },
+    h("span", { class: "t", text: b.title }), h("span", { class: "muted small", text: (b.author || "Unknown author") + " · " + b.pages + " pages" }),
+    h("span", { class: "chip" + (b.kind === "fiction" ? " gold" : ""), text: b.kind === "fiction" ? "Style reference" : b.area || "Craft" })))));
+  app.append(list);
+}
+function bookDetail() {
+  const b = Lib.books.find(x => x.id === books.id); if (!b) { books.view = "list"; return renderBooks(); }
+  const A = books.ask[b.id] || (books.ask[b.id] = { q: "", out: "", err: "", confirm: false });
+  const c = b.card;
+  const sec = h("section", { class: "sheet" },
+    h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => { books.view = "list"; render(); } }, "← All books")),
+    h("span", { class: "label", text: (b.kind === "fiction" ? "Style reference" : "Craft book · " + b.area) + " · " + b.pages + " pages" }),
+    h("h2", { text: b.title }), b.author ? h("p", { class: "lead", text: b.author }) : null, errNote(books.err));
+  if (c) {
+    put(sec, h("p", { text: c.summary }), h("h3", { text: "Key ideas" }),
+      h("ul", {}, c.key_ideas.map(k => h("li", {}, k.idea, k.pages ? h("span", { class: "muted small", text: " · p. " + k.pages }) : null))),
+      h("h3", { text: "Use it when" }), h("ul", {}, c.use_it_for.map(u => h("li", { text: u }))),
+      c.style_notes ? h("div", {}, h("h3", { text: "Style notes" }), h("p", { text: c.style_notes })) : null);
+  } else put(sec, roomBusy ? roomBusyRow() : h("div", { class: "row" }, h("p", { class: "muted spacer", text: "No summary card yet." }), h("button", { disabled: !AI.sample, onclick: () => makeBookCard(b) }, "Write summary card")));
+  put(sec, h("h3", { text: "Ask this book" }),
+    h("div", { class: "field" }, h("label", { for: "bq" }, "Question"), h("textarea", { id: "bq", rows: 2, value: A.q, placeholder: "e.g. Interval point kaise design karein? Subtext ke liye kya exercise hai?", oninput: e => A.q = e.target.value })),
+    roomBusy && c ? roomBusyRow() : h("div", { class: "row" }, h("button", { class: "primary", disabled: !AI.sample, onclick: () => { if (A.q.trim()) askLibrary(A, ["book:" + b.id], A.q, "bookans"); } }, "Ask"),
+      b.kind === "fiction" ? h("button", { onclick: () => gotoRoom("critique", { critique: { ...room.critique, lens: "book:" + b.id } }) }, "Use as a style lens") : null),
+    errNote(A.err), h("div", { class: "page mdpage", id: "bookans", hidden: !A.out && !roomBusy }, A.out ? md(A.out) : null),
+    h("div", { class: "row end" }, A.confirm
+      ? h("div", { class: "row" }, h("button", { class: "danger", onclick: async () => { await Lib.removeBook(b.id).catch(() => {}); books.view = "list"; toast("Book deleted"); render(); } }, "Delete for good"), h("button", { class: "ghost", onclick: () => { A.confirm = false; render(); } }, "Keep"))
+      : h("button", { class: "ghost danger", onclick: () => { A.confirm = true; render(); } }, "Delete book")));
+  app.append(sec);
+}
+
+// ---------- Videos ----------
+const vids = { view: "list", id: null, form: null, err: "", busy: "", ask: {} };
+function parseSubs(text) {
+  const out = []; let stamp = "";
+  for (const raw of text.replace(/\r/g, "").split("\n")) {
+    const l = raw.trim();
+    if (!l || l === "WEBVTT" || /^\d+$/.test(l) || /^NOTE\b/.test(l)) continue;
+    const tc = l.match(/^(\d{1,2}:)?(\d{2}):(\d{2})[.,]\d{3}\s+-->/);
+    if (tc) { const hh = tc[1] ? +tc[1].slice(0, -1) : 0; stamp = `[${hh ? hh + ":" : ""}${tc[2]}:${tc[3]}] `; continue; }
+    out.push(stamp + l.replace(/<[^>]+>/g, "")); stamp = "";
+  }
+  return out.join("\n").replace(/\n(?!\[)/g, " ");
+}
+function capTranscript(t) {
+  let s = t.slice(0, 80000);
+  while (new TextEncoder().encode(s).length > 200000) s = s.slice(0, Math.floor(s.length * 0.9));
+  return s;
+}
+function newVideoForm() { return { title: "", person: "", role: "Writer", link: "", file: null, transcript: "", notes: "" }; }
+async function saveVideo() {
+  const F = vids.form;
+  if (!F.title.trim()) { vids.err = "Give the video a title."; return render(); }
+  if (!F.file && !F.link.trim()) { vids.err = "Choose a video file or paste a link."; return render(); }
+  if (F.file && F.file.size > 20 * 1024 * 1024) { vids.err = "That file is over 20 MB, the limit for uploads here. Paste a YouTube or other link instead, and add its transcript."; return render(); }
+  if (F.link && !/^https?:\/\//i.test(F.link.trim())) { vids.err = "The link should start with https://"; return render(); }
+  vids.err = ""; vids.busy = F.file ? "Uploading the video…" : "Saving…"; render();
+  try {
+    const v = { id: "v" + Date.now().toString(36), title: F.title.trim(), person: F.person.trim(), role: F.role, link: F.link.trim(), assetId: "", url: "",
+      transcript: capTranscript(F.transcript.trim()), notes: F.notes.trim(), card: null, createdAt: Date.now() };
+    if (F.file) {
+      const assets = await claude.use("assets");
+      if (!assets) throw new Error("Uploads aren't available in this view. Paste a link instead.");
+      const r = await assets.upload(F.file); v.assetId = r.id; v.url = r.url;
+    }
+    await Lib.saveVideo(v); Lib.videos.unshift(v);
+    vids.form = null; vids.view = "detail"; vids.id = v.id; vids.busy = ""; toast("Saved to your videos"); render();
+    if (v.transcript || v.notes) makeVideoCard(v);
+  } catch (e) {
+    vids.busy = ""; vids.err = e?.code === "too_large" ? "That file is too big to upload (20 MB limit). Paste a link instead." : e?.code === "not_granted" ? "Uploading was not allowed. Allow file uploads in the page's permissions, or paste a link." : "Couldn't save the video: " + (e?.message || e?.code || "unknown error");
+    render();
+  }
+}
+async function makeVideoCard(v) {
+  if (!AI.sample) return;
+  const ctrl = new AbortController(); roomBusy = { label: "Studying the transcript…", ctrl }; render();
+  const prompt = `A writer saved this interview or documentary to learn from: "${v.title}"${v.person ? " with " + v.person + " (" + v.role + ")" : ""}.\n${v.notes ? "Their notes: " + v.notes + "\n" : ""}\nTRANSCRIPT (timestamps in [mm:ss] where available):\n"""\n${(v.transcript || "(no transcript)").slice(0, 60000)}\n"""\n\nWrite a study card. ${HINGLISH} Use only what the transcript and notes say; never invent quotes.\nReply with JSON only: {"summary": string (3–4 sentences), "lessons": [{"lesson": string, "at": string (timestamp if present, else "")}] (4–8 craft lessons for a writer), "quotes": [{"text": string (exact words from the transcript, under 30 words), "at": string}] (up to 3), "try_this": [string] (2–3 exercises)}`;
+  try {
+    const c = await AI.sample.json(prompt, { signal: ctrl.signal, modelTier: AI.tier("default") });
+    v.card = { summary: String(c.summary || ""), lessons: (c.lessons || []).map(x => ({ lesson: String(x.lesson || ""), at: String(x.at || "") })),
+      quotes: (c.quotes || []).map(x => ({ text: String(x.text || ""), at: String(x.at || "") })).filter(q => q.text && (v.transcript || "").includes(q.text.slice(0, 25))),
+      try_this: (c.try_this || []).map(String) };
+    await Lib.saveVideo(v).catch(() => {});
+  } catch (e) { vids.err = "The video is saved, but the study card failed: " + AI.errText(e); }
+  roomBusy = null; render();
+}
+function renderVideos() {
+  if (!Lib.loaded) { app.append(h("div", { class: "empty" }, "Loading your videos…")); return; }
+  if (vids.view === "detail") return videoDetail();
+  const F = vids.form;
+  const sec = h("section", { class: "sheet" }, h("h2", { text: "Video corner" }),
+    h("p", { class: "muted", text: "Keep interviews and documentaries on writers, actors and directors. Claude can't watch video, so add the transcript or subtitles (YouTube shows a transcript under the video) and it will turn them into lessons and use them in critiques." }),
+    errNote(vids.err));
+  if (!F) put(sec, h("div", { class: "row" }, h("button", { class: "primary", onclick: () => { vids.form = newVideoForm(); vids.err = ""; render(); } }, "+ Add a video")));
+  else {
+    const subIn = h("input", { type: "file", accept: ".srt,.vtt,.txt,text/plain,text/vtt", id: "subsin", onchange: async e => { const f = e.target.files[0]; if (!f) return; const t = await f.text(); F.transcript = /-->/.test(t) ? parseSubs(t) : t; render(); } });
+    put(sec, h("div", { class: "sheet inner" },
+      h("div", { class: "lengths" },
+        h("div", { class: "field" }, h("label", { for: "vtitle" }, "Title"), h("input", { id: "vtitle", type: "text", value: F.title, placeholder: "e.g. Gulzar on writing Ijaazat", oninput: e => F.title = e.target.value })),
+        h("div", { class: "field" }, h("label", { for: "vperson" }, "Who's speaking"), h("input", { id: "vperson", type: "text", value: F.person, oninput: e => F.person = e.target.value })),
+        h("div", { class: "field" }, h("label", { for: "vrole" }, "They are a…"), h("select", { id: "vrole", onchange: e => F.role = e.target.value }, ["Writer", "Actor", "Director", "Other"].map(r => h("option", { selected: F.role === r ? "selected" : null }, r))))),
+      h("div", { class: "field" }, h("label", { for: "vfile" }, "Video file (mp4 or webm, up to 20 MB)"),
+        h("input", { id: "vfile", type: "file", accept: "video/mp4,video/webm", onchange: e => { F.file = e.target.files[0] || null; if (F.file && F.file.size > 20 * 1024 * 1024) { vids.err = "That file is over 20 MB. Paste a link instead."; F.file = null; render(); } } })),
+      h("div", { class: "field" }, h("label", { for: "vlink" }, "…or a link (YouTube, Vimeo, any site)"), h("input", { id: "vlink", type: "text", inputmode: "url", value: F.link, placeholder: "https://", oninput: e => F.link = e.target.value })),
+      h("div", { class: "field" }, h("label", { for: "vtrans" }, "Transcript or subtitles"),
+        h("textarea", { id: "vtrans", rows: 6, value: F.transcript, placeholder: "Paste the transcript here, or load an .srt / .vtt subtitle file below", oninput: e => F.transcript = e.target.value }), subIn),
+      h("div", { class: "field" }, h("label", { for: "vnotes" }, "Your notes (optional)"), h("textarea", { id: "vnotes", rows: 3, value: F.notes, oninput: e => F.notes = e.target.value })),
+      vids.busy ? h("div", { class: "busy" }, h("span", { class: "dot" }), vids.busy) :
+        h("div", { class: "row end" }, h("button", { class: "ghost", onclick: () => { vids.form = null; vids.err = ""; render(); } }, "Cancel"), h("button", { class: "primary", onclick: saveVideo }, "Save video"))));
+  }
+  app.append(sec);
+  const list = h("section", { class: "sheet" }, h("h3", { text: `Your videos (${Lib.videos.length})` }));
+  if (!Lib.videos.length) list.append(h("div", { class: "empty" }, "Videos you add appear here, each with lessons drawn from its transcript."));
+  else list.append(h("div", { class: "stories" }, Lib.videos.map(v => h("div", { class: "card", tabindex: "0", role: "button", onclick: () => { vids.view = "detail"; vids.id = v.id; render(); }, onkeydown: e => { if (e.key === "Enter") { vids.view = "detail"; vids.id = v.id; render(); } } },
+    h("span", { class: "t", text: v.title }), h("span", { class: "muted small", text: [v.person, v.role].filter(Boolean).join(" · ") }),
+    h("div", { class: "row" }, h("span", { class: "chip", text: v.assetId ? "Uploaded" : "Link" }), v.transcript ? h("span", { class: "chip gold", text: "Transcript" }) : null)))));
+  app.append(list);
+}
+function videoDetail() {
+  const v = Lib.videos.find(x => x.id === vids.id); if (!v) { vids.view = "list"; return renderVideos(); }
+  const A = vids.ask[v.id] || (vids.ask[v.id] = { q: "", out: "", err: "", confirm: false, edit: false, t: v.transcript });
+  const c = v.card;
+  const sec = h("section", { class: "sheet" },
+    h("div", { class: "row" }, h("button", { class: "ghost", onclick: () => { vids.view = "list"; render(); } }, "← All videos")),
+    h("span", { class: "label", text: [v.person, v.role].filter(Boolean).join(" · ") }), h("h2", { text: v.title }), errNote(vids.err),
+    v.url ? h("video", { src: v.url, controls: true, playsinline: true, preload: "metadata", class: "player" }) : null,
+    v.link ? h("p", {}, h("a", { href: v.link, target: "_blank", rel: "noopener" }, "Watch at the source ↗")) : null,
+    v.notes ? h("p", { class: "note", text: v.notes }) : null);
+  if (c) put(sec, h("h3", { text: "What to learn" }), h("p", { text: c.summary }),
+    h("ul", {}, c.lessons.map(l => h("li", {}, l.lesson, l.at ? h("span", { class: "muted small", text: " · " + l.at }) : null))),
+    c.quotes.length ? h("div", {}, h("h3", { text: "In their words" }), c.quotes.map(q => h("blockquote", {}, q.text, q.at ? h("span", { class: "muted small", text: " " + q.at }) : null))) : null,
+    h("h3", { text: "Try this" }), h("ul", {}, c.try_this.map(t => h("li", { text: t }))));
+  else if (v.transcript) put(sec, roomBusy ? roomBusyRow() : h("div", { class: "row" }, h("p", { class: "muted spacer", text: "No study card yet." }), h("button", { disabled: !AI.sample, onclick: () => makeVideoCard(v) }, "Write study card")));
+  put(sec, h("details", { class: "transcript" }, h("summary", { text: v.transcript ? "Transcript" : "Add a transcript" }),
+    h("textarea", { id: "vt-edit", rows: 8, value: A.t || "", placeholder: "Paste the transcript…", oninput: e => A.t = e.target.value }),
+    h("div", { class: "row end" }, h("button", { onclick: async () => { v.transcript = capTranscript((A.t || "").trim()); v.card = null; delete Lib.pieceCache["video:" + v.id]; await Lib.saveVideo(v).catch(() => {}); toast("Transcript saved"); render(); if (v.transcript) makeVideoCard(v); } }, "Save transcript"))));
+  if (v.transcript) put(sec, h("h3", { text: "Ask this video" }),
+    h("div", { class: "field" }, h("label", { for: "vq" }, "Question"), h("textarea", { id: "vq", rows: 2, value: A.q, placeholder: "e.g. Dialogue likhne ke baare mein kya kehte hain?", oninput: e => A.q = e.target.value })),
+    roomBusy && c ? roomBusyRow() : h("div", { class: "row" }, h("button", { class: "primary", disabled: !AI.sample, onclick: () => { if (A.q.trim()) askLibrary(A, ["video:" + v.id], A.q, "vidans"); } }, "Ask")),
+    errNote(A.err), h("div", { class: "page mdpage", id: "vidans", hidden: !A.out && !roomBusy }, A.out ? md(A.out) : null));
+  put(sec, h("div", { class: "row end" }, A.confirm
+    ? h("div", { class: "row" }, h("button", { class: "danger", onclick: async () => { await Lib.removeVideo(v).catch(() => {}); vids.view = "list"; toast("Video deleted"); render(); } }, "Delete for good"), h("button", { class: "ghost", onclick: () => { A.confirm = false; render(); } }, "Keep"))
+    : h("button", { class: "ghost danger", onclick: () => { A.confirm = true; render(); } }, "Delete video")));
+  app.append(sec);
+}
+
+// ---------- Hooks into the story draft ----------
+function stylePanel() {
+  const st = story.style || (story.style = { a: "", b: "", mix: 70 });
+  const choices = styleChoices();
+  const sel = (id, val, label, on) => h("div", { class: "field" }, h("label", { for: id }, label),
+    h("select", { id, onchange: e => { on(e.target.value); persist(); render(); } }, h("option", { value: "" }, "None"),
+      choices.map(w => h("option", { value: w.id, selected: val === w.id ? "selected" : null }, w.name))));
+  return h("details", { class: "sheet sofar", open: st.a ? true : null },
+    h("summary", {}, h("h3", { text: "Co-writer style" + (st.a ? ": " + styleLabel(st) : "") })),
+    h("p", { class: "muted small", text: "Pick a writer, or blend two. New parts and rewrites use these techniques; your language and format stay the same. Writers still under copyright are imitated by technique, never copied." }),
+    h("div", { class: "lengths" },
+      sel("stylea", st.a, "Main style", v => st.a = v),
+      st.a ? sel("styleb", st.b, "Blend with (optional)", v => st.b = v) : null),
+    st.a && st.b ? h("div", { class: "field" }, h("label", { for: "mix" }, `Mix: ${st.mix}% ${writerById(st.a)?.name} · ${100 - st.mix}% ${writerById(st.b)?.name}`),
+      h("input", { id: "mix", type: "range", min: "50", max: "90", step: "10", value: st.mix, onchange: e => { st.mix = +e.target.value; persist(); render(); } })) : null);
+}
+
+/*ROOM:END*/
 // ---------- Boot ----------
 async function loadList() {
   loading = true; render();
@@ -890,5 +1745,6 @@ render();
 (async () => {
   await Promise.all([Store.init(), AI.init()]);
   loadList();
+  Lib.load().then(() => { if (tab !== "stories") render(); });
 })();
 </script>

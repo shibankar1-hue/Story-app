@@ -9,3 +9,11 @@ A Claude artifact that turns a story idea into a first draft in Hindi or Hinglis
 5. **Draft**: written part by part, with rewrite notes. A "Story so far" note after each part keeps names and facts consistent. Download as PDF or Fountain (.txt).
 
 The page runs on the viewer's own Claude plan (no API key). Source: `pehla-draft.html`.
+
+## Writers' Room, Books and Videos
+
+- **Writers' Room**: about 45 writers and craft books (Hindi & Urdu, Indian film, world classics, theatre, craft). Real passages only for out-of-copyright works, copied from Wikisource with sources; living writers get style notes and labelled imitations. Tools: Critic, Lessons, Side by side, Compare drafts, Co-writer style in the draft view.
+- **Books**: upload a PDF; its text is saved privately and used in critiques, lessons and "Ask this book".
+- **Videos**: upload a video (up to 20 MB) or save a link, plus a transcript or subtitles that Claude learns from.
+
+Source layout: `room.js` and `writers-data.json` are inlined into `pehla-draft.html` by `python3 build.py`.

@@ -1,0 +1,1499 @@
+[
+ {
+  "id": "premchand",
+  "name": "Premchand",
+  "group": "hindi",
+  "era": "1880–1936",
+  "pd": true,
+  "line": "Village India, money and dignity, told in plain Hindustani with a moral sting.",
+  "signature": "Premchand writes ordinary people (farmers, children, widows, clerks) caught between need and self-respect. The narrator talks to you like an elder, comments on the characters, and lets irony do the hurting. Big emotion arrives through small objects: a pair of tongs, a shroud, a blanket.",
+  "techniques": [
+   {
+    "name": "The small object that carries the theme",
+    "how": "Hang the whole story on one cheap, concrete thing (Hamid's chimta) and let every character react to it."
+   },
+   {
+    "name": "Narrator as a warm commentator",
+    "how": "The narrator steps in with a line of judgement or wit, then steps back into the scene."
+   },
+   {
+    "name": "Lists of everyday detail",
+    "how": "Open with a rush of village activity (buttons, shoes, oxen) to put us inside the day before the plot starts."
+   },
+   {
+    "name": "Child's-eye logic",
+    "how": "Let a child argue like a lawyer; his innocent reasoning exposes the adults' world."
+   }
+  ],
+  "works": [
+   "Idgah",
+   "Kafan",
+   "Poos ki Raat",
+   "Bade Bhai Sahab",
+   "Shatranj ke Khiladi",
+   "Godaan (novel)"
+  ],
+  "excerpts": [
+   {
+    "work": "Idgah (opening)",
+    "lang": "hi",
+    "text": "रमज़ान के पूरे तीस रोज़ के बाद आज ईद आई है। कितना मनोहर; कितना सुहावना प्रभात है। वृक्षों पर कुछ अजीब हरियाली है, खेतों में कुछ अजीब रौनक है, आसमान पर कुछ अजीब लालिमा है। आज का सूर्य देखो, कितना प्यारा, कितना शीतल है, मानों संसार को ईद की बधाई दे रहा है। गाँव में कितनी हलचल है। ईदगाह जाने की तैयारियाँ हो रही हैं। किसी के कुरते में बटन नहीं है। पड़ोस के घर से सुई-तागा लेने दौड़ा जा रहा है। किसी के जूते कड़े हो गये हैं, उनमें तेल डालने के लिए तेली के घर भागा जाता है। जल्दी-जल्दी बैलों की सानी-पानी दे दें। ईदगाह से लौटते-लौटते दोपहर हो जायेगा। तीन कोस का पैदल रास्ता, फिर सैकड़ों आदमियों से मिलना-भेंटना। दोपहर के पहले लौटना असम्भव है। लड़के सबसे ज़्यादा प्रसन्न हैं। किसी ने एक रोज़ा रखा है, वह भी दोपहर तक, किसी ने वह भी नहीं है लेकिन ईदगाह जाने की खुशी उनके हिस्से की चीज़ हैं। रोज़े बड़े-बूढ़े के लिए होंगे। इनके लिए तो ईद है।",
+    "source": "Mansarovar 1 (1947), Hindi Wikisource",
+    "url": "https://hi.wikisource.org/wiki/%E0%A4%AE%E0%A4%BE%E0%A4%A8%E0%A4%B8%E0%A4%B0%E0%A5%8B%E0%A4%B5%E0%A4%B0_%E0%A5%A7/%E0%A4%88%E0%A4%A6%E0%A4%97%E0%A4%BE%E0%A4%B9",
+    "note": "A rush of tiny village details (a missing button, stiff shoes, oxen to feed) puts us inside Eid morning before any plot. Notice the narrator's asides: 'रोज़े बड़े-बूढ़े के लिए होंगे। इनके लिए तो ईद है।'"
+   },
+   {
+    "work": "Poos ki Raat (ending)",
+    "lang": "hi",
+    "text": "दोनों खेत की दशा देख रहे थे। मुन्नी के मुख पर उदासी छाई थी; पर हल्कू प्रसन्न था।\nमुन्नी ने चिंतित होकर कहा --- अब मजूरी करके मालगुजारी भरनी पड़ेगी।\nहल्कू ने प्रसन्न-मुख से कहा --- रात की ठण्ड में यहां सोना तो न पड़ेगा।",
+    "source": "Mansarovar 1 (1947), Hindi Wikisource",
+    "url": "https://hi.wikisource.org/wiki/%E0%A4%AE%E0%A4%BE%E0%A4%A8%E0%A4%B8%E0%A4%B0%E0%A5%8B%E0%A4%B5%E0%A4%B0_%E0%A5%A7/%E0%A4%AA%E0%A5%82%E0%A4%B8_%E0%A4%95%E0%A5%80_%E0%A4%B0%E0%A4%BE%E0%A4%A4",
+    "note": "The ironic ending: the crop is destroyed, the wife despairs, and Halku is happy because he won't have to sleep in the cold field again. One line of dialogue reverses the whole story's meaning."
+   }
+  ]
+ },
+ {
+  "id": "prasad",
+  "name": "Jaishankar Prasad",
+  "group": "hindi",
+  "era": "1889–1937",
+  "pd": true,
+  "line": "Lyrical, Sanskrit-rich prose of history, romance and sacrifice.",
+  "signature": "A Chhayavaad poet writing prose: long musical sentences, nature as a mirror of feeling, and heroes and heroines torn between love and duty, often against a historical backdrop. Endings are usually renunciation, not victory.",
+  "techniques": [
+   {
+    "name": "Landscape as emotion",
+    "how": "Describe sea, night or lamp-light so it tells us what the character feels before they speak."
+   },
+   {
+    "name": "Love against duty",
+    "how": "Put the lovers on opposite sides of a loyalty (nation, family, vow) so the choice costs something."
+   },
+   {
+    "name": "Elevated diction",
+    "how": "Choose tatsam words and rhythmic phrasing for a heightened, poetic register."
+   }
+  ],
+  "works": [
+   "Aakashdeep",
+   "Puraskar",
+   "Mamta",
+   "Chandragupta (play)",
+   "Dhruvswamini (play)"
+  ],
+  "excerpts": [
+   {
+    "work": "Aakashdeep (opening)",
+    "lang": "hi",
+    "text": "\"बन्दी!\"\n\"क्या है? सोने दो।\"\n\"मुक्त होना चाहते हो?\"\n\"अभी नहीं, निद्रा खुलने पर, चुप रहो।\"\n\"फिर अवसर न मिलेगा।\"\n\"बड़ा शीत है, कहीं से एक कम्बल डालकर कोई शीत से मुक्त करता।\"\n\"आँधी की सम्भावना है। यही अवसर है। आज मेरे बन्धन शिथिल हैं।\"\n\"तो क्या तुम भी बन्दी हो?\"\n\"हाँ, धीरे बोलो, इस नाव पर केवल दस नाविक और प्रहरी हैं।\"\n\"शस्त्र मिलेगा?\"\n\"मिल जाएगा। पोत से सम्बद्ध रज्जु काट सकोगे?\"\n\"हाँ।\"",
+    "source": "Jaishankar Prasad ki Shreshth Kahaniyan, Hindi Wikisource",
+    "url": "https://hi.wikisource.org/wiki/%E0%A4%9C%E0%A4%AF%E0%A4%B6%E0%A4%82%E0%A4%95%E0%A4%B0_%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%B8%E0%A4%BE%E0%A4%A6_%E0%A4%95%E0%A5%80_%E0%A4%B6%E0%A5%8D%E0%A4%B0%E0%A5%87%E0%A4%B7%E0%A5%8D%E0%A4%A0_%E0%A4%95%E0%A4%B9%E0%A4%BE%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE%E0%A4%82/%E0%A4%86%E0%A4%95%E0%A4%BE%E0%A4%B6%E0%A4%A6%E0%A5%80%E0%A4%AA",
+    "note": "The story opens in pure dialogue, in the dark: two prisoners, no names, no description. Tension first, landscape later. When the storm arrives, it mirrors their escape."
+   }
+  ]
+ },
+ {
+  "id": "manto",
+  "name": "Saadat Hasan Manto",
+  "group": "hindi",
+  "era": "1912–1955",
+  "pd": false,
+  "line": "Partition, sex workers, madness: told flatly, ending with a shock.",
+  "signature": "Manto writes like a reporter at a crime scene: short sentences, no sermon, no tears. He goes where polite literature won't (riots, brothels, asylums) and ends on one devastating line or image that flips everything before it.",
+  "techniques": [
+   {
+    "name": "The last-line punch",
+    "how": "Build quietly, then end on one line or gesture that reveals the true horror or irony."
+   },
+   {
+    "name": "Clinical tone for terrible events",
+    "how": "Describe violence plainly; the reader supplies the emotion."
+   },
+   {
+    "name": "Compassion for the outcast",
+    "how": "Give the 'immoral' character the most human moment in the story."
+   }
+  ],
+  "works": [
+   "Toba Tek Singh",
+   "Thanda Gosht",
+   "Khol Do",
+   "Kaali Shalwar",
+   "Siyah Hashiye (vignettes)"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "chughtai",
+  "name": "Ismat Chughtai",
+  "group": "hindi",
+  "era": "1915–1991",
+  "pd": false,
+  "line": "Bold, funny, intimate stories of women inside middle-class Muslim homes.",
+  "signature": "Chughtai writes in the chatty, idiomatic speech of women at home: gossip, teasing, taunts. Under the comedy are desire, loneliness and power within the family. A child or young girl often narrates what she half understands.",
+  "techniques": [
+   {
+    "name": "Begumati zubaan",
+    "how": "Use women's household idiom, proverbs and taunts as the music of the prose."
+   },
+   {
+    "name": "The half-understanding narrator",
+    "how": "A child narrates; the reader understands more than she does."
+   },
+   {
+    "name": "Comedy hiding pain",
+    "how": "Keep the surface funny so the dark truth lands harder."
+   }
+  ],
+  "works": [
+   "Lihaaf",
+   "Tedhi Lakeer (novel)",
+   "Chauthi ka Joda",
+   "Gainda"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "parsai",
+  "name": "Harishankar Parsai",
+  "group": "hindi",
+  "era": "1924–1995",
+  "pd": false,
+  "line": "Hindi satire (vyangya): deadpan, short and merciless about hypocrisy.",
+  "signature": "Parsai takes an absurd premise (a policeman sent to the moon, a dead man's soul stuck in government files) and narrates it with a straight face. Every sentence carries a jab at bureaucracy, politics or religion.",
+  "techniques": [
+   {
+    "name": "Absurd premise, serious tone",
+    "how": "State something impossible as plain fact and follow its logic to the end."
+   },
+   {
+    "name": "Bureaucratic language as a weapon",
+    "how": "Let officials speak in jargon that exposes their emptiness."
+   },
+   {
+    "name": "One target per piece",
+    "how": "Pick one hypocrisy and hit it from every angle."
+   }
+  ],
+  "works": [
+   "Bholaram ka Jeev",
+   "Inspector Matadeen Chand Par",
+   "Viklang Shraddha ka Daur"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "renu",
+  "name": "Phanishwar Nath Renu",
+  "group": "hindi",
+  "era": "1921–1977",
+  "pd": false,
+  "line": "Regional (aanchalik) fiction full of folk song, dialect and sound.",
+  "signature": "Renu makes a region, rural Purnia in Bihar, the hero. His pages are full of sounds, folk songs, local words and festivals. Plot is loose; atmosphere and community carry the story.",
+  "techniques": [
+   {
+    "name": "Sound on the page",
+    "how": "Write the dhol, bells and calls as words, so the reader hears the village."
+   },
+   {
+    "name": "Folk song as commentary",
+    "how": "Drop in a song whose lines comment on the scene."
+   },
+   {
+    "name": "Dialect as character",
+    "how": "Let each character's local speech show class and place."
+   }
+  ],
+  "works": [
+   "Maila Aanchal (novel)",
+   "Maare Gaye Gulfam (Teesri Kasam)",
+   "Panchlight"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "mannu",
+  "name": "Mannu Bhandari",
+  "group": "hindi",
+  "era": "1931–2021",
+  "pd": false,
+  "line": "Quiet, sharp stories of modern marriages and women's choices.",
+  "signature": "Bhandari writes urban middle-class women deciding between two men, a career and a family, honesty and comfort. The prose is plain, the drama inward, and the endings often leave the choice uncomfortably open.",
+  "techniques": [
+   {
+    "name": "Diary-like interiority",
+    "how": "Let the heroine's thoughts contradict what she says aloud."
+   },
+   {
+    "name": "The undramatic crisis",
+    "how": "Make a phone call or a letter the turning point, not a fight."
+   },
+   {
+    "name": "Open ending",
+    "how": "Stop at the moment of choice and let the reader decide."
+   }
+  ],
+  "works": [
+   "Yahi Sach Hai (filmed as Rajnigandha)",
+   "Aapka Bunty (novel)",
+   "Mahabhoj (novel)"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "nirmal",
+  "name": "Nirmal Verma",
+  "group": "hindi",
+  "era": "1929–2005",
+  "pd": false,
+  "line": "Lyrical, inward prose of memory, silence and loneliness.",
+  "signature": "Verma's stories happen mostly inside people: in pauses, in rooms at dusk, in what they don't say. Hill stations and European cities, fog and rain; long sentences that drift like memory.",
+  "techniques": [
+   {
+    "name": "Silence as dialogue",
+    "how": "Let the most important line go unsaid; write the pause around it."
+   },
+   {
+    "name": "Weather as mood",
+    "how": "Fog, rain and dusk set the emotional key of the scene."
+   },
+   {
+    "name": "Memory folding into the present",
+    "how": "Slide between now and then without a hard break."
+   }
+  ],
+  "works": [
+   "Parinde",
+   "Ve Din (novel)",
+   "Kavve aur Kala Pani"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "salim-javed",
+  "name": "Salim–Javed",
+  "group": "film",
+  "era": "1970s–80s",
+  "pd": false,
+  "line": "The angry young man, mythic plots and dialogue that becomes a proverb.",
+  "signature": "Salim Khan and Javed Akhtar built larger-than-life heroes with a wound (a tattooed insult, a murdered father), a clear enemy and a moral choice. Every big line is set up earlier, so when it comes it lands like thunder. Mother, brother, and law versus loyalty are the engines.",
+  "techniques": [
+   {
+    "name": "Setup and payoff dialogue",
+    "how": "Plant a phrase or object early; pay it off in the climax with a twist in meaning."
+   },
+   {
+    "name": "The hero's wound",
+    "how": "Show the childhood injustice in the first minutes; everything after is the hero answering it."
+   },
+   {
+    "name": "Two brothers, two paths",
+    "how": "Split one moral question between two characters who love each other."
+   },
+   {
+    "name": "The quotable line",
+    "how": "Short, rhythmic, a contrast in two halves, built on character, not decoration."
+   }
+  ],
+  "works": [
+   "Zanjeer",
+   "Deewaar",
+   "Sholay",
+   "Trishul",
+   "Don"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "gulzar",
+  "name": "Gulzar",
+  "group": "film",
+  "era": "b. 1934",
+  "pd": false,
+  "line": "Poet-filmmaker: everyday images made strange, relationships told softly.",
+  "signature": "Gulzar joins senses that don't usually go together (a fragrance you can see, a voice you can touch) and finds poetry in small household things. His films are about relationships breaking and mending, often told out of order through memory.",
+  "techniques": [
+   {
+    "name": "Synaesthetic image",
+    "how": "Describe one sense with another to make a familiar feeling new."
+   },
+   {
+    "name": "Non-linear memory",
+    "how": "Tell a relationship through flashbacks triggered by objects or places."
+   },
+   {
+    "name": "Restraint in dialogue",
+    "how": "Characters say less than they feel; one soft line carries the scene."
+   }
+  ],
+  "works": [
+   "Ijaazat",
+   "Aandhi",
+   "Mausam",
+   "Koshish",
+   "Masoom (screenplay)"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "hrishikesh",
+  "name": "Hrishikesh Mukherjee",
+  "group": "film",
+  "era": "1922–2006",
+  "pd": false,
+  "line": "Warm middle-class comedies and dramas about decent people.",
+  "signature": "Mukherjee's films (written with collaborators like Gulzar and Rajinder Singh Bedi) find drama in everyday middle-class life: a job interview, a new cook, a dying friend. Comedy comes from character and misunderstanding, never cruelty.",
+  "techniques": [
+   {
+    "name": "Comedy of deception",
+    "how": "One small lie snowballs; the fun is watching it be maintained."
+   },
+   {
+    "name": "The outsider who heals a house",
+    "how": "A newcomer (cook, patient, guest) quietly fixes a broken family."
+   },
+   {
+    "name": "Gentle stakes",
+    "how": "Keep the stakes human-sized so warmth, not spectacle, drives the story."
+   }
+  ],
+  "works": [
+   "Anand",
+   "Golmaal",
+   "Chupke Chupke",
+   "Bawarchi",
+   "Abhimaan"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "kashyap",
+  "name": "Anurag Kashyap",
+  "group": "film",
+  "era": "b. 1972",
+  "pd": false,
+  "line": "Gritty small-town crime, dark humour and raw Hindi.",
+  "signature": "Kashyap's stories are messy and alive: gangs, obsession, revenge across generations, told with street dialogue, sudden violence and dark jokes. Structure often breaks into chapters or jumps in time.",
+  "techniques": [
+   {
+    "name": "Violence with a joke beside it",
+    "how": "Put an absurd or funny beat right next to brutality to unsettle the audience."
+   },
+   {
+    "name": "Dialect and swearing as truth",
+    "how": "Let characters speak exactly as they would in their town."
+   },
+   {
+    "name": "Generational revenge",
+    "how": "Spread one feud across fathers and sons so history drives the plot."
+   }
+  ],
+  "works": [
+   "Black Friday",
+   "Gangs of Wasseypur (co-written)",
+   "Dev.D",
+   "Ugly"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "juhi",
+  "name": "Juhi Chaturvedi",
+  "group": "film",
+  "era": "b. 1975",
+  "pd": false,
+  "line": "Slice-of-life family stories with quiet, specific humour.",
+  "signature": "Chaturvedi finds stories in topics nobody films (sperm donation, constipation, a comatose co-worker, an old landlord) and plays them through family bickering and small rituals. Low plot, high texture; feeling arrives sideways.",
+  "techniques": [
+   {
+    "name": "The unglamorous premise",
+    "how": "Build a film on an everyday or awkward subject people really live with."
+   },
+   {
+    "name": "Family argument as music",
+    "how": "Overlapping, repetitive bickering that reveals love."
+   },
+   {
+    "name": "Emotion through routine",
+    "how": "Show change through a habit that shifts (a morning walk, a tea order)."
+   }
+  ],
+  "works": [
+   "Vicky Donor",
+   "Piku",
+   "October",
+   "Gulabo Sitabo"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "varun",
+  "name": "Varun Grover",
+  "group": "film",
+  "era": "b. 1980",
+  "pd": false,
+  "line": "Poetic realism, satire and the small towns of North India.",
+  "signature": "A lyricist and satirist, Grover writes characters trapped by caste, family or exams who reach for dignity. Banaras ghats, coaching cities, poetry inside working-class lives; humour that cuts.",
+  "techniques": [
+   {
+    "name": "Poetry in ordinary mouths",
+    "how": "Give a working-class character a line of real poetry that changes the scene."
+   },
+   {
+    "name": "System as antagonist",
+    "how": "Let caste, exams or the law be the real villain, not one person."
+   },
+   {
+    "name": "Satire without a sermon",
+    "how": "Make the absurdity visible and let the audience judge."
+   }
+  ],
+  "works": [
+   "Masaan (screenplay)",
+   "Sacred Games (co-writer)",
+   "All India Rank"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "bhardwaj",
+  "name": "Vishal Bhardwaj",
+  "group": "film",
+  "era": "b. 1965",
+  "pd": false,
+  "line": "Shakespeare in the Indian hinterland, with dialect and music.",
+  "signature": "Bhardwaj moves classic tragedies into Mumbai's underworld, UP's badlands and Kashmir, keeping the structure and changing the soul. Earthy dialects, black humour, songs that do plot work.",
+  "techniques": [
+   {
+    "name": "Classic structure, local skin",
+    "how": "Keep a proven plot skeleton; rebuild every detail from a real Indian place."
+   },
+   {
+    "name": "Dialect as world-building",
+    "how": "Characters' speech (Khari Boli, Kashmiri-Urdu) tells us where we are."
+   },
+   {
+    "name": "Songs that move plot",
+    "how": "A song should change a relationship, not pause the story."
+   }
+  ],
+  "works": [
+   "Maqbool",
+   "Omkara",
+   "Haider",
+   "Kaminey"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "raghavan",
+  "name": "Sriram Raghavan",
+  "group": "film",
+  "era": "b. 1963",
+  "pd": false,
+  "line": "Noir thrillers with twists, dark comedy and film-buff homage.",
+  "signature": "Raghavan builds thrillers where one wrong decision spirals: crime that goes wrong, revenge that rots, liars cornered. Twists are fair (clues are on screen), and dark comedy keeps tension crackling.",
+  "techniques": [
+   {
+    "name": "The decision that spirals",
+    "how": "One choice early on traps the hero in consequences that keep multiplying."
+   },
+   {
+    "name": "Fair-play twist",
+    "how": "Show every clue on screen; the twist reframes what we already saw."
+   },
+   {
+    "name": "Comedy inside suspense",
+    "how": "Let an absurd interruption stretch the tension of a dangerous scene."
+   }
+  ],
+  "works": [
+   "Johnny Gaddaar",
+   "Badlapur",
+   "Andhadhun",
+   "Merry Christmas"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "chekhov",
+  "name": "Anton Chekhov",
+  "group": "world",
+  "era": "1860–1904",
+  "pd": true,
+  "line": "Ordinary lives, precise details, endings that stay open.",
+  "signature": "Chekhov watches people without judging them. He picks a few exact details (a beret, a white dog, a slice of watermelon) and lets them carry character. Stories end not with resolution but with the realisation that the hardest part is just beginning.",
+  "techniques": [
+   {
+    "name": "The telling detail",
+    "how": "Choose one or two specific, slightly odd details instead of a full description."
+   },
+   {
+    "name": "No villain, no verdict",
+    "how": "Show people as they are; let the reader judge, or not."
+   },
+   {
+    "name": "The open ending",
+    "how": "End at a moment of understanding, not of resolution."
+   },
+   {
+    "name": "Chekhov's gun",
+    "how": "Anything you show prominently must matter later; cut what doesn't."
+   }
+  ],
+  "works": [
+   "The Lady with the Dog",
+   "Ward No. 6",
+   "The Bet",
+   "The Seagull (play)",
+   "The Cherry Orchard (play)"
+  ],
+  "excerpts": [
+   {
+    "work": "The Lady with the Dog (opening)",
+    "lang": "en",
+    "text": "It was said that a new person had appeared on the sea-front: a lady with a little dog. Dmitri Dmitritch Gurov, who had by then been a fortnight at Yalta, and so was fairly at home there, had begun to take an interest in new arrivals. Sitting in Verney's pavilion, he saw, walking on the sea-front, a fair-haired young lady of medium height, wearing a beret; a white Pomeranian dog was running behind her.\n\nAnd afterwards he met her in the public gardens and in the square several times a day. She was walking alone, always wearing the same beret, and always with the same white dog; no one knew who she was, and every one called her simply \"the lady with the dog.\"\n\n\"If she is here alone without a husband or friends, it wouldn't be amiss to make her acquaintance,\" Gurov reflected.",
+    "source": "The Tales of Chekhov, vol. 3, tr. Constance Garnett (1917), English Wikisource",
+    "url": "https://en.wikisource.org/wiki/The_Tales_of_Chekhov/Volume_3/The_Lady_with_the_Dog",
+    "note": "Three details make her a person: a beret, a white Pomeranian, always alone. Gurov's cynical thought in one line gives us his whole character."
+   },
+   {
+    "work": "The Lady with the Dog (ending)",
+    "lang": "en",
+    "text": "Then they spent a long while taking counsel together, talked of how to avoid the necessity for secrecy, for deception, for living in different towns and not seeing each other for long at a time. How could they be free from this intolerable bondage?\n\n\"How? How?\" he asked, clutching his head. \"How?\"\n\nAnd it seemed as though in a little while the solution would be found, and then a new and splendid life would begin; and it was clear to both of them that they had still a long, long road before them, and that the most complicated and difficult part of it was only just beginning.",
+    "source": "The Tales of Chekhov, vol. 3, tr. Constance Garnett (1917), English Wikisource",
+    "url": "https://en.wikisource.org/wiki/The_Tales_of_Chekhov/Volume_3/The_Lady_with_the_Dog",
+    "note": "The famous open ending: no solution, only the realisation that 'the most complicated and difficult part of it was only just beginning.'"
+   }
+  ]
+ },
+ {
+  "id": "ohenry",
+  "name": "O. Henry",
+  "group": "world",
+  "era": "1862–1910",
+  "pd": true,
+  "line": "City stories with a playful narrator and a twist ending.",
+  "signature": "O. Henry's narrator chats with the reader, makes jokes and long, showy words, then springs an ironic twist in the last lines that turns the story into a parable.",
+  "techniques": [
+   {
+    "name": "The twist ending",
+    "how": "Plant the twist's ingredients openly; reveal how they combine only at the end."
+   },
+   {
+    "name": "A narrator with personality",
+    "how": "Let the narrator joke and comment like a storyteller at a tea stall."
+   },
+   {
+    "name": "A precise money detail",
+    "how": "Ground the story in an exact, small sum or price."
+   }
+  ],
+  "works": [
+   "The Gift of the Magi",
+   "The Last Leaf",
+   "The Ransom of Red Chief",
+   "After Twenty Years"
+  ],
+  "excerpts": [
+   {
+    "work": "The Gift of the Magi (opening)",
+    "lang": "en",
+    "text": "ONE dollar and eighty-seven cents. That was all. And sixty cents of it was in pennies. Pennies saved one and two at a time by bulldozing the grocer and the vegetable man and the butcher until one’s cheeks burned with the silent imputation of parsimony that such close dealing implied. Three times Della counted it. One dollar and eighty-seven cents. And the next day would be Christmas.",
+    "source": "The Four Million (A. L. Burt), English Wikisource",
+    "url": "https://en.wikisource.org/wiki/The_Four_Million/The_Gift_of_the_Magi",
+    "note": "An exact sum, repeated, as the first line and the last but one. The money detail is the whole conflict, stated before we know who Della is."
+   },
+   {
+    "work": "The Gift of the Magi (ending)",
+    "lang": "en",
+    "text": "The magi, as you know, were wise men—wonderfully wise men—who brought gifts to the Babe in the manger. They invented the art of giving Christmas presents. Being wise, their gifts were no doubt wise ones, possibly bearing the privilege of exchange in case of duplication. And here I have lamely related to you the uneventful chronicle of two foolish children in a flat who most unwisely sacrificed for each other the greatest treasures of their house. But in a last word to the wise of these days let it be said that of all who give gifts these two were the wisest. Of all who give and receive gifts, such as they are wisest. Everywhere they are wisest. They are the magi.",
+    "source": "The Four Million (A. L. Burt), English Wikisource",
+    "url": "https://en.wikisource.org/wiki/The_Four_Million/The_Gift_of_the_Magi",
+    "note": "After the twist, the chatty narrator steps forward and turns the story into a parable: 'They are the magi.'"
+   }
+  ]
+ },
+ {
+  "id": "tagore",
+  "name": "Rabindranath Tagore",
+  "group": "world",
+  "era": "1861–1941",
+  "pd": true,
+  "line": "Tender, humane stories of bonds across class and distance.",
+  "signature": "Tagore's short stories, translated into English in his lifetime, find deep feeling in unlikely friendships (a little girl and an Afghan fruit-seller) and in the cost of social rules. A gentle narrator, often a father or observer, and endings that ache rather than shock.",
+  "techniques": [
+   {
+    "name": "Friendship across worlds",
+    "how": "Pair two people separated by age, class or country, and let their bond grow through small rituals."
+   },
+   {
+    "name": "The observer narrator",
+    "how": "A father or neighbour watches and understands slowly, with us."
+   },
+   {
+    "name": "Ending in quiet sacrifice",
+    "how": "Resolve with a small, costly generous act rather than a dramatic event."
+   }
+  ],
+  "works": [
+   "The Cabuliwallah (Kabuliwala)",
+   "The Postmaster",
+   "Subha",
+   "The Hungry Stones"
+  ],
+  "excerpts": [
+   {
+    "work": "The Cabuliwallah (opening)",
+    "lang": "en",
+    "text": "My five years' old daughter Mini cannot live without chattering. I really believe that in all her life she has not wasted a minute in silence. Her mother is often vexed at this, and would stop her prattle, but I would not. To see Mini quiet is unnatural, and I cannot bear it long. And so my own talk with her is always lively.\n\nOne morning, for instance, when I was in the midst of the seventeenth chapter of my new novel, my little Mini stole into the room, and putting her hand into mine, said: \"Father! Ramdayal the door-keeper calls a crow a krow! He doesn't know anything, does he?\"",
+    "source": "The Hungry Stones and Other Stories (1916), tr. Sister Nivedita, English Wikisource",
+    "url": "https://en.wikisource.org/wiki/The_Hungry_Stones_and_Other_Stories/The_Cabuliwallah",
+    "note": "Character through speech: Mini is introduced by her chatter, and the father-narrator by his indulgence and his unfinished novel."
+   },
+   {
+    "work": "The Cabuliwallah (ending)",
+    "lang": "en",
+    "text": "The marriage-pipes sounded, and the mild autumn sun streamed round us. But Rahmun sat in the little Calcutta lane, and saw before him the barren mountains of Afghanistan.\n\nI took out a bank-note, and gave it to him, saying: \"Go back to your own daughter, Rahmun, in your own country, and may the happiness of your meeting bring good fortune to my child!\"\n\nHaving made this present, I had to curtail some of the festivities. I could not have the electric lights I had intended, nor the military band, and the ladies of the house were despondent at it. But to me the wedding feast was all the brighter for the thought that in a distant land a long-lost father met again with his only child.",
+    "source": "The Hungry Stones and Other Stories (1916), tr. Sister Nivedita, English Wikisource",
+    "url": "https://en.wikisource.org/wiki/The_Hungry_Stones_and_Other_Stories/The_Cabuliwallah",
+    "note": "A quiet, costly gift resolves the story. The image of the barren mountains inside a Calcutta wedding lane holds both fathers' longing."
+   }
+  ]
+ },
+ {
+  "id": "hemingway",
+  "name": "Ernest Hemingway",
+  "group": "world",
+  "era": "1899–1961",
+  "pd": false,
+  "line": "Short, plain sentences; the real story under the surface.",
+  "signature": "Hemingway's 'iceberg' method: show only a little of what is going on and leave the rest underwater. Simple words, repeated phrases, dialogue where people talk around the real subject.",
+  "techniques": [
+   {
+    "name": "The iceberg",
+    "how": "Know everything about the situation, write a fraction, and trust the reader to feel the rest."
+   },
+   {
+    "name": "Dialogue around the subject",
+    "how": "Characters never name the real problem; they argue about drinks and hills."
+   },
+   {
+    "name": "Plain declarative rhythm",
+    "how": "Short sentences joined with 'and'; few adjectives."
+   }
+  ],
+  "works": [
+   "Hills Like White Elephants",
+   "The Old Man and the Sea",
+   "A Clean, Well-Lighted Place"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "marquez",
+  "name": "Gabriel García Márquez",
+  "group": "world",
+  "era": "1927–2014",
+  "pd": false,
+  "line": "Magical realism: wonders told as plain fact, time folding on itself.",
+  "signature": "Márquez narrates miracles and plagues with the calm of a grandmother telling family history. Opening lines jump across time; long, rolling sentences mix the absurd, the tragic and the funny.",
+  "techniques": [
+   {
+    "name": "The marvellous stated flatly",
+    "how": "Describe an impossible event in the same tone as breakfast."
+   },
+   {
+    "name": "Time-folding first line",
+    "how": "Open with a future moment that looks back to a past one."
+   },
+   {
+    "name": "Family as a town's history",
+    "how": "Let one family's generations stand for a nation."
+   }
+  ],
+  "works": [
+   "One Hundred Years of Solitude",
+   "Chronicle of a Death Foretold",
+   "A Very Old Man with Enormous Wings"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "carver",
+  "name": "Raymond Carver",
+  "group": "world",
+  "era": "1938–1988",
+  "pd": false,
+  "line": "Minimalist stories of working-class couples, endings left hanging.",
+  "signature": "Carver strips scenes to kitchen-table talk, drinks and silences. Nothing seems to happen, yet a marriage or a life shifts. Endings stop abruptly, leaving the reader inside the tension.",
+  "techniques": [
+   {
+    "name": "Kitchen-table scene",
+    "how": "Put two or three people at a table and let talk reveal a crisis."
+   },
+   {
+    "name": "Cut, cut, cut",
+    "how": "Remove every sentence that explains; keep only what we can see and hear."
+   },
+   {
+    "name": "The hanging ending",
+    "how": "Stop just after the turn, before anyone reacts."
+   }
+  ],
+  "works": [
+   "Cathedral",
+   "What We Talk About When We Talk About Love",
+   "A Small, Good Thing"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "shakespeare",
+  "name": "William Shakespeare",
+  "group": "theatre",
+  "era": "1564–1616",
+  "pd": true,
+  "line": "Soliloquy, poetry under pressure, comedy beside tragedy.",
+  "signature": "Shakespeare lets characters think aloud in verse, turning private doubt into public drama. Plots braid a main and a sub-plot; clowns and gravediggers comment on kings. Images (poison, gardens, sleep) repeat across a play to build meaning.",
+  "techniques": [
+   {
+    "name": "The soliloquy",
+    "how": "Let a character alone on stage argue with themselves; the audience becomes their confidant."
+   },
+   {
+    "name": "Comic relief that cuts deep",
+    "how": "Put a joking low-life character in the darkest scene; his jokes carry the truth."
+   },
+   {
+    "name": "Image patterns",
+    "how": "Repeat one image family across the play so it gathers meaning."
+   }
+  ],
+  "works": [
+   "Hamlet",
+   "Macbeth",
+   "Othello",
+   "King Lear",
+   "Twelfth Night"
+  ],
+  "excerpts": [
+   {
+    "work": "Hamlet, Act III, Scene 1",
+    "lang": "en",
+    "text": "To be, or not to be: that is the question:\nWhether 'tis nobler in the mind to suffer\nThe slings and arrows of outrageous fortune,\nOr to take arms against a sea of troubles,\nAnd by opposing end them? To die: to sleep;\nNo more; and, by a sleep to say we end\nThe heart-ache and the thousand natural shocks\nThat flesh is heir to, 'tis a consummation\nDevoutly to be wish'd. To die, to sleep;\nTo sleep: perchance to dream: ay, there's the rub;\nFor in that sleep of death what dreams may come\nWhen we have shuffled off this mortal coil,\nMust give us pause. There's the respect\nThat makes calamity of so long life;",
+    "source": "Hamlet (Yale Shakespeare, 1917), English Wikisource",
+    "url": "https://en.wikisource.org/wiki/Hamlet_%281917%29_Yale/Text/Act_III",
+    "note": "A soliloquy is an argument with yourself: question, option one, option two, a complication ('ay, there's the rub'). Notice how 'to die, to sleep' repeats and turns."
+   }
+  ]
+ },
+ {
+  "id": "ibsen",
+  "name": "Henrik Ibsen",
+  "group": "theatre",
+  "era": "1828–1906",
+  "pd": true,
+  "line": "Realist drama: a respectable home, a hidden secret, a reckoning.",
+  "signature": "Ibsen sets plays in ordinary drawing rooms where a secret from the past (a forged signature, a disease, a lie) slowly comes out. Each act tightens the screw; the climax is a conversation, not a fight.",
+  "techniques": [
+   {
+    "name": "The past breaking into the present",
+    "how": "Build the plot on a secret already done before the play begins."
+   },
+   {
+    "name": "The confrontation scene",
+    "how": "Sit two characters down and let them finally say everything."
+   },
+   {
+    "name": "The door that closes",
+    "how": "End on one decisive action that changes a life."
+   }
+  ],
+  "works": [
+   "A Doll's House",
+   "Ghosts",
+   "Hedda Gabler",
+   "An Enemy of the People"
+  ],
+  "excerpts": [
+   {
+    "work": "A Doll's House, Act III (ending)",
+    "lang": "en",
+    "text": "HELMER\nNora—can I never be anything more than a stranger to you?\n\nNORA\n[taking her bag] Ah, Torvald, the most wonderful thing of all would have to happen.\n\nHELMER\nTell me what that would be!\n\nNORA\nBoth you and I would have to be so changed that—. Oh, Torvald, I don't believe any longer in wonderful things happening.\n\nHELMER\nBut I will believe in it. Tell me! So changed that—?\n\nNORA\nThat our life together would be a real wedlock. Goodbye. [She goes out through the hall.]\n\nHELMER\n[sinks down on a chair at the door and buries his face in his hands] Nora! Nora! [Looks round, and rises.] Empty. She is gone. [A hope flashes across his mind.] The most wonderful thing of all—?\n\n[The sound of a door shutting is heard from below.]",
+    "source": "English Wikisource (translator not named there; public-domain translation)",
+    "url": "https://en.wikisource.org/wiki/A_Doll%27s_House/Act_III",
+    "note": "The climax is a conversation and then a sound. Nora's refusals get shorter and shorter; the slammed door does what no speech could."
+   }
+  ]
+ },
+ {
+  "id": "tendulkar",
+  "name": "Vijay Tendulkar",
+  "group": "theatre",
+  "era": "1928–2008",
+  "pd": false,
+  "line": "Marathi theatre of power, cruelty and hypocrisy.",
+  "signature": "Tendulkar exposes violence hidden in respectable society: a mock trial that turns into a real hunt, a power-hungry official, a man who 'keeps' women. Games and rituals on stage turn into cruelty.",
+  "techniques": [
+   {
+    "name": "The game that turns real",
+    "how": "Start with play-acting or a mock event that slowly becomes an actual trial or attack."
+   },
+   {
+    "name": "Hypocrisy under a polite surface",
+    "how": "Let respectable characters reveal brutality through small remarks."
+   },
+   {
+    "name": "Chorus and folk form",
+    "how": "Use a chorus or folk performance style to comment on power."
+   }
+  ],
+  "works": [
+   "Shantata! Court Chalu Ahe",
+   "Ghashiram Kotwal",
+   "Sakharam Binder",
+   "Kamala"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "rakesh",
+  "name": "Mohan Rakesh",
+  "group": "theatre",
+  "era": "1925–1972",
+  "pd": false,
+  "line": "Modern Hindi drama of incomplete people and broken homes.",
+  "signature": "Rakesh writes lonely characters who want more than life gives: an artist who leaves his village love, a family where everyone is 'half complete'. Long silences, interrupted speech and one room that traps everyone.",
+  "techniques": [
+   {
+    "name": "Broken-off speech",
+    "how": "Characters start sentences they can't finish; the gaps hold the feeling."
+   },
+   {
+    "name": "One trapping room",
+    "how": "Keep the whole play in one space so pressure builds."
+   },
+   {
+    "name": "Desire for completeness",
+    "how": "Every character wants something the others can't give."
+   }
+  ],
+  "works": [
+   "Aashadh Ka Ek Din",
+   "Aadhe Adhure",
+   "Lehron Ke Rajhans"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "tanvir",
+  "name": "Habib Tanvir",
+  "group": "theatre",
+  "era": "1923–2009",
+  "pd": false,
+  "line": "Folk theatre: Chhattisgarhi Nacha, songs and village actors.",
+  "signature": "Tanvir built plays with folk performers from Chhattisgarh, using their songs, improvisation and direct address to the audience. Stories are fables with sharp political edges, and comedy carries the message.",
+  "techniques": [
+   {
+    "name": "Direct address",
+    "how": "Characters talk to the audience, sing commentary and break the fourth wall."
+   },
+   {
+    "name": "Fable with a sting",
+    "how": "A simple folk tale whose moral turns against the powerful."
+   },
+   {
+    "name": "Songs as structure",
+    "how": "Songs open, link and close scenes."
+   }
+  ],
+  "works": [
+   "Charandas Chor",
+   "Agra Bazar",
+   "Mitti ki Gaadi"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "sircar",
+  "name": "Badal Sircar",
+  "group": "theatre",
+  "era": "1925–2011",
+  "pd": false,
+  "line": "Third Theatre: no stage, no sets, actors among the audience.",
+  "signature": "Sircar left the proscenium for open spaces, bodies and voices only. His plays are about the trapped urban middle class, repeating patterns and the search for meaning, staged so close that the audience is part of the scene.",
+  "techniques": [
+   {
+    "name": "The body as set",
+    "how": "Actors become walls, trains and crowds; no props needed."
+   },
+   {
+    "name": "Repetition as theme",
+    "how": "Repeat the same scene with small changes to show a life stuck in a loop."
+   },
+   {
+    "name": "Audience inside the play",
+    "how": "Stage it in the round so spectators are witnesses."
+   }
+  ],
+  "works": [
+   "Evam Indrajit",
+   "Pagla Ghoda",
+   "Michhil"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "karnad",
+  "name": "Girish Karnad",
+  "group": "theatre",
+  "era": "1938–2019",
+  "pd": false,
+  "line": "Myth and history retold to ask modern questions.",
+  "signature": "Karnad takes a myth, folktale or historical king and uses it to ask about identity, power and desire today. He borrows folk forms (Yakshagana, a narrator-Bhagavata, masks) and mixes the comic with the tragic.",
+  "techniques": [
+   {
+    "name": "Old story, new question",
+    "how": "Retell a known myth or history so it asks something urgent now."
+   },
+   {
+    "name": "The Bhagavata narrator",
+    "how": "A narrator figure introduces, comments on and even enters the play."
+   },
+   {
+    "name": "Masks and doubles",
+    "how": "Swap heads, bodies or identities to dramatise a split self."
+   }
+  ],
+  "works": [
+   "Tughlaq",
+   "Hayavadana",
+   "Naga-Mandala",
+   "Yayati"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "pinter",
+  "name": "Harold Pinter",
+  "group": "theatre",
+  "era": "1930–2008",
+  "pd": false,
+  "line": "Menace, pauses and power games in ordinary rooms.",
+  "signature": "Pinter's characters fight for territory with small talk. Threat comes from what is not said; famous pauses and silences shift power. In Betrayal he tells an affair backwards.",
+  "techniques": [
+   {
+    "name": "The pause",
+    "how": "Write silences as beats where power changes hands."
+   },
+   {
+    "name": "Menace from the ordinary",
+    "how": "A stranger's polite questions become a threat."
+   },
+   {
+    "name": "Reverse chronology",
+    "how": "Tell the story backwards so the audience watches innocence return."
+   }
+  ],
+  "works": [
+   "The Birthday Party",
+   "The Homecoming",
+   "Betrayal",
+   "The Caretaker"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "aristotle",
+  "name": "Aristotle, Poetics",
+  "group": "craft",
+  "area": "Screenwriting",
+  "era": "c. 335 BCE",
+  "pd": true,
+  "line": "The first book on story: plot as soul, reversal and recognition.",
+  "signature": "The oldest surviving study of drama. Aristotle argues that plot (the arrangement of events) matters more than character, that a story needs a beginning, middle and end bound by probability, and that the strongest moments are a reversal of fortune and a recognition.",
+  "techniques": [
+   {
+    "name": "Plot is the soul",
+    "how": "Arrange events so each follows from the last by probability or necessity."
+   },
+   {
+    "name": "Reversal (peripeteia)",
+    "how": "An action meant to help produces the opposite result."
+   },
+   {
+    "name": "Recognition (anagnorisis)",
+    "how": "A character moves from ignorance to knowledge, ideally at the moment of reversal."
+   },
+   {
+    "name": "Pity and fear",
+    "how": "A good-but-flawed person falling through an error moves us most."
+   }
+  ],
+  "works": [
+   "Poetics (S. H. Butcher translation, 1902)"
+  ],
+  "excerpts": [
+   {
+    "work": "Poetics, part VI: the definition of tragedy",
+    "lang": "en",
+    "text": "Tragedy, then, is an imitation of an action that is serious, complete, and of a certain magnitude; in language embellished with each kind of artistic ornament, the several kinds being found in separate parts of the play; in the form of action, not of narrative; through pity and fear effecting the proper purgation of these emotions.",
+    "source": "The Poetics, tr. S. H. Butcher, English Wikisource",
+    "url": "https://en.wikisource.org/wiki/The_Poetics_translated_by_S._H._Butcher/Whole_text",
+    "note": "'Action, not narrative': drama shows, it doesn't tell. 'Complete' means a real beginning, middle and end."
+   },
+   {
+    "work": "Poetics, part VI: plot as the soul",
+    "lang": "en",
+    "text": "The plot, then, is the first principle, and, as it were, the soul of a tragedy; Character holds the second place. A similar fact is seen in painting. The most beautiful colors, laid on confusedly, will not give as much pleasure as the chalk outline of a portrait. Thus Tragedy is the imitation of an action, and of the agents mainly with a view to the action.",
+    "source": "The Poetics, tr. S. H. Butcher, English Wikisource",
+    "url": "https://en.wikisource.org/wiki/The_Poetics_translated_by_S._H._Butcher/Whole_text",
+    "note": "Aristotle's chalk-outline comparison: a clear plot shape matters more than beautiful details laid on confusedly."
+   },
+   {
+    "work": "Poetics, part XI: reversal and recognition",
+    "lang": "en",
+    "text": "Reversal of the Situation is a change by which the action veers round to its opposite, subject always to our rule of probability or necessity. Thus in the Oedipus, the messenger comes to cheer Oedipus and free him from his alarms about his mother, but by revealing who he is, he produces the opposite effect.\n\nRecognition, as the name indicates, is a change from ignorance to knowledge, producing love or hate between the persons destined by the poet for good or bad fortune The best form of recognition is coincident with a Reversal of the Situation, as in the Oedipus.",
+    "source": "The Poetics, tr. S. H. Butcher, English Wikisource",
+    "url": "https://en.wikisource.org/wiki/The_Poetics_translated_by_S._H._Butcher/Whole_text",
+    "note": "The messenger means to comfort Oedipus and destroys him: the purest reversal. Best of all when the recognition arrives at that same moment."
+   }
+  ]
+ },
+ {
+  "id": "natyashastra",
+  "name": "Bharata, Natyashastra",
+  "group": "craft",
+  "area": "Acting",
+  "era": "c. 200 BCE – 200 CE",
+  "pd": false,
+  "line": "Indian theory of rasa: the audience tastes emotion through bhava.",
+  "signature": "The Sanskrit treatise on performance. Its core idea: a performance creates rasa (an aesthetic 'flavour' such as shringara, karuna, vira, hasya) in the audience, built from the actor's bhava (emotion), its causes (vibhava), its expressions (anubhava) and passing feelings (vyabhichari bhava). Original Sanskrit is ancient; English translations here are cited by idea.",
+  "techniques": [
+   {
+    "name": "Pick the dominant rasa",
+    "how": "Decide which rasa the scene should leave the audience tasting; make every element serve it."
+   },
+   {
+    "name": "Vibhava → anubhava",
+    "how": "Show the cause of the emotion, then its outward signs (tears, trembling), not a statement of it."
+   },
+   {
+    "name": "Passing feelings",
+    "how": "Layer brief contrary moods (doubt, shame, hope) over the main emotion to make it real."
+   }
+  ],
+  "works": [
+   "Natyashastra, chapters 6–7 (rasa and bhava)"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "freytag",
+  "name": "Gustav Freytag, Technique of the Drama",
+  "group": "craft",
+  "area": "Screenwriting",
+  "era": "1863",
+  "pd": true,
+  "line": "The pyramid: exposition, rise, climax, fall, catastrophe.",
+  "signature": "Freytag analysed five-act tragedies and drew drama as a pyramid: introduction, rising action, climax, falling action and catastrophe, with an 'exciting force' that starts the rise. Cited here by idea.",
+  "techniques": [
+   {
+    "name": "The exciting force",
+    "how": "One event early on starts the conflict moving."
+   },
+   {
+    "name": "Climax in the middle",
+    "how": "In tragedy, the peak of the hero's power comes mid-play; the rest is the fall."
+   },
+   {
+    "name": "The force of the last suspense",
+    "how": "Just before the catastrophe, offer a glimmer of escape."
+   }
+  ],
+  "works": [
+   "Die Technik des Dramas (1863), translated by E. J. MacEwan (1895)"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "field",
+  "name": "Syd Field, Screenplay",
+  "group": "craft",
+  "area": "Screenwriting",
+  "era": "1979",
+  "pd": false,
+  "line": "Three acts and two plot points: the 'paradigm'.",
+  "signature": "Field's paradigm: Act I setup (about a quarter), Act II confrontation (half), Act III resolution (a quarter), turned by Plot Point I and Plot Point II, events that hook into the story and spin it in a new direction. Cited by idea.",
+  "techniques": [
+   {
+    "name": "Plot Point I",
+    "how": "Around the end of Act I, an event locks the hero into the story's conflict."
+   },
+   {
+    "name": "The midpoint",
+    "how": "A central event that splits Act II and raises the stakes."
+   },
+   {
+    "name": "Plot Point II",
+    "how": "The event that launches the final act and the resolution."
+   }
+  ],
+  "works": [
+   "Screenplay: The Foundations of Screenwriting"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "mckee",
+  "name": "Robert McKee, Story",
+  "group": "craft",
+  "area": "Screenwriting",
+  "era": "1997",
+  "pd": false,
+  "line": "Scenes turn on values; the gap between expectation and result.",
+  "signature": "McKee: every scene should turn a value (love/hate, safe/danger) from positive to negative or the reverse. A character acts expecting one result, the world answers differently, and that gap creates story. Cited by idea.",
+  "techniques": [
+   {
+    "name": "The turning scene",
+    "how": "Name the value at stake; make sure it changes by the end of the scene, or cut the scene."
+   },
+   {
+    "name": "The gap",
+    "how": "The character expects A, gets B; the next action must be bigger."
+   },
+   {
+    "name": "Controlling idea",
+    "how": "State the story's meaning in one sentence: value + cause."
+   }
+  ],
+  "works": [
+   "Story: Substance, Structure, Style and the Principles of Screenwriting"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "snyder",
+  "name": "Blake Snyder, Save the Cat!",
+  "group": "craft",
+  "area": "Screenwriting",
+  "era": "2005",
+  "pd": false,
+  "line": "A 15-beat sheet and a likeable hero.",
+  "signature": "Snyder's beat sheet maps a film into 15 beats (Opening Image, Theme Stated, Catalyst, Break into Two, Midpoint, All Is Lost, Finale, and more) and recommends a 'save the cat' moment that makes us like the hero early. Cited by idea.",
+  "techniques": [
+   {
+    "name": "Save the cat",
+    "how": "Early on, let the hero do one kind or brave act so we root for them."
+   },
+   {
+    "name": "Catalyst",
+    "how": "Something happens to the hero that knocks their life off course."
+   },
+   {
+    "name": "All is lost",
+    "how": "Near the end of Act II, the hero loses what mattered most; hint at a 'whiff of death'."
+   }
+  ],
+  "works": [
+   "Save the Cat! The Last Book on Screenwriting You'll Ever Need"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "egri",
+  "name": "Lajos Egri, The Art of Dramatic Writing",
+  "group": "craft",
+  "area": "Screenwriting",
+  "era": "1946",
+  "pd": false,
+  "line": "Start from a premise; build characters in three dimensions.",
+  "signature": "Egri argues every play needs a premise (for example 'great love defies even death') and characters built from physiology, sociology and psychology, orchestrated so opposites clash. Cited by idea.",
+  "techniques": [
+   {
+    "name": "The premise",
+    "how": "Write the story's argument in one line: character + conflict + conclusion."
+   },
+   {
+    "name": "Three-dimensional character",
+    "how": "Define body, social world and inner psychology; they explain every choice."
+   },
+   {
+    "name": "Orchestration",
+    "how": "Cast characters who are sharply different so conflict is built in."
+   }
+  ],
+  "works": [
+   "The Art of Dramatic Writing"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "mackendrick",
+  "name": "Alexander Mackendrick, On Film-making",
+  "group": "craft",
+  "area": "Directing",
+  "era": "2004 (lectures from the 1970s–90s)",
+  "pd": false,
+  "line": "The director's grammar: show, don't say; build scenes from cause and effect.",
+  "signature": "Mackendrick, director of The Ladykillers and Sweet Smell of Success, taught at CalArts that cinema works below words. A film should be understandable with the sound off: tell the story through what characters do and see, not what they say. He stresses cause and effect between shots, the audience anticipating what will happen next, dramatic irony, and dialogue as action rather than explanation. Cited by idea.",
+  "techniques": [
+   {
+    "name": "Sound-off test",
+    "how": "Could the audience follow the scene with no dialogue? If not, move the story into behaviour, objects and looks."
+   },
+   {
+    "name": "Dialogue as action",
+    "how": "Every line should be a character doing something to another (pleading, trapping, testing), never information for the audience."
+   },
+   {
+    "name": "Anticipation and dramatic irony",
+    "how": "Let the audience know something the character doesn't, so they lean forward waiting for it to land."
+   },
+   {
+    "name": "Cause and effect between shots",
+    "how": "Each shot or beat should prompt a question the next one answers."
+   }
+  ],
+  "works": [
+   "On Film-making: An Introduction to the Craft of the Director (ed. Paul Cronin)"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "yorke",
+  "name": "John Yorke, Into the Woods",
+  "group": "craft",
+  "area": "Screenwriting",
+  "era": "2013",
+  "pd": false,
+  "line": "Five-act shape, the midpoint, and change as the heart of every story.",
+  "signature": "Yorke, who ran drama at the BBC and Channel 4, argues that all stories share one shape: a character with a flaw goes 'into the woods' and comes out changed. He maps it as five acts with a midpoint where the protagonist gets what they want or learns the truth, and shows the same shape repeating at the level of the act, the scene and even the beat. Want versus need, and the fractal structure of scenes, are his key tools. Cited by idea.",
+  "techniques": [
+   {
+    "name": "Into the woods",
+    "how": "Send the hero from a known world into an unknown one that forces them to face their flaw."
+   },
+   {
+    "name": "The midpoint",
+    "how": "At the centre, the hero gets what they want or discovers the truth, and the story turns."
+   },
+   {
+    "name": "Want versus need",
+    "how": "Give the hero a conscious want; let the story reveal the deeper need that contradicts it."
+   },
+   {
+    "name": "Fractal scenes",
+    "how": "Each scene should have its own set-up, turn and change, the whole story's shape in miniature."
+   }
+  ],
+  "works": [
+   "Into the Woods: How Stories Work and Why We Tell Them"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "stanislavski",
+  "name": "Konstantin Stanislavski, An Actor Prepares",
+  "group": "craft",
+  "area": "Acting",
+  "era": "1936",
+  "pd": false,
+  "line": "Given circumstances, objectives and the 'magic if'.",
+  "signature": "Stanislavski's system asks the actor (and the writer) what the character wants in each moment (the objective), what stands in the way, under what given circumstances, and 'what would I do if…'. Under the lines runs subtext. Cited by idea.",
+  "techniques": [
+   {
+    "name": "Objective in every scene",
+    "how": "Give each character a playable want ('to make her stay'), not a feeling."
+   },
+   {
+    "name": "Given circumstances",
+    "how": "Fix who, where, when and what just happened before the scene starts."
+   },
+   {
+    "name": "Subtext",
+    "how": "Write lines that say one thing while the character wants another."
+   }
+  ],
+  "works": [
+   "An Actor Prepares",
+   "Building a Character"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "hagen",
+  "name": "Uta Hagen, Respect for Acting",
+  "group": "craft",
+  "area": "Acting",
+  "era": "1973",
+  "pd": false,
+  "line": "Real behaviour, substitution and the questions an actor asks.",
+  "signature": "Hagen teaches actors to find truthful behaviour by asking: who am I, what are my circumstances, what do I want, what's in my way, what do I do to get it. Writers can use the same questions to test every scene. Cited by idea.",
+  "techniques": [
+   {
+    "name": "The actor's questions",
+    "how": "Who, where, when, what do I want, what's in my way, how do I get it: answer them for each character."
+   },
+   {
+    "name": "Substitution",
+    "how": "Use a real memory as the source of a character's emotion, to make the reaction specific."
+   },
+   {
+    "name": "Physical destination",
+    "how": "Give characters a task with their hands while they talk."
+   }
+  ],
+  "works": [
+   "Respect for Acting",
+   "A Challenge for the Actor"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "mchekhov",
+  "name": "Michael Chekhov, To the Actor",
+  "group": "craft",
+  "area": "Acting",
+  "era": "1953",
+  "pd": false,
+  "line": "Psychological gesture and atmosphere.",
+  "signature": "Michael Chekhov (Anton's nephew) gave actors the psychological gesture, one strong physical movement that captures a character's inner drive, and the idea that each scene has an atmosphere the actors must play with or against. Cited by idea.",
+  "techniques": [
+   {
+    "name": "Psychological gesture",
+    "how": "Find one physical action that sums up the character (grasping, pushing away)."
+   },
+   {
+    "name": "Atmosphere",
+    "how": "Decide the scene's air (dread, celebration) and let a character fight it."
+   }
+  ],
+  "works": [
+   "To the Actor: On the Technique of Acting"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "lumet",
+  "name": "Sidney Lumet, Making Movies",
+  "group": "craft",
+  "area": "Directing",
+  "era": "1995",
+  "pd": false,
+  "line": "First decide what the movie is about; every choice follows.",
+  "signature": "Lumet's practical account of directing: once you know what the story is really about (its theme, not its plot), that answer decides casting, lenses, light and pace. Cited by idea.",
+  "techniques": [
+   {
+    "name": "What is it about?",
+    "how": "Write the theme in one line and test every scene against it."
+   },
+   {
+    "name": "Visual progression",
+    "how": "Change lenses or light gradually across the film to match the theme (rooms closing in)."
+   }
+  ],
+  "works": [
+   "Making Movies"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "mamet",
+  "name": "David Mamet, On Directing Film",
+  "group": "craft",
+  "area": "Directing",
+  "era": "1991",
+  "pd": false,
+  "line": "Tell the story in cuts of simple, uninflected images.",
+  "signature": "Mamet: the director's job is to tell the story through a juxtaposition of plain shots, each one only showing what it must. Ask what the protagonist wants, and what each scene's beat is. Cited by idea.",
+  "techniques": [
+   {
+    "name": "Uninflected images",
+    "how": "Each shot shows one simple thing; meaning comes from the cut."
+   },
+   {
+    "name": "What does the hero want?",
+    "how": "State the protagonist's want for every scene; cut what doesn't serve it."
+   }
+  ],
+  "works": [
+   "On Directing Film"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "murch",
+  "name": "Walter Murch, In the Blink of an Eye",
+  "group": "craft",
+  "area": "Directing",
+  "era": "1995",
+  "pd": false,
+  "line": "Editing: emotion first, the 'rule of six'.",
+  "signature": "Murch ranks the reasons to cut: emotion first (by far), then story, rhythm, eye-trace and spatial rules. Writers can use it to judge where scenes should start and end. Cited by idea.",
+  "techniques": [
+   {
+    "name": "Emotion first",
+    "how": "Cut a scene where the feeling peaks, even if information is incomplete."
+   },
+   {
+    "name": "Late in, early out",
+    "how": "Enter a scene as late as possible and leave as early as possible."
+   }
+  ],
+  "works": [
+   "In the Blink of an Eye"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "eisenstein",
+  "name": "Sergei Eisenstein, Film Form",
+  "group": "craft",
+  "area": "Directing",
+  "era": "1920s–40s",
+  "pd": false,
+  "line": "Montage: two shots colliding create a third meaning.",
+  "signature": "Eisenstein argued that meaning in film comes from the collision of shots: put two images side by side and the audience makes an idea neither contains. Cited by idea.",
+  "techniques": [
+   {
+    "name": "Collision montage",
+    "how": "Cut between two unrelated images so the audience draws a conclusion (a feast, a hungry child)."
+   },
+   {
+    "name": "Rhythmic montage",
+    "how": "Shorten shots as tension rises."
+   }
+  ],
+  "works": [
+   "Film Form",
+   "The Film Sense"
+  ],
+  "excerpts": []
+ },
+ {
+  "id": "brook",
+  "name": "Peter Brook, The Empty Space",
+  "group": "craft",
+  "area": "Theatre craft",
+  "era": "1968",
+  "pd": false,
+  "line": "Deadly, holy, rough and immediate theatre.",
+  "signature": "Brook: any empty space can be a stage if someone walks across it while someone else watches. He names four theatres (deadly, holy, rough and immediate) and pushes for theatre that's alive tonight, not dutiful. Cited by idea.",
+  "techniques": [
+   {
+    "name": "The empty space",
+    "how": "Strip the scene to actors and audience; add only what's essential."
+   },
+   {
+    "name": "Rough theatre",
+    "how": "Use popular, noisy, funny forms to reach truth."
+   }
+  ],
+  "works": [
+   "The Empty Space"
+  ],
+  "excerpts": []
+ }
+]
