@@ -1969,3 +1969,64 @@ function scheduleDigest() {
     try { await Store.col().doc("_digest").set(d); digestLast = key; } catch {}
   }, 1500);
 }
+
+
+// ---------- Start a story from an image ----------
+const ICON_IMAGE = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>';
+const ideaImg = { forId: null, preview: "", blob: null, busy: false, options: null, err: "", picked: -1 };
+async function shrinkImage(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("This image format can't be opened here. Try a JPG or PNG.")); i.src = url; });
+    const max = 1600, sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement("canvas"); c.width = Math.round(img.naturalWidth * sc); c.height = Math.round(img.naturalHeight * sc);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    return await new Promise(res => c.toBlob(b => res(b), "image/jpeg", 0.85));
+  } finally { URL.revokeObjectURL(url); }
+}
+async function onIdeaImage(file) {
+  if (!file) return;
+  Object.assign(ideaImg, { forId: story.id, busy: true, options: null, err: "", picked: -1 });
+  render();
+  try {
+    const caps = AI.sample ? await AI.sample.limits().catch(() => null) : null;
+    const blob = await shrinkImage(file);
+    if (ideaImg.preview) URL.revokeObjectURL(ideaImg.preview);
+    ideaImg.blob = blob; ideaImg.preview = URL.createObjectURL(blob); render();
+    // Keep the image with the story (when uploads are available).
+    (async () => { try { const a = await claude.use("assets"); if (a) { const r = await a.upload(blob, { type: "image/jpeg" }); story.image = { assetId: r.id, url: r.url }; persist(); } } catch {} })();
+    if (!caps?.images) throw new Error(AI.sample ? "Reading images isn't available in this view. You can still keep the image with your story and type the idea yourself." : "Open the app in Claude, signed in, to have Claude read the image.");
+    const lang = story.lang === "hindi" ? "Hindi in Devanagari" : "Hinglish (Hindi in Roman letters, mixed naturally with English)";
+    const prompt = `A writer wants to start a story from this image. Look closely: the people, place, objects, light, era and mood, and anything odd or unresolved in it.\n\nSuggest 3 different stories this image could be the seed of: one tender, one tense or dark, one surprising. Each idea is 2–3 sentences: who the main character is, what they want, and what stands in their way, rooted in what is actually visible. Set them in India unless the image clearly shows somewhere else. Write in ${lang}.\n\nReply with JSON only: {"description": "one sentence describing what the image shows", "ideas": [{"title": "a short working title", "idea": string}]}`;
+    const r = await AI.sample.json(prompt, { images: [blob], modelTier: AI.tier("default"), cache: false });
+    ideaImg.options = (r?.ideas || []).slice(0, 3).map(x => ({ title: String(x.title || ""), idea: String(x.idea || "") })).filter(x => x.idea);
+    story.imageNote = String(r?.description || "").slice(0, 400); persistSoon();
+    if (!ideaImg.options.length) ideaImg.err = "Claude couldn't find a story in this image. Try another, or type your idea.";
+  } catch (e) { ideaImg.err = e?.code ? AI.errText(e) : (e?.message || "Couldn't read that image."); }
+  ideaImg.busy = false; render();
+}
+function useImageIdea(i) {
+  const o = ideaImg.options[i]; if (!o) return;
+  const prev = ideaImg.picked >= 0 ? ideaImg.options[ideaImg.picked] : null;
+  if (!story.idea.trim() || (prev && story.idea.trim() === prev.idea.trim())) story.idea = o.idea;
+  else story.idea = story.idea.trimEnd() + "\n\n" + o.idea;
+  if (!story.title || (prev && story.title === prev.title)) story.title = o.title;
+  ideaImg.picked = i; persist(); render();
+}
+function ideaImageBox() {
+  if (ideaImg.forId !== story.id) Object.assign(ideaImg, { forId: story.id, preview: "", blob: null, busy: false, options: null, err: "", picked: -1 });
+  const src = ideaImg.preview || story.image?.url || "";
+  const input = h("input", { type: "file", accept: "image/*", id: "ideaimg", hidden: true, onchange: e => { onIdeaImage(e.target.files[0]); e.target.value = ""; } });
+  const btn = h("label", { for: "ideaimg", class: "btn imgbtn", tabindex: "0", role: "button", onkeydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } } },
+    icon(ICON_IMAGE), src ? "Use a different image" : "Start from an image");
+  return h("div", { class: "ideaimg" }, input,
+    src ? h("div", { class: "ideathumb-wrap" }, h("img", { src, alt: story.imageNote || "The image this story started from", class: "ideathumb" })) : null,
+    story.imageNote && src ? h("p", { class: "imgdesc", text: story.imageNote }) : null,
+    h("div", { class: "row" }, btn,
+      src && !ideaImg.busy ? h("button", { class: "ghost", onclick: () => { story.image = null; story.imageNote = ""; ideaImg.preview = ""; ideaImg.options = null; persist(); render(); } }, "Remove image") : null,
+      !src ? h("span", { class: "muted small", text: "A photo, a painting, a frame from a film…" }) : null),
+    ideaImg.busy ? h("div", { class: "busy", role: "status" }, h("span", { class: "dot" }), ideaImg.blob ? "Looking for stories in your image…" : "Opening the image…") : null,
+    ideaImg.err ? h("div", { class: "note err", role: "alert", text: ideaImg.err }) : null,
+    ideaImg.options?.length ? h("div", { class: "imgideas" }, h("span", { class: "label", text: "Stories in this image · tap one to use it" }),
+      ideaImg.options.map((o, i) => h("button", { class: "imgidea", "aria-pressed": ideaImg.picked === i ? "true" : "false", onclick: () => useImageIdea(i) }, h("b", { text: o.title }), h("span", { text: o.idea })))) : null);
+}
