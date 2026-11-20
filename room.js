@@ -1386,7 +1386,7 @@ function goalCard() {
 const fmtClock = hhmm => { const [H, M] = hhmm.split(":").map(Number); const d = new Date(); d.setHours(H, M, 0, 0); return d.toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" }); };
 function nudgeDismissed() { try { return localStorage.getItem("pd.nudge") === dayKey(); } catch { return false; } }
 function continueTarget() {
-  const cands = stories.filter(s => s.outline && s.stats && (s.stats.written < s.stats.total || s.stats.open > 0));
+  const cands = stories.filter(s => s.outline && !s.sketchbook && s.stats && (s.stats.written < s.stats.total || s.stats.open > 0));
   if (!cands.length) return null;
   const s = cands.slice().sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
   return { s, part: Number.isInteger(s.lastPart) ? s.lastPart : null };
@@ -1408,7 +1408,8 @@ function nudgeCard() {
       tgt ? h("button", { class: "primary", onclick: () => continueWhereLeft(tgt) }, "Continue where I left off") : null,
       tgt ? h("button", { class: "sprintbtn", onclick: async () => { await continueWhereLeft(tgt); if (story?.stage === "draft") openSprint(curPart, 5); } }, icon(ICON_TIMER), "5-minute sprint")
           : h("button", { class: "primary", onclick: () => { story = newStory(); parts = {}; render(); } }, "+ New story"),
-      h("button", { class: "ghost", onclick: () => { try { localStorage.setItem("pd.nudge", dayKey()); } catch {} render(); } }, "Not today")));
+      h("button", { class: "ghost", onclick: () => { try { localStorage.setItem("pd.nudge", dayKey()); } catch {} render(); } }, "Not today")),
+    seedPromptBox(true));
 }
 async function continueWhereLeft(tgt) {
   await openStory(tgt.s);
@@ -1714,6 +1715,8 @@ function renderSangam() {
     h("h2", { text: "Sangam" }),
     h("p", { class: "lead", text: "Where your stories meet. Every sprint leaves seeds (characters, images, lines, conflicts, places, questions), and Sangam fuses seeds from different stories into new ones." }),
     h("div", { class: "row" }, h("span", { class: "chip", text: `${kept.length} kept ${kept.length === 1 ? "seed" : "seeds"}` }), h("span", { class: "chip gold", text: `from ${storiesWith.size} ${storiesWith.size === 1 ? "story" : "stories"}` }))));
+  const sp = seedPromptBox(false); if (sp) app.append(h("section", { class: "sheet" }, sp));
+  app.append(jaalCard(kept));
 
   if (fresh.length) app.append(h("section", { class: "sheet" },
     h("div", { class: "row" }, h("h3", { class: "spacer", text: `New seeds · ${fresh.length}` }),
@@ -1817,4 +1820,124 @@ async function findSeedsFor(k) {
   try { const c = await harvestSeeds(p.text, k); toast(c ? `${c} new ${c === 1 ? "seed" : "seeds"} in Sangam` : "No new seeds found"); }
   catch (e) { toast(AI.errText(e)); }
   busy = null; render();
+}
+
+
+// ---------- Today's seed prompt ----------
+const PROMPTS = {
+  character: [t => `${t}. Aaj inhe ek ajnabi milta hai. Kya hota hai?`, t => `${t}. Inka ek din ka sabse chhota jhooth likho.`],
+  image: [t => `Is image se ek scene shuru karo: ${t}.`, t => `${t}. Ise kisi aur ki aankhon se dikhao.`],
+  line: [t => `Ek naya scene likho jo is line pe khatam ho: ${t}`, t => `Yeh line kisi aur ke munh mein daalo, bilkul alag jagah: ${t}`],
+  conflict: [t => `${t}. Pehla chhota faisla kya hoga?`, t => `${t}. Ise ek bachche ki nazar se likho.`],
+  place: [t => `${t}. Raat ke do baje wahan kaun hai, aur kyun?`, t => `${t}. Wahan ki ek awaaz se scene shuru karo.`],
+  question: [t => `Is sawaal ka ek jawab, ek scene mein: ${t}`, t => `${t} Is sawaal se darne waale kirdaar ko likho.`],
+};
+let promptShift = 0;
+function todaysSeed() {
+  const kept = (Lib.seeds || []).filter(x => x.status === "kept");
+  if (!kept.length) return null;
+  const fresh = kept.filter(x => !(x.usedIn || []).length && !(x.sketched || []).includes(dayKey()));
+  const pool = fresh.length ? fresh : kept;
+  const d = dayKey(); let hsh = 0; for (const c of d) hsh = (hsh * 31 + c.charCodeAt(0)) >>> 0;
+  const sd = pool[(hsh + promptShift) % pool.length];
+  const ts = PROMPTS[sd.type] || PROMPTS.image;
+  const text = sd.text.replace(/[.।]\s*$/, "");
+  return { seed: sd, prompt: ts[(hsh + promptShift) % ts.length](text) };
+}
+function seedPromptBox(inNudge) {
+  const t = todaysSeed(); if (!t) return null;
+  return h("div", { class: "seedprompt" + (inNudge ? " in-nudge" : "") },
+    h("span", { class: "label", text: "Today's seed prompt" }),
+    h("p", { class: "sp-prompt", text: t.prompt }),
+    h("span", { class: "muted small", text: `${SEED_TYPES[t.seed.type]} seed from “${t.seed.story}” · ${Goal.words} words` }),
+    h("div", { class: "row" },
+      h("button", { class: inNudge ? "sprintbtn" : "primary", disabled: false, onclick: () => sprintOnSeed(t) }, icon(ICON_TIMER), "Sprint on this seed"),
+      h("button", { class: "ghost", onclick: () => { promptShift++; render(); } }, "Another seed")));
+}
+async function getSketchbook() {
+  let sb = stories.find(s => s.sketchbook);
+  if (!sb) {
+    sb = newStory(); Object.assign(sb, { title: "Seed Sketchbook", idea: "Short sketches written from today's seed prompts.", lang: "hinglish", formatKey: "short-story",
+      len: presetLength(FORMATS[0]), screenCat: "Short film", stage: "draft", sketchbook: true,
+      outline: { title: "Seed Sketchbook", logline: "Daily sketches grown from your own seeds.", characters: [], suggestions: [], parts: [] } });
+    await Store.save(sb).catch(() => {}); stories.unshift(sb);
+  }
+  return sb;
+}
+async function sprintOnSeed(t) {
+  const sb = await getSketchbook();
+  await openStory(sb);
+  const d = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  story.outline.parts.push({ title: `${d} · ${t.seed.text.slice(0, 60)}${t.seed.text.length > 60 ? "…" : ""}`, summary: t.prompt });
+  const k = story.outline.parts.length - 1;
+  story.stage = "draft"; curPart = k; story.lastPart = k;
+  t.seed.sketched = [...(t.seed.sketched || []), dayKey()]; Seeds.save(t.seed).catch(() => {});
+  await Store.save(story).catch(() => {});
+  tab = "stories"; render(); openSprint(k, 5);
+}
+
+// ---------- Jaal: the web of motifs between stories ----------
+function jaalCard(kept) {
+  const byStory = new Map();
+  kept.forEach(x => { if (!byStory.has(x.storyId)) byStory.set(x.storyId, { id: x.storyId, title: x.story, seeds: [], motifs: new Set() }); const n = byStory.get(x.storyId); n.seeds.push(x); (x.motifs || []).forEach(m => n.motifs.add(m)); });
+  const nodes = [...byStory.values()];
+  const sec = h("section", { class: "sheet" }, h("h3", { text: "Jaal · threads between your stories" }));
+  const motifStories = {}; nodes.forEach(n => n.motifs.forEach(m => (motifStories[m] = motifStories[m] || []).push(n.id)));
+  const shared = Object.entries(motifStories).filter(([, v]) => v.length > 1).sort((a, b) => b[1].length - a[1].length);
+  if (nodes.length < 2 || !shared.length) {
+    sec.append(h("p", { class: "muted small", text: nodes.length < 2 ? "Keep seeds from at least two stories and the threads between them will appear here." : "No motif is shared between your stories yet. As your seed bank grows, threads will appear here." }));
+    return sec;
+  }
+  const J = sg.jaal || (sg.jaal = { motif: shared[0][0], story: null });
+  if (J.motif && !motifStories[J.motif]) J.motif = shared[0][0];
+  // Layout: stories around a circle, each with its seeds as small dots.
+  const W = 360, H = 310, cx = W / 2, cy = H / 2 + 6, R = nodes.length === 2 ? 110 : Math.min(118, 70 + nodes.length * 8);
+  nodes.forEach((n, i) => { const a = -Math.PI / 2 + (2 * Math.PI * i) / nodes.length + (nodes.length === 2 ? Math.PI / 2 : 0); n.x = cx + R * Math.cos(a); n.y = cy + R * Math.sin(a) * 0.82; n.r = Math.min(22, 9 + n.seeds.length * 1.6); });
+  const NS = "http://www.w3.org/2000/svg", el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); return e; };
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "jaal", role: "img", "aria-label": `Map of ${nodes.length} stories joined by ${shared.length} shared motifs` });
+  const pairs = [];
+  for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
+    const common = [...nodes[i].motifs].filter(m => nodes[j].motifs.has(m));
+    if (common.length) pairs.push({ a: nodes[i], b: nodes[j], common });
+  }
+  const active = pr => (J.motif && pr.common.includes(J.motif)) || (J.story && (pr.a.id === J.story || pr.b.id === J.story));
+  pairs.forEach(pr => {
+    const mx = (pr.a.x + pr.b.x) / 2, my = (pr.a.y + pr.b.y) / 2, qx = mx + (cx - mx) * 0.35, qy = my + (cy - my) * 0.35;
+    const on = active(pr);
+    const path = el("path", { d: `M${pr.a.x},${pr.a.y} Q${qx},${qy} ${pr.b.x},${pr.b.y}`, class: "thread" + (on ? " on" : ""), "stroke-width": String(1.5 + pr.common.length * 1.2) });
+    const tt = el("title", {}); tt.textContent = `${pr.a.title} ↔ ${pr.b.title}: ${pr.common.join(", ")}`; path.append(tt);
+    path.addEventListener("click", () => { J.motif = pr.common[0]; J.story = null; render(); });
+    svg.append(path);
+    if (on) { const lbl = el("text", { x: qx, y: qy - 4, class: "thread-lbl", "text-anchor": "middle" }); lbl.textContent = (J.motif && pr.common.includes(J.motif)) ? J.motif : pr.common[0]; svg.append(lbl); }
+  });
+  nodes.forEach(n => {
+    const g = el("g", { class: "node" + (J.story === n.id || (J.motif && n.motifs.has(J.motif)) ? " on" : ""), tabindex: "0", role: "button", "aria-label": `${n.title}: ${n.seeds.length} seeds` });
+    n.seeds.forEach((sd, i) => { const a = (2 * Math.PI * i) / n.seeds.length, rr = n.r + 7; g.append(el("circle", { cx: n.x + rr * Math.cos(a), cy: n.y + rr * Math.sin(a), r: 2.4, class: "sdot" + (J.motif && (sd.motifs || []).includes(J.motif) ? " on" : "") })); });
+    g.append(el("circle", { cx: n.x, cy: n.y, r: n.r, class: "star" }));
+    const words = n.title.length > 18 ? n.title.slice(0, 17) + "…" : n.title;
+    const lbl = el("text", { x: Math.min(W - 52, Math.max(52, n.x)), y: n.y < cy - 10 ? n.y - n.r - 12 : n.y + n.r + 20, "text-anchor": "middle", class: "node-lbl" }); lbl.textContent = words; g.append(lbl);
+    const tt = el("title", {}); tt.textContent = `${n.title}: ${n.seeds.length} seeds; motifs ${[...n.motifs].join(", ")}`; g.append(tt);
+    const pick = () => { J.story = J.story === n.id ? null : n.id; J.motif = null; render(); };
+    g.addEventListener("click", pick); g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+    svg.append(g);
+  });
+  sec.append(h("div", { class: "jaal-wrap" }, svg));
+  sec.append(h("div", { class: "chips" }, shared.map(([m, ids]) => h("button", { "aria-pressed": J.motif === m ? "true" : "false", onclick: () => { J.motif = J.motif === m ? null : m; J.story = null; render(); } }, `${m} · ${ids.length}`))));
+  let detail;
+  if (J.motif) {
+    const ids = motifStories[J.motif] || [];
+    const sds = kept.filter(x => (x.motifs || []).includes(J.motif));
+    detail = h("div", { class: "jaal-detail" },
+      h("p", { class: "sl-insight", text: `“${J.motif}” runs through ${ids.length} ${ids.length === 1 ? "story" : "stories"}: ${ids.map(id => byStory.get(id).title).join(", ")}.` }),
+      h("div", { class: "seedrow" }, sds.slice(0, 6).map(x => seedChip(x))),
+      h("div", { class: "row" }, h("button", { class: "primary", disabled: !AI.sample || roomBusy, onclick: () => { const pick = []; const seen = new Set(); for (const x of sds) if (!seen.has(x.storyId) && pick.length < 3) { seen.add(x.storyId); pick.push(x.id); } sg.sel = pick; runSangam("picked"); window.scrollTo({ top: 0, behavior: "smooth" }); } }, `Fuse along “${J.motif}”`)));
+  } else if (J.story) {
+    const n = byStory.get(J.story);
+    const links = pairs.filter(pr => pr.a.id === n.id || pr.b.id === n.id).map(pr => `${(pr.a.id === n.id ? pr.b : pr.a).title} (${pr.common.join(", ")})`);
+    detail = h("div", { class: "jaal-detail" }, h("p", { class: "sl-insight", text: `${n.title}: ${n.seeds.length} seeds` }),
+      h("p", { class: "muted small", text: links.length ? "Connected to " + links.join("; ") + "." : "Not connected to another story yet." }));
+  }
+  if (detail) sec.append(detail);
+  sec.append(h("p", { class: "muted small", text: "Tap a story or a thread. Thicker threads mean more shared motifs." }));
+  return sec;
 }
