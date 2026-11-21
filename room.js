@@ -1370,6 +1370,7 @@ function goalCard() {
     h("div", { class: "goal-main" },
       h("h3", { text: headline }),
       h("p", { class: "muted small", text: streak ? `${streak}-day streak${met ? "" : " · write today to keep it"}` : "Hit your goal on consecutive days to build a streak." }),
+      writeNowRow(),
       h("div", { class: "goal-days", role: "img", "aria-label": `Last 14 days: goal met on ${Object.keys(tot).filter(k => tot[k] >= g && k >= dayKey(new Date(Date.now() - 13 * 864e5))).length} days` }, days),
       h("div", { class: "goal-set remind-row" }, h("label", { class: "remind" },
           h("input", { type: "checkbox", id: "remindon", checked: Goal.remindOn ? "checked" : null, onchange: async e => { Goal.remindOn = e.target.checked; await Goal.save(); render(); } }), "Remind me after"),
@@ -1866,11 +1867,10 @@ async function getSketchbook() {
 }
 async function sprintOnSeed(t) {
   const sb = await getSketchbook();
-  await openStory(sb);
   const d = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" });
-  story.outline.parts.push({ title: `${d} · ${t.seed.text.slice(0, 60)}${t.seed.text.length > 60 ? "…" : ""}`, summary: t.prompt });
-  const k = story.outline.parts.length - 1;
-  story.stage = "draft"; curPart = k; story.lastPart = k;
+  sb.outline.parts.push({ title: `${d} · ${t.seed.text.slice(0, 60)}${t.seed.text.length > 60 ? "…" : ""}`, summary: t.prompt });
+  const k = sb.outline.parts.length - 1; sb.stage = "draft"; sb.lastPart = k;
+  await openStory(sb); curPart = k;
   t.seed.sketched = [...(t.seed.sketched || []), dayKey()]; Seeds.save(t.seed).catch(() => {});
   await Store.save(story).catch(() => {});
   tab = "stories"; render(); openSprint(k, 5);
@@ -2055,4 +2055,40 @@ function notesField(k, noteEl) {
       h("p", { class: "muted small", text: "Every rewrite follows all of these. Tap ✕ to drop one." })) : null,
     h("label", { for: "rewritenote" }, whole.length || mine.length ? "Add another note (optional)" : "Rewrite note (optional)"), noteEl,
     h("label", { class: "checkline" }, h("input", { type: "checkbox", id: "noteall" }), "Use this note for all parts, including new ones"));
+}
+
+
+// ---------- Write now: one tap from the goal card into a sprint ----------
+function writeTarget() {
+  const tgt = continueTarget();
+  if (tgt) return { kind: "continue", tgt, label: `Continue “${tgt.s.outline.title}”` };
+  const recent = stories.filter(s => s.outline && !s.sketchbook && s.stats).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))[0];
+  if (recent) return { kind: "story", s: recent, label: `Add to “${recent.outline.title}”` };
+  return { kind: "free", label: "Free write" };
+}
+async function freeWrite(title) {
+  const sb = await getSketchbook();
+  const d = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  sb.outline.parts.push({ title: `${d} · ${title}`, summary: "" });
+  const k = sb.outline.parts.length - 1; sb.stage = "draft"; sb.lastPart = k;
+  await openStory(sb); curPart = k;
+  await Store.save(story).catch(() => {}); tab = "stories"; render(); openSprint(k, 5);
+}
+async function writeNow(t) {
+  if (t.kind === "continue") { await continueWhereLeft(t.tgt); if (story?.stage === "draft") openSprint(curPart, 5); return; }
+  if (t.kind === "story") {
+    await openStory(t.s); story.stage = "draft";
+    const n = story.outline.parts.length; curPart = Number.isInteger(t.s.lastPart) && t.s.lastPart < n ? t.s.lastPart : n - 1;
+    render(); openSprint(curPart, 5); return;
+  }
+  freeWrite("Free write");
+}
+function writeNowRow() {
+  const t = writeTarget(), seed = todaysSeed();
+  return h("div", { class: "row writenow" },
+    h("button", { class: "primary", onclick: () => writeNow(t) }, icon(ICON_TIMER), "Write now"),
+    h("span", { class: "muted small", text: t.kind === "free" ? "5-minute sprint in your Seed Sketchbook" : `${t.label} · 5-minute sprint` }),
+    h("div", { class: "row", style: "gap:4px;flex-basis:100%" },
+      seed ? h("button", { class: "ghost", onclick: () => sprintOnSeed(seed) }, "Write from today's seed") : null,
+      t.kind !== "free" ? h("button", { class: "ghost", onclick: () => freeWrite("Free write") }, "Free write") : null));
 }
