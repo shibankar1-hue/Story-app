@@ -1,0 +1,10 @@
+{
+  "name": "Mastermind",
+  "short_name": "Mastermind",
+  "description": "Think clearly in a world built to move you: persuasion, desire, behavior and reasoning tools.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#E9ECF1",
+  "theme_color": "#141B2B",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

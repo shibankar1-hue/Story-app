@@ -1,0 +1,768 @@
+<title>Mastermind</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an instrument panel for the mind. Fixed rail of tools on desktop, scrolling tab strip on phones; each tool is one working surface. */
+:root{
+  --bg:#E9ECF1; --surface:#FFFFFF; --sunk:#F3F5F8; --line:#D3D8E1;
+  --ink:#141B2B; --muted:#56607A; --accent:#C2410C; --accent-ink:#FFFFFF;
+  --influence:#B45309; --desire:#BE123C; --biology:#15803D; --reason:#1D4ED8;
+  --good:#15803D; --warn:#B45309; --bad:#B91C1C;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E131D; --surface:#161D2B; --sunk:#111725; --line:#273146;
+  --ink:#E6EAF2; --muted:#94A0B8; --accent:#F97316; --accent-ink:#1A0D03;
+  --influence:#F59E0B; --desire:#FB7185; --biology:#4ADE80; --reason:#7AA2FF;
+  --good:#4ADE80; --warn:#FBBF24; --bad:#F87171; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E131D; --surface:#161D2B; --sunk:#111725; --line:#273146;
+  --ink:#E6EAF2; --muted:#94A0B8; --accent:#F97316; --accent-ink:#1A0D03;
+  --influence:#F59E0B; --desire:#FB7185; --biology:#4ADE80; --reason:#7AA2FF;
+  --good:#4ADE80; --warn:#FBBF24; --bad:#F87171; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;margin:0}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.35rem;font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+button,input,textarea,select{font:inherit;color:inherit}
+input,textarea,select{font-weight:400}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.shell>*{min-width:0}
+.rail{position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid var(--line);background:var(--surface);
+  padding-block:22px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:16px;display:flex;flex-direction:column;gap:22px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:34px;height:34px;flex:none}
+.brand-name{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--ink);font-weight:500;font-size:.94rem}
+.nav a:hover{background:var(--sunk)}
+.nav a[aria-current="page"]{background:var(--ink);color:var(--bg)}
+.nav .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--muted)}
+.nav-group{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:12px 10px 4px}
+.rail-foot{margin-top:auto;font-size:.78rem;color:var(--muted)}
+
+main{min-width:0;padding-block:28px 64px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.view{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.view-head{display:flex;flex-direction:column;gap:8px;max-width:68ch}
+.lede{color:var(--muted);font-size:1.02rem}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.stack{display:flex;flex-direction:column;gap:10px}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;font-weight:600;cursor:pointer;font-size:.92rem}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:5px 10px;font-size:.82rem}
+label.field{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.9rem}
+label.field span.hint{font-weight:400;color:var(--muted);font-size:.82rem}
+input[type=text],input[type=number],textarea,select{width:100%;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+textarea{min-height:110px;resize:vertical;line-height:1.5}
+.check{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);cursor:pointer;font-size:.92rem}
+.check input{margin-top:4px;accent-color:var(--accent)}
+.check:has(input:checked){border-color:var(--accent)}
+.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.c-influence{color:var(--influence)} .c-desire{color:var(--desire)} .c-biology{color:var(--biology)} .c-reason{color:var(--reason)}
+.bg-influence{background:var(--influence)} .bg-desire{background:var(--desire)} .bg-biology{background:var(--biology)} .bg-reason{background:var(--reason)}
+
+/* Today */
+.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}
+.principle{background:var(--ink);color:var(--bg);border-radius:var(--r);padding:26px;display:flex;flex-direction:column;gap:12px}
+.principle .eyebrow{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.principle h2{font-size:1.7rem}
+.principle .tag{align-self:flex-start}
+.meter{display:flex;flex-direction:column;gap:12px}
+.meter-row{display:grid;grid-template-columns:88px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:.88rem}
+.bar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%}
+.protocol li{list-style:none}
+.protocol{padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.streak{font-family:var(--display);font-size:2.4rem;font-weight:800;line-height:1}
+
+/* Radar */
+.scan-out{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
+.marked{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:14px;line-height:1.75;max-height:420px;overflow:auto}
+mark{background:transparent;color:inherit;border-bottom:2px solid;padding:0 1px}
+mark.k-reciprocity,mark.k-commitment,mark.k-social,mark.k-liking,mark.k-authority,mark.k-scarcity{border-color:var(--influence);background:color-mix(in srgb,var(--influence) 14%,transparent)}
+mark.k-fear{border-color:var(--biology);background:color-mix(in srgb,var(--biology) 14%,transparent)}
+mark.k-tribal,mark.k-mimetic{border-color:var(--desire);background:color-mix(in srgb,var(--desire) 14%,transparent)}
+mark.k-certainty{border-color:var(--reason);background:color-mix(in srgb,var(--reason) 14%,transparent)}
+.gauge{display:flex;align-items:baseline;gap:10px}
+.gauge b{font-family:var(--display);font-size:3rem;line-height:1}
+.hit{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.hit:first-child{border-top:0;padding-top:0}
+.hit-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+
+/* Gym */
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.q-opt{text-align:left;border:1px solid var(--line);background:var(--sunk);border-radius:8px;padding:12px 14px;cursor:pointer}
+.q-opt:hover:not(:disabled){border-color:var(--ink)}
+.q-opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--surface))}
+.q-opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--surface))}
+.q-opt:disabled{cursor:default}
+.explain{border-left:3px solid var(--accent);padding:4px 0 4px 14px}
+.progress{display:flex;gap:4px}
+.progress i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.progress i.on{background:var(--accent)}
+
+/* Decision table */
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:middle}
+th{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+td input[type=number]{width:64px;padding:6px 8px}
+td input[type=text]{min-width:140px;padding:6px 8px}
+tfoot td{font-weight:700;font-family:var(--mono)}
+.win{color:var(--good)}
+
+/* Codex */
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:.85rem;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px}
+.card .src{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.card .use{font-size:.88rem;background:var(--sunk);border-radius:8px;padding:10px 12px}
+.card .use b{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;display:block;color:var(--muted);font-weight:500;margin-bottom:2px}
+
+/* Future */
+.future{display:flex;flex-direction:column;gap:14px}
+.f-item{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.f-item ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+
+/* Journal */
+.entry{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px}
+.entry pre{white-space:pre-wrap;font-family:var(--body);margin:0;font-size:.9rem}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:28px;text-align:center;color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;font-size:.9rem;z-index:50;transition:opacity .2s}
+.result{background:var(--sunk);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px}
+.result ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.layer{display:flex;flex-direction:column;gap:8px}
+.layer-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:sticky;top:env(safe-area-inset-top, 0px);z-index:20;height:auto;flex-direction:row;align-items:center;gap:12px;padding-block:10px;
+    padding-right:max(16px, env(safe-area-inset-right, 0px));border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--surface)}
+  .brand-name,.rail-foot,.nav-group{display:none}
+  .nav{flex-direction:row;overflow-x:auto;scrollbar-width:none;min-width:0}
+  .nav a{white-space:nowrap;padding:7px 10px;font-size:.88rem}
+  .hero,.scan-out,.grid2,.grid3,.f-item{grid-template-columns:1fr}
+  main{padding-block:20px 56px}
+}
+@media (max-width:520px){.checks{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 34 34" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" rx="8" fill="var(--ink)"/>
+        <circle cx="12" cy="12" r="3.2" fill="var(--influence)"/><circle cx="22" cy="12" r="3.2" fill="var(--desire)"/>
+        <circle cx="12" cy="22" r="3.2" fill="var(--biology)"/><circle cx="22" cy="22" r="3.2" fill="var(--reason)"/>
+      </svg>
+      <span class="brand-name">Mastermind</span>
+    </div>
+    <nav class="nav" id="nav" aria-label="Tools"></nav>
+    <div class="rail-foot">Your entries stay in this browser. Nothing is sent anywhere.</div>
+  </aside>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+"use strict";
+/* ---------- storage (safe) ---------- */
+const mem = {};
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem("mm:"+k); return v==null ? (k in mem ? mem[k] : d) : JSON.parse(v);}catch(e){ return k in mem ? mem[k] : d; } },
+  set(k, v){ mem[k]=v; try{ localStorage.setItem("mm:"+k, JSON.stringify(v)); }catch(e){} }
+};
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2200); }
+const todayKey = () => new Date().toISOString().slice(0,10);
+function dayIndex(){ const d=new Date(); return Math.floor((d - new Date(d.getFullYear(),0,0))/864e5) + d.getFullYear()*366; }
+
+const PILLARS = {
+  influence:{name:"Influence", book:"Cialdini · Influence: The Psychology of Persuasion"},
+  desire:{name:"Desire", book:"Girard · Things Hidden Since the Foundation of the World"},
+  biology:{name:"Biology", book:"Sapolsky · Behave"},
+  reason:{name:"Reason", book:"Halpern · Thought and Knowledge"}
+};
+
+/* ---------- journal ---------- */
+function journal(){ return store.get("journal", []); }
+function saveEntry(tool, title, body, pillar){
+  const j = journal(); j.unshift({id:Date.now(), date:new Date().toISOString(), tool, title, body, pillar});
+  store.set("journal", j.slice(0,500)); markProtocol(tool); toast("Saved to journal");
+}
+function markProtocol(tool){
+  const map={radar:"radar",desire:"desire",decoder:"decoder",gym:"gym",decide:"decide",journal:"journal"};
+  const p = store.get("protocol:"+todayKey(), {}); if(map[tool]){ p[map[tool]]=true; store.set("protocol:"+todayKey(), p); }
+  touchStreak();
+}
+function touchStreak(){
+  const s = store.get("streak", {last:null,count:0}); const t = todayKey();
+  if(s.last===t) return;
+  const y = new Date(Date.now()-864e5).toISOString().slice(0,10);
+  s.count = (s.last===y) ? s.count+1 : 1; s.last=t; store.set("streak", s);
+}
+
+/* =========================================================
+   CODEX — distilled concepts from the four books
+   ========================================================= */
+const CODEX = [
+ // Influence
+ {p:"influence",t:"Click, whirr",s:"Cialdini, ch. 1",d:"Much of what we do runs on automatic shortcuts. One trigger feature (a price tag, a uniform, the word “because”) sets off a whole canned response. Shortcuts are usually useful, which is why people who profit from triggering them can hijack them so easily.",u:"When you notice you decided in under a second, ask which single cue did the deciding."},
+ {p:"influence",t:"Contrast",s:"Cialdini, ch. 1",d:"We judge things against whatever we saw just before. A $300 sweater after a $1,500 suit feels cheap. An okay apartment after two awful ones feels great.",u:"Before you compare, ask: what was I shown first, and who picked the order?"},
+ {p:"influence",t:"Reciprocation",s:"Cialdini, ch. 2",d:"We feel obliged to repay what we receive, even uninvited gifts and even when the return is far bigger than the gift. A concession works the same way: “rejection-then-retreat” gets a yes on the second, smaller ask.",u:"Take the gift if you like, then name it for what it is: a sales tool. A tactic creates no debt."},
+ {p:"influence",t:"Commitment & consistency",s:"Cialdini, ch. 3",d:"Once we take a stand, especially in public, in writing, or with effort, we feel pressure to act in line with it. Small first commitments (the foot in the door) change our self-image and then pull bigger actions after them.",u:"Use the gut check: “Knowing what I know now, if I could go back, would I make the same choice?”"},
+ {p:"influence",t:"Social proof",s:"Cialdini, ch. 4",d:"We decide what is correct by looking at what others do. The pull is strongest when we are uncertain and when the others are like us. Crowds can be manufactured, and a crowd that is itself uncertain can freeze, as in the bystander effect.",u:"Ask two things: is this crowd real, and are they better informed than I am?"},
+ {p:"influence",t:"Liking",s:"Cialdini, ch. 5",d:"We say yes to people we like. Attractiveness, similarity, compliments, contact and cooperation, and association with good things all raise liking, and all can be staged.",u:"If you like someone unusually fast, separate the person from the deal and judge the deal alone."},
+ {p:"influence",t:"Authority",s:"Cialdini, ch. 6",d:"Deference to authority runs deep (Milgram's subjects kept going). Its symbols work almost as well as the real thing: titles, clothes, cars, confident tone.",u:"Is this person truly an expert on this exact question? How honest can I expect them to be here? What do they gain?"},
+ {p:"influence",t:"Scarcity",s:"Cialdini, ch. 7",d:"Things seem more valuable when they are rare or slipping away, and we hate losing freedoms. Newly scarce things, and things others are competing for, pull hardest. Scarcity also raises arousal, and arousal makes thinking worse.",u:"Notice the rush, then calm down. Ask whether you want it to use, or just to have."},
+ // Desire
+ {p:"desire",t:"Mimetic desire",s:"Girard, Book III ch. 1",d:"We rarely want things on our own. We want what a model wants. Desire is a triangle (me, the model, the object), even when it feels like a straight line from me to the thing.",u:"For any strong want, ask: who showed me this was desirable?"},
+ {p:"desire",t:"External vs internal mediation",s:"Girard",d:"When the model is far away (a hero, a saint, a historical figure) imitation is safe and even inspiring. When the model is close (a colleague, a sibling, a peer online) we compete for the same objects, and admiration turns to rivalry.",u:"Choose models whose success cannot block yours, and models you can't fight over objects with."},
+ {p:"desire",t:"Doubles and escalating rivalry",s:"Girard, Book III ch. 2",d:"Rivals imitate each other's desire, and then each other's hostility. The object fades and the rivals become mirror images, more and more alike the harder each insists on being different.",u:"In a feud, list what you are now doing just because they did it. Stop one of those things."},
+ {p:"desire",t:"The scapegoat mechanism",s:"Girard, Book I ch. 1",d:"When mimetic rivalry spreads through a group, the “all against all” can turn into “all against one.” Uniting against a victim brings sudden peace, and the group then believes the victim really was the cause. Myths are told from the persecutors' side, so the mechanism stays hidden.",u:"Warning sign: a shared crisis, then sudden unanimity that one person or group is to blame."},
+ {p:"desire",t:"Texts of persecution",s:"Girard, Book I ch. 5",d:"Accounts that describe a crisis, a crime blamed on someone, signs that mark the accused (being foreign, disabled, different) and then violence can be read for what really happened: a persecution told by the persecutors.",u:"Read viral outrage like a historian. Who tells the story, and who can't answer?"},
+ {p:"desire",t:"Scandal (skandalon)",s:"Girard, Book III ch. 5",d:"A skandalon is a stumbling block. It is the model who is also an obstacle, and the more they block us, the more they fascinate us. Obsessive resentment is a sign we are caught.",u:"If someone you resent takes up your thoughts, treat it as a sign of imitation, not a sign they matter."},
+ {p:"desire",t:"Renouncing rivalry",s:"Girard, Book II",d:"Girard reads the Gospels as the text that finally tells the story from the victim's side and exposes the scapegoat. The way out of violent mimesis is to give up retaliation and imitate a model who has no rivalry in them.",u:"Practice not retaliating in small things. It breaks the mirror."},
+ // Biology
+ {p:"biology",t:"Explain across timescales",s:"Sapolsky, ch. 1–10",d:"To explain any behavior, ask what happened in the brain a second before, what senses picked up minutes before, what hormones did hours before, how the brain changed over months, then go back through adolescence, childhood, the womb, genes, culture, and evolution. No single level is “the cause.”",u:"When someone shocks you, run the ladder before you judge. Use the Behavior Decoder."},
+ {p:"biology",t:"Frontal cortex: doing the harder thing",s:"Sapolsky, ch. 2",d:"The prefrontal cortex lets you do the harder thing when it's the right thing. It is the brain's restraint and long-term planning. Stress, fatigue, alcohol, and hunger weaken it first.",u:"Make big decisions when you are rested and fed. The PFC is the first thing you lose."},
+ {p:"biology",t:"Amygdala: fast threat",s:"Sapolsky, ch. 2",d:"The amygdala drives fear, anger, and threat detection, and it reacts before slower conscious reasoning catches up. It is also involved in fast, often unconscious, reactions to faces that look like “them.”",u:"First reactions are data about your amygdala, not verdicts about the world."},
+ {p:"biology",t:"Dopamine is about anticipation",s:"Sapolsky, ch. 2",d:"Dopamine is less about pleasure than the anticipation of reward and motivation to pursue it. It spikes most for an uncertain reward, “maybe,” which is why intermittent reinforcement (slot machines, feeds) grips so hard.",u:"If a product rewards you unpredictably, it is training your dopamine system. Decide whether you consent."},
+ {p:"biology",t:"Stress: helpful short, harmful long",s:"Sapolsky, ch. 4",d:"Short stress sharpens you. Chronic stress (sustained glucocorticoids) shrinks hippocampal function, weakens the PFC, makes the amygdala more excitable, and makes us more fearful, more impulsive, and more likely to see threats.",u:"Under months of stress, assume your judgment is skewed toward fear and add a second opinion."},
+ {p:"biology",t:"Testosterone amplifies, it doesn't create",s:"Sapolsky, ch. 4",d:"Testosterone mostly raises status-seeking and makes existing tendencies stronger. If status in a setting is won by generosity, testosterone can increase generosity.",u:"Design your circles so status comes from good acts."},
+ {p:"biology",t:"Oxytocin is parochial",s:"Sapolsky, ch. 4",d:"Oxytocin boosts trust and kindness toward your own group, and can sharpen wariness of outsiders. Bonding chemistry is tribal by default.",u:"After a warm team moment, watch for how “we” starts talking about “them.”"},
+ {p:"biology",t:"Adolescence: the frontal cortex comes last",s:"Sapolsky, ch. 6",d:"The frontal cortex is the last brain region to fully mature, into the mid-twenties. Teens feel reward and peer opinion intensely, before full restraint is online. This also makes adolescence a window of plasticity and idealism.",u:"For young people, change the environment and the peers. Lectures do little."},
+ {p:"biology",t:"Us vs. them",s:"Sapolsky, ch. 11",d:"The brain sorts people into us and them in a fraction of a second, on almost any marker, even arbitrary ones. The good news: the categories are flexible. A shared goal or a new identity can turn “them” into “us” fast.",u:"To calm a group conflict, find the bigger “us” and a real shared task."},
+ {p:"biology",t:"Hierarchy and health",s:"Sapolsky, ch. 12",d:"In primates and humans, low rank in an unstable or unfair hierarchy is a heavy stressor. In humans, how poor you feel relative to others predicts health beyond how poor you are.",u:"Have several ladders in life (craft, family, community) so no single ranking owns you."},
+ {p:"biology",t:"Metaphors we kill by",s:"Sapolsky, ch. 15",d:"The brain mixes up literal and symbolic. The insula reacts to rotten food and to moral disgust. That's why dehumanizing language (vermin, disease, infestation) prepares violence.",u:"When a group is described with disgust words, treat it as an alarm."},
+ {p:"biology",t:"Explaining is not excusing",s:"Sapolsky, ch. 16 & epilogue",d:"The more we understand the biology behind behavior, the less sense blame based on “free will” makes. Society still needs protection from dangerous acts. Understanding makes us more humane and better at prevention.",u:"Judge less, prevent more. Explanations give you levers."},
+ // Reason
+ {p:"reason",t:"Critical thinking is a disposition",s:"Halpern, ch. 1",d:"Skills are not enough. Critical thinkers are willing to plan, to stay flexible, to persist, to admit errors, and to notice when they should think harder. Metacognition, watching your own thinking, is the core habit.",u:"Ask often: “How would I know if I were wrong right now?”"},
+ {p:"reason",t:"Memory is a reconstruction",s:"Halpern, ch. 2",d:"Memories are rebuilt every time we recall them, shaped by expectation, leading questions, and later information. Confidence is not proof of accuracy.",u:"Write decisions and predictions down at the time. Your future memory will flatter you."},
+ {p:"reason",t:"Language frames thought",s:"Halpern, ch. 3",d:"Word choice steers judgment: “90% survival” versus “10% mortality,” “tax relief” versus “tax cut.” Euphemism, loaded words, and vague phrasing do persuasive work out of sight.",u:"Rephrase the claim in neutral or opposite words and see if your reaction changes."},
+ {p:"reason",t:"Analyze the argument",s:"Halpern, ch. 5",d:"Break it into premises, conclusion, and unstated assumptions. Ask whether the premises are acceptable, whether they actually support the conclusion, and what is missing. Watch for fallacies: ad hominem, straw man, false dilemma, slippery slope.",u:"Find the hidden assumption. That is usually where the argument is weak."},
+ {p:"reason",t:"Correlation isn't causation",s:"Halpern, ch. 6",d:"Two things moving together may share a third cause, may run the other way, or may be chance. Only controlled comparison (random assignment, a control group) shows cause.",u:"Ask: compared to what? Was there a control group?"},
+ {p:"reason",t:"Confirmation bias",s:"Halpern, ch. 6",d:"We search for, notice, and remember evidence that supports what we already believe. Testing a hypothesis means looking for what would disprove it.",u:"For any belief you care about, write down what evidence would change your mind."},
+ {p:"reason",t:"Base rates",s:"Halpern, ch. 7",d:"How common something is overall matters enormously. A 99%-accurate test for a rare disease still produces mostly false positives. A vivid individual case makes us forget the base rate.",u:"Before judging a case, ask how common the thing is to begin with."},
+ {p:"reason",t:"Availability & vividness",s:"Halpern, ch. 7",d:"We judge how likely something is by how easily examples come to mind. Dramatic, recent, and heavily covered events feel more common than they are.",u:"Is this common, or just easy to remember? Look up the actual numbers."},
+ {p:"reason",t:"Regression to the mean",s:"Halpern, ch. 7",d:"Extreme results tend to be followed by more average ones. That's why praise after great results seems to “fail” and criticism after bad results seems to “work.”",u:"Before crediting a fix, ask whether things would have improved anyway."},
+ {p:"reason",t:"Sunk costs & framing in decisions",s:"Halpern, ch. 8",d:"Money, time, and effort already spent should not decide what you do next. Only future costs and benefits count. Losses loom larger than gains, so the same choice framed as a loss feels worse.",u:"Ask: “If I were starting fresh today, would I choose this?”"},
+ {p:"reason",t:"Problem-solving strategies",s:"Halpern, ch. 9",d:"Represent the problem well (draw it, restate it), work backward from the goal, split it into sub-goals, use analogies from other fields, and watch out for functional fixedness and mental sets.",u:"Stuck? Change how you represent the problem before you push harder."},
+ {p:"reason",t:"Creative thinking",s:"Halpern, ch. 10",d:"Creativity can be developed. Quantity breeds quality, so generate many options. Change perspective, make the familiar strange, and incubate by stepping away.",u:"For any problem, force yourself to list ten options before choosing."}
+];
+
+/* =========================================================
+   INFLUENCE RADAR — pattern library
+   ========================================================= */
+const RADAR = {
+  reciprocity:{p:"influence",n:"Reciprocation",re:[/\bfree\s+(gift|bonus|sample|trial|guide|e-?book|consultation|report)\b/gi,/\b(our|a|this|special)\s+gift\b/gi,/\bcomplimentary\b/gi,/\bas a (thank[- ]you|token)\b/gi,/\bon the house\b/gi,/\bwe('ve| have) (already )?(sent|given|done|prepared)\b/gi,/\bin return\b/gi,/\bno strings attached\b/gi],
+    why:"A gift or favor creates a felt debt, so the return ask is harder to refuse.",counter:"Accept or decline the gift on its merits, then treat it as a sales tool. A tactic creates no obligation."},
+  commitment:{p:"influence",n:"Commitment & consistency",re:[/\byou('ve| have)? already (said|agreed|signed|started|taken)\b/gi,/\bpeople like you\b/gi,/\byou('re| are) (the kind of|someone who|a person who)\b/gi,/\bjust (say|click|tap) yes\b/gi,/\b(small|first|simple) step\b/gi,/\bfinish what you started\b/gi,/\byou('ve| have) come this far\b/gi,/\bas a (loyal|valued|smart) (member|customer|investor|reader)\b/gi,/\bdon'?t (give up|quit) now\b/gi,/\bstay true\b/gi],
+    why:"It ties the request to an earlier yes or to your self-image, so saying no feels like contradicting yourself.",counter:"Ask: “Knowing what I know now, would I make that first commitment again?” If not, you owe it nothing."},
+  social:{p:"influence",n:"Social proof",re:[/\b\d[\d,.]*\s?[km+]?\+?\s+(people|users|customers|members|investors|readers|subscribers|families|students|traders|others)\b/gi,/\b(thousands|millions|hundreds) of\b/gi,/\beveryone('s| is)\b/gi,/\btrending\b/gi,/\bgoing viral\b/gi,/\bmost popular\b/gi,/\bbest-?sell(er|ing)\b/gi,/\b(5|five)[- ]star\b/gi,/\bjoin (the|our|them|\d)/gi,/\bfastest[- ]growing\b/gi,/\bdon'?t be (the only one|left out)\b/gi],
+    why:"When unsure, we copy the crowd, and the crowd can be invented or bought.",counter:"Check that the crowd is real, similar to you, and better informed than you. Bought reviews and bots are common."},
+  liking:{p:"influence",n:"Liking",re:[/\b(my|dear|hey) friend\b/gi,/\bjust like you\b/gi,/\bwe('re| are) (all )?in this together\b/gi,/\b(our|the) family\b/gi,/\byou deserve\b/gi,/\b(smart|amazing|beautiful|savvy) (people|person|reader|investor)s?\b/gi,/\bi('m| am) (just )?(a )?(regular|normal|ordinary)\b/gi,/\bpersonally\b/gi,/\bbetween (you and me|us)\b/gi],
+    why:"Flattery, similarity, and warmth make us want to agree with the messenger.",counter:"Separate the person from the offer. Would you take this deal from a stranger you felt nothing about?"},
+  authority:{p:"influence",n:"Authority",re:[/\bexperts?\b/gi,/\b(doctor|dr\.|scientists?|professors?|phd|economists?|insiders?)\b/gi,/\b(harvard|stanford|mit|oxford|cambridge|nasa)\b/gi,/\b(studies|research|science) (shows?|proves?|confirms?)\b/gi,/\bclinically\b/gi,/\b(scientifically )?proven\b/gi,/\bcertified\b/gi,/\bofficial(ly)?\b/gi,/\bendorsed\b/gi,/\bas seen on\b/gi,/\baward[- ]winning\b/gi,/\bworld[- ]leading\b/gi],
+    why:"Titles and authority symbols switch off our own judgment, even when they are fake or off-topic.",counter:"Ask: an expert in exactly this? Named and checkable? What do they gain if I believe them?"},
+  scarcity:{p:"influence",n:"Scarcity",re:[/\bonly \d+ (left|remaining|spots?|seats?|slots?)\b/gi,/\blimited(-time| time| offer| spots| supply| edition)?\b/gi,/\blast chance\b/gi,/\bends (today|tonight|soon|at midnight|in)\b/gi,/\bhurry\b/gi,/\bact (now|fast|today)\b/gi,/\bdeadline\b/gi,/\bexclusive\b/gi,/\bbefore it'?s (gone|too late)\b/gi,/\brunning out\b/gi,/\btoday only\b/gi,/\b\d+\s+(hours?|minutes?) (left|remaining)\b/gi,/\bwon'?t last\b/gi,/\bselling (out|fast)\b/gi,/\bnever again\b/gi,/\bclosing soon\b/gi],
+    why:"Rarity and deadlines make things seem more valuable, and the rush they cause hurts clear thinking.",counter:"Ask: would I want this if there were plenty, with no deadline? A real opportunity usually survives a 24-hour wait."},
+  fear:{p:"biology",n:"Threat & alarm",re:[/\b(danger(ous)?|threat|warning|alert|urgent|emergency)\b/gi,/\b(crisis|collapse|catastroph\w*|disaster)\b/gi,/\b(destroy\w*|attack\w*|wipe[ds]? out)\b/gi,/\b(shocking|terrifying|horrifying|scary)\b/gi,/\b(miss out|lose everything|losing everything|you'?ll regret)\b/gi],
+    why:"Threat language triggers the amygdala, which reacts before your frontal cortex can weigh evidence.",counter:"Wait out the spike: breathe, wait ten minutes, then ask what the actual probability and size of the threat are."},
+  tribal:{p:"desire",n:"Us vs. them / scapegoat",re:[/\bthose people\b/gi,/\bthe (elites?|establishment|globalists|mainstream media|system)\b/gi,/\b(enem(y|ies)|traitors?|invaders?|infiltrators?)\b/gi,/\breal (people|patriots|americans|citizens|men|women|believers)\b/gi,/\bus (vs\.?|versus|against) them\b/gi,/\b(it'?s )?(all )?their fault\b/gi,/\bbecause of (them|those)\b/gi,/\bblame\b/gi,/\b(vermin|parasites?|infest\w*|plague|cockroach\w*|subhuman|animals)\b/gi,/\bthey (want to|are coming|will take|don'?t want you)\b/gi],
+    why:"It builds an us/them line and points shared frustration at one target, the start of the scapegoat mechanism. Disgust words (vermin, infestation) are an extra warning.",counter:"Ask: is one group really the cause of a problem with many causes? Who benefits from our anger pointing there? What would “them” say?"},
+  mimetic:{p:"desire",n:"Mimetic bait",re:[/\bwhat (the rich|the wealthy|celebrities|billionaires|insiders|successful people|top performers) (know|do|use|have|buy)\b/gi,/\b(get|stay) ahead\b/gi,/\bleft behind\b/gi,/\bwhile (others|everyone else|your friends)\b/gi,/\bbe the (first|envy)\b/gi,/\benvy\b/gi,/\b(luxury|elite|status|vip|inner circle|exclusive club)\b/gi,/\blevel up\b/gi,/\blike (a boss|the pros|a millionaire)\b/gi],
+    why:"It sells you a model's desire: want this because people you admire or compete with have it.",counter:"Ask: would I still want this if nobody could see me have it, and if my rivals didn't care about it?"},
+  certainty:{p:"reason",n:"False certainty",re:[/\bguarantee(d|s)?\b/gi,/\b100\s?%/g,/\brisk[- ]free\b/gi,/\bno risk\b/gi,/\beveryone knows\b/gi,/\b(obviously|undeniabl\w*|indisputabl\w*)\b/gi,/\bthe truth (is|about|they)\b/gi,/\bwake up\b/gi,/\b(secret|hidden truth|they don'?t want you to know)\b/gi,/\b(miracle|cure[sd]?|breakthrough)\b/gi,/\b(always|never) fails?\b/gi,/\bdo your own research\b/gi],
+    why:"Certainty words skip over the evidence. Real knowledge comes with probabilities and limits.",counter:"Ask: what is the evidence, from whom, compared to what? What would prove it wrong?"}
+};
+const SAMPLE_PITCH = `Hey friend — I'm just a regular guy like you, and I wanted to personally share something.
+
+Harvard-trained experts have built an AI trading bot that is GUARANTEED to double your money. Over 48,000 members already joined this month and it's trending everywhere. While others are getting left behind, smart people like you are getting ahead — this is what the wealthy don't want you to know.
+
+As a thank-you, we've already reserved a free bonus e-book for you. You already signed up for our newsletter, so just click yes to claim your spot.
+
+Hurry: only 7 spots left and the offer ends tonight. The banks and the elites are coming for your savings — don't lose everything. Act now.`;
+
+/* =========================================================
+   BEHAVIOR DECODER — Sapolsky's timescale ladder (+ Girard)
+   ========================================================= */
+const LADDER = [
+ {id:"sec",n:"One second before",sub:"The brain in the moment",f:[
+   {id:"threat",l:"Felt a sudden threat, insult, or humiliation",x:"The amygdala fired before slower reasoning could weigh in.",lv:"Build in a pause: delay replies, step out, name the feeling."},
+   {id:"impulse",l:"Acted before thinking",x:"The frontal cortex, which does the harder right thing, was bypassed or overpowered.",lv:"Remove the easy wrong option ahead of time (friction beats willpower)."},
+   {id:"disgust",l:"Something felt disgusting or morally “wrong”",x:"The insula treats moral disgust much like rotten food, and that drives harsh judgment.",lv:"Ask whether the disgust is about harm or just unfamiliarity."}]},
+ {id:"min",n:"Seconds to minutes before",sub:"What the senses picked up",f:[
+   {id:"them",l:"Someone looked, sounded, or dressed like “them”",x:"The brain sorts us/them in milliseconds, on almost any marker.",lv:"Look for a shared identity: same city, same job, parent, fan."},
+   {id:"environment",l:"Noise, crowding, heat, or pain",x:"Discomfort raises irritability and lowers frontal-cortex control.",lv:"Change the setting before the conversation."},
+   {id:"cue",l:"A charged cue just before (news, a post, a flag, a word)",x:"Context shifts what we notice and how we judge. Some priming effects replicate poorly, but emotional context clearly matters.",lv:"Curate inputs before decisions. No doomscrolling before hard talks."}]},
+ {id:"hrs",n:"Hours to days before",sub:"Hormones and the body",f:[
+   {id:"sleep",l:"Slept badly or very little",x:"Sleep loss weakens frontal control and makes the amygdala more reactive.",lv:"Postpone big decisions and hard conversations until rested."},
+   {id:"hunger",l:"Hungry, depleted, or exhausted",x:"A tired, depleted body makes self-control and patience harder.",lv:"Eat first, then decide (HALT: hungry, angry, lonely, tired)."},
+   {id:"stress",l:"An acute stress spike",x:"Stress hormones shift the brain toward fast, habitual, fearful responses.",lv:"Breathe, walk, wait. Acute stress passes in minutes to hours."},
+   {id:"status",l:"A status contest or competition",x:"Testosterone rises in competition and amplifies status-seeking, whatever earns status in that setting.",lv:"Change what wins status in the room: credit, generosity, accuracy."},
+   {id:"alcohol",l:"Alcohol or another substance",x:"Alcohol suppresses the frontal cortex first, so restraint goes before anything else.",lv:"Pre-commit to rules before drinking. Avoid charged topics."},
+   {id:"bond",l:"A strong in-group bonding moment",x:"Oxytocin warms us to our own and can sharpen distrust of outsiders.",lv:"Notice “we” language turning into “them” language."}]},
+ {id:"mon",n:"Days to months before",sub:"How the brain has been reshaped",f:[
+   {id:"chronic",l:"Chronic stress for weeks or months",x:"Sustained stress makes the amygdala more excitable and weakens the frontal cortex and hippocampus, so fear and impulsivity increase.",lv:"Treat chronic stress as a health issue. Assume your judgment leans toward fear."},
+   {id:"lonely",l:"Loneliness or social isolation",x:"Isolation acts as a chronic stressor and makes people more vigilant toward social threat.",lv:"Rebuild small, regular contact. It changes biology."},
+   {id:"loss",l:"Recent grief, loss, or humiliation",x:"Major loss changes mood, sleep, and stress systems for months.",lv:"Lower expectations temporarily and add support."},
+   {id:"habit",l:"Long repetition of this behavior",x:"Repeated behavior strengthens its own circuits (neuroplasticity).",lv:"Practice a replacement behavior. Repetition rewires both ways."}]},
+ {id:"young",n:"Adolescence",sub:"The frontal cortex still maturing",f:[
+   {id:"teen",l:"The person is under about 25",x:"The frontal cortex matures last, into the mid-twenties, while reward and peer sensitivity peak.",lv:"Change peers and environment. Give real responsibility and meaning."}]},
+ {id:"child",n:"Childhood and the womb",sub:"The early foundation",f:[
+   {id:"adversity",l:"Early adversity, chaos, or unpredictability",x:"Childhood adversity shapes stress reactivity and frontal development. It raises risk, but it doesn't fix destiny.",lv:"Stability and one reliable relationship are powerful at any age."},
+   {id:"model",l:"Grew up imitating someone who did this",x:"We learn by imitation, and imitation shapes desire as well as behavior.",lv:"Find a new model to imitate on purpose."}]},
+ {id:"gene",n:"Genes",sub:"Potential, never a script",f:[
+   {id:"temper",l:"A temperament that runs in the family",x:"Genes shape sensitivity and tendencies, always in interaction with environment.",lv:"Know your defaults and plan around them. Genes are not fate."}]},
+ {id:"culture",n:"Culture and ecology",sub:"Centuries before",f:[
+   {id:"honor",l:"A culture where insults must be answered",x:"Honor cultures, often descended from herding societies, demand retaliation for insults.",lv:"Offer a way to save face. Make backing down respectable."},
+   {id:"norms",l:"Strong group norms in their crowd",x:"Local norms decide which behaviors earn status.",lv:"Change the norm by changing what the respected people visibly do."}]},
+ {id:"evo",n:"Evolution",sub:"Millions of years before",f:[
+   {id:"kin",l:"Loyalty to kin or tribe",x:"Kin selection and group loyalty run deep.",lv:"Widen the circle of “kin” with shared goals."},
+   {id:"cheat",l:"A sense of being cheated or exploited",x:"We evolved sharp cheater detection and a drive to punish unfairness.",lv:"Make fairness visible: transparent rules, explained decisions."}]},
+ {id:"mimesis",n:"Mimetic layer",sub:"Girard",f:[
+   {id:"rival",l:"Wanted what a rival or model wanted",x:"Desire copied from a nearby model turns into rivalry over the same object.",lv:"Name the model. Choose objects that can't be fought over."},
+   {id:"double",l:"Locked in a mirror conflict with someone similar",x:"Rivals become doubles, copying each other's hostility.",lv:"Make one unilateral non-retaliation and break the mirror."},
+   {id:"scapegoat",l:"A group united against one person or group",x:"Shared tension resolved by blaming one victim. Unanimity feels like proof.",lv:"Be the one who asks for evidence and gives the accused a voice."}]}
+];
+
+/* =========================================================
+   THINKING GYM — question bank
+   ========================================================= */
+const QUIZ = [
+ {p:"reason",tag:"Base rates",q:"A disease affects 1 in 1,000 people. A test catches 99% of real cases but also gives a false positive to 5% of healthy people. You test positive. Roughly how likely is it that you have the disease?",o:["About 99%","About 95%","About 50%","About 2%"],a:3,e:"Out of 1,000 people, about 1 is sick and tests positive, and about 50 healthy people also test positive. So only about 1 in 51 positives is real, roughly 2%. A rare condition overwhelms an accurate test."},
+ {p:"reason",tag:"Conjunction",q:"Linda is 31, outspoken, and studied philosophy, and she cared deeply about justice as a student. Which is more probable?",o:["Linda is a bank teller","Linda is a bank teller and active in the feminist movement"],a:0,e:"“A and B” can never be more probable than “A” alone. The detail makes the story more representative, not more likely."},
+ {p:"reason",tag:"Sunk cost",q:"You paid $40 for a concert ticket. On the night, you feel ill and would rather stay home. What is the reasoned choice?",o:["Go, or the $40 is wasted","Stay home if that's better for you now. The $40 is gone either way."],a:1,e:"The money is spent whatever you do. Only future costs and benefits should drive the choice."},
+ {p:"reason",tag:"Gambler's fallacy",q:"A fair coin lands heads five times in a row. What is the chance the next flip is tails?",o:["Higher than 50%, it's due","Exactly 50%","Lower than 50%, heads is hot"],a:1,e:"The coin has no memory. Each flip is independent, and streaks are normal in random sequences."},
+ {p:"reason",tag:"Regression to the mean",q:"A flight instructor notices that after praising an excellent landing, the next one is usually worse, and after yelling at a terrible one, the next is usually better. What is the most likely explanation?",o:["Praise makes pilots complacent","Yelling works better than praise","Extreme results tend to be followed by more average ones anyway"],a:2,e:"Regression to the mean: unusually good or bad performances drift back toward average whatever feedback you give."},
+ {p:"reason",tag:"Causation",q:"Cities with more ice cream sales have more drownings. What should you conclude?",o:["Ice cream causes drowning","A third factor, hot weather, likely drives both","Drowning causes ice cream sales"],a:1,e:"Correlation without control. Summer heat raises both swimming and ice cream. Always look for a third variable."},
+ {p:"reason",tag:"Confirmation bias",q:"Four cards show E, K, 4, 7. Rule: “If a card has a vowel on one side, it has an even number on the other.” Which cards must you turn over to test the rule?",o:["E and 4","E only","E and 7","All four"],a:2,e:"Turn E (it must have an even number) and 7 (it must not have a vowel). Turning 4 can only confirm, never disprove. Real testing looks for what would prove the rule false."},
+ {p:"reason",tag:"Framing",q:"Surgery A: “90% of patients survive.” Surgery B: “10% of patients die.” Which is safer?",o:["A","B","They are identical"],a:2,e:"Same numbers, different frame. People pick A far more often. Rephrase claims both ways before deciding."},
+ {p:"reason",tag:"Availability",q:"Which typically kills more people per year in the United States?",o:["Shark attacks","Lightning strikes"],a:1,e:"Lightning kills around 20 people a year in the US. Sharks kill about one, on average. Shark attacks get vivid coverage, so they feel more common."},
+ {p:"reason",tag:"Survivorship",q:"A magazine profiles ten college dropouts who became billionaires. What's the biggest flaw in concluding “drop out to succeed”?",o:["The sample is too small","We never see the many dropouts who failed","Billionaires exaggerate"],a:1,e:"Survivorship bias: the failures are invisible. You need the full group, successes and failures, to judge."},
+ {p:"reason",tag:"Hidden assumption",q:"“Crime rose after the new mayor took office, so the mayor caused it.” What hidden assumption does this need?",o:["The mayor is dishonest","Nothing else that affects crime changed in that period","Crime statistics are always accurate"],a:1,e:"Post hoc reasoning assumes no other cause changed. Find the unstated assumption, and you find the weak point."},
+ {p:"reason",tag:"Anchoring",q:"Before estimating a house's value, an agent is shown a listing price of $900k, which is far too high. What is most likely?",o:["The agent ignores it","The agent's estimate is pulled toward $900k","The agent's estimate goes lower out of suspicion"],a:1,e:"Anchoring: even experts' estimates drift toward an arbitrary first number. Make your own estimate before you see theirs."},
+ {p:"influence",tag:"Reciprocation",q:"A charity mails you free personalized address labels with its donation request. Why do donation rates jump?",o:["People need labels","A gift triggers a felt obligation to give back","The labels prove the charity is legitimate"],a:1,e:"Cialdini reports that small unsolicited gifts nearly doubled response rates in one charity's mailings. The debt feeling works even when you never asked for the gift."},
+ {p:"influence",tag:"Commitment",q:"Residents who first agreed to put a tiny “Be a safe driver” sign in their window were later far more likely to accept a huge ugly billboard on their lawn. Why?",o:["They liked the cause more over time","The small yes changed their self-image to “someone who supports this”","They forgot what they agreed to"],a:1,e:"Foot-in-the-door: a small commitment changes self-image, and consistency pressure then pulls bigger commitments."},
+ {p:"influence",tag:"Rejection-then-retreat",q:"A scout asks you to buy $5 raffle tickets. You say no. They then ask, “Well, how about just a $1 chocolate bar?” You buy it. Which principle was at work?",o:["Scarcity","Reciprocal concession","Authority"],a:1,e:"Retreating to a smaller request feels like a concession, and we feel obliged to concede back. Often the smaller request was the goal all along."},
+ {p:"influence",tag:"Social proof",q:"When is social proof most powerful?",o:["When we're certain and alone","When we're uncertain and the others are similar to us","When the crowd is made of strangers unlike us"],a:1,e:"Uncertainty plus similarity: we copy people like us when we don't know what to do. That's exactly when fake crowds work best."},
+ {p:"influence",tag:"Authority",q:"In Milgram's experiments, what was most strongly associated with obedience?",o:["The subjects' cruelty","The presence of a seemingly legitimate authority directing them","The money they were paid"],a:1,e:"Ordinary people went much further than predicted under the direction of a lab-coated authority. Symbols of authority can override conscience."},
+ {p:"influence",tag:"Scarcity",q:"Cookies from a jar with 2 cookies were rated more desirable than identical cookies from a jar of 10. When were they rated highest?",o:["When the jar had always held 2","When the jar went from 10 to 2","When the jar went from 2 to 10"],a:1,e:"Newly scarce things pull hardest, especially when others caused the scarcity through demand. Notice the rush and take a breath."},
+ {p:"desire",tag:"Mimetic desire",q:"You didn't care about a promotion until a close colleague you compete with started going after it. Now you want it badly. Girard would call this…",o:["Natural ambition","Mimetic desire through internal mediation","Scarcity"],a:1,e:"Your desire was copied from a nearby model. Close models produce rivalry. Ask whether you'd want it if they didn't."},
+ {p:"desire",tag:"Scapegoat",q:"A town hit by a mysterious economic collapse suddenly agrees one outsider family is responsible. Tension drops after they're driven out. What does Girard say the group believes afterwards?",o:["They made a mistake","The victim truly was the cause, because the peace seems to prove it","The crisis had many causes"],a:1,e:"The scapegoat mechanism hides itself. The relief that follows makes the group sure of the victim's guilt. Unanimity is not evidence."},
+ {p:"desire",tag:"Doubles",q:"Two rival founders keep copying each other's features, pricing, and insults. According to Girard, what happens over time?",o:["They become more different","They become mirror images of each other, while each insists on being unique","One naturally wins"],a:1,e:"Mimetic rivals become doubles. The object fades and the rivalry itself takes over."},
+ {p:"desire",tag:"External mediation",q:"Which model is least likely to lead to destructive rivalry?",o:["Your sibling","A coworker on your team","A historical figure you admire from centuries ago"],a:2,e:"External mediation: a distant model can't compete with you for the same objects, so imitation stays inspiring instead of rivalrous."},
+ {p:"biology",tag:"Testosterone",q:"In experiments where status was earned by generosity, what did testosterone tend to do?",o:["Increase aggression regardless","Increase generosity","Nothing"],a:1,e:"Testosterone amplifies status-seeking in whatever form the setting rewards. It doesn't simply cause aggression."},
+ {p:"biology",tag:"Adolescence",q:"Which brain region finishes maturing last, around the mid-twenties?",o:["Amygdala","Frontal cortex","Brainstem"],a:1,e:"The frontal cortex, which handles restraint, planning, and doing the harder thing, matures last. This shapes adolescent risk-taking."},
+ {p:"biology",tag:"Oxytocin",q:"What does oxytocin tend to do in group settings?",o:["Makes us kind to everyone equally","Increases trust and cooperation toward the in-group, and can increase wariness toward outsiders","Reduces all social behavior"],a:1,e:"Oxytocin is parochial: warmth toward “us,” not necessarily toward “them.”"},
+ {p:"biology",tag:"Dopamine",q:"When does dopamine release tend to be strongest?",o:["When reward is certain","When reward is uncertain, around 50/50","After the reward is consumed"],a:1,e:"Dopamine is about anticipation, and “maybe” drives it hardest. Feeds and slot machines are built on this."},
+ {p:"biology",tag:"Chronic stress",q:"Months of chronic stress tend to make the amygdala…",o:["Less active","More excitable","Unchanged"],a:1,e:"Chronic stress makes the amygdala more excitable and weakens the frontal cortex, a recipe for fear and impulsivity."},
+ {p:"biology",tag:"Us vs. them",q:"What is the most effective way, in the research Sapolsky reviews, to shrink us/them hostility between groups?",o:["Telling people not to be biased","Working together, as equals, on a shared goal","Separating the groups"],a:1,e:"Contact works under the right conditions (equal status, shared goals, cooperation). The categories are malleable."},
+ {p:"reason",tag:"AI-era media",q:"A shocking video of a politician spreads fast. What is the strongest first move?",o:["Watch it more closely for glitches","Check who first published it and whether reliable outlets confirm it (lateral reading)","Trust it if many people shared it"],a:1,e:"Detection by eye is getting less reliable. Check the source and corroboration: leave the page and see what independent sources say."}
+];
+
+/* =========================================================
+   FUTURE FIELD GUIDE
+   ========================================================= */
+const FUTURE = [
+ {t:"Persuasion at machine scale",p:["influence","reason"],pr:"AI systems can write tailored messages for each person, testing which of Cialdini's levers moves you and adjusting in real time. Influence that once needed a skilled salesperson will cost almost nothing.",pc:["Run anything that asks for money, a vote, or a click through Influence Radar.","Adopt a 24-hour rule for any “act now” decision over a set amount.","Learn your own levers: the Gym shows which principles fool you most."]},
+ {t:"Seeing is no longer believing",p:["reason"],pr:"Synthetic video, voice, and images are becoming easy to make and hard to spot. Voice-cloned “family emergency” calls and fake clips of public figures will keep getting cheaper.",pc:["Set a family code word for emergencies.","Read laterally: check who published it first and what independent sources say.","Treat strong emotion plus a strong claim as a reason to slow down."]},
+ {t:"A global mimetic engine",p:["desire","biology"],pr:"Feeds put everyone's lifestyle in front of you. Girard's internal mediation, rivalry with near peers, now runs with millions of “near” models at once, and unpredictable rewards keep the dopamine loop going.",pc:["Run a Desire Audit on any purchase or goal that arrived through a screen.","Pick distant models (people from other eras or fields) for big life choices.","Cut feeds that pay you in “maybe.”"]},
+ {t:"Status anxiety from automation",p:["biology","desire"],pr:"As AI changes what work is valued, many people will lose the ladder their status rested on. Sapolsky shows that low or unstable rank is a major stressor, and losing status fuels resentment.",pc:["Build several status ladders: craft, community, family, health.","Learn faster than the change: use Halpern's problem-solving habits to learn new fields.","Judge yourself against your past self, not against a feed."]},
+ {t:"Crisis and the search for scapegoats",p:["desire","biology"],pr:"Climate shocks, economic swings, and pandemics create the conditions Girard describes: diffuse tension that looks for one target. Disgust language and us/them framing usually come first.",pc:["Use Influence Radar to flag scapegoat and dehumanizing language.","Ask for evidence when a crowd becomes unanimous.","Name a bigger “us” and a shared task. Both soften group boundaries."]},
+ {t:"Chronic stress, loneliness, and judgment",p:["biology"],pr:"Constant connection alongside rising loneliness keeps stress systems switched on. A chronically stressed brain sees more threats and acts more impulsively, which makes every other pressure on this list worse.",pc:["Protect sleep like an asset. It is cheap frontal-cortex support.","Do the HALT check in Decision Lab before big choices.","Keep regular in-person contact. It lowers stress over time."]},
+ {t:"Too much information, too little attention",p:["reason"],pr:"Answers are cheap. Judgment is scarce. The edge goes to people who can frame problems, test claims, and notice their own biases. That is metacognition.",pc:["Do five Gym drills a day. Short practice builds the habit.","Write predictions down and score them later.","For each belief you care about, write what would change your mind."]}
+];
+
+/* =========================================================
+   ROUTING + NAV
+   ========================================================= */
+const VIEWS = [
+ {id:"today",n:"Today",g:"Daily",c:"var(--accent)"},
+ {id:"radar",n:"Influence Radar",g:"Tools",c:"var(--influence)"},
+ {id:"desire",n:"Desire Audit",g:"Tools",c:"var(--desire)"},
+ {id:"decoder",n:"Behavior Decoder",g:"Tools",c:"var(--biology)"},
+ {id:"gym",n:"Thinking Gym",g:"Tools",c:"var(--reason)"},
+ {id:"decide",n:"Decision Lab",g:"Tools",c:"var(--ink)"},
+ {id:"codex",n:"Codex",g:"Library",c:"var(--muted)"},
+ {id:"future",n:"Future Field Guide",g:"Library",c:"var(--muted)"},
+ {id:"journal",n:"Journal",g:"Library",c:"var(--muted)"}
+];
+function renderNav(cur){
+  let g=null, h="";
+  for(const v of VIEWS){
+    if(v.g!==g){ g=v.g; h+=`<div class="nav-group">${g}</div>`; }
+    h+=`<a href="#${v.id}" ${v.id===cur?'aria-current="page"':''}><span class="dot" style="background:${v.c}"></span>${v.n}</a>`;
+  }
+  $("#nav").innerHTML=h;
+  const a=$('#nav a[aria-current]'); if(a && window.innerWidth<860) a.scrollIntoView({block:"nearest",inline:"center"});
+}
+function route(){
+  const id = (location.hash||"#today").slice(1);
+  const v = VIEWS.find(x=>x.id===id) ? id : "today";
+  renderNav(v);
+  const m=$("#main"); m.innerHTML=`<div class="view">${R[v]()}</div>`;
+  (B[v]||(()=>{}))();
+  window.scrollTo(0,0);
+}
+const R={}, B={};
+
+/* ---------- TODAY ---------- */
+function gymStats(){ return store.get("gym", {}); }
+function pillarScores(){
+  const s=gymStats(), out={influence:[0,0],desire:[0,0],biology:[0,0],reason:[0,0]};
+  for(const q of QUIZ){ const r=s[q.tag+"|"+q.p]; if(r){ out[q.p][0]+=r.c; out[q.p][1]+=r.n; } }
+  return out;
+}
+R.today=()=>{
+  const card = CODEX[dayIndex()%CODEX.length];
+  const st = store.get("streak",{last:null,count:0});
+  const y = new Date(Date.now()-864e5).toISOString().slice(0,10);
+  const streak = (st.last===todayKey()||st.last===y)?st.count:0;
+  const p = store.get("protocol:"+todayKey(), {});
+  const items=[["gym","Five drills in the Thinking Gym","gym"],["radar","Scan one message, ad, or post with Influence Radar","radar"],["desire","Audit one desire: who is the model?","desire"],["decoder","Decode one reaction, yours or someone else's","decoder"],["journal","Write one line about what you noticed today","journal"]];
+  const done=items.filter(i=>p[i[0]]).length;
+  const sc=pillarScores();
+  const meters=Object.keys(PILLARS).map(k=>{const [c,n]=sc[k];const pct=n?Math.round(100*c/n):0;
+    return `<div class="meter-row"><span class="c-${k}" style="font-weight:600">${PILLARS[k].name}</span><div class="bar"><i class="bg-${k}" style="width:${pct}%"></i></div><span class="mono small">${n?pct+"%":"—"}</span></div>`}).join("");
+  return `
+  <div class="view-head"><span class="eyebrow">${new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})}</span>
+  <h1>Think clearly in a world built to move you.</h1>
+  <p class="lede">Four lenses, one practice. Spot persuasion (Cialdini), see where your desires come from (Girard), understand the biology behind behavior (Sapolsky), and reason under uncertainty (Halpern).</p></div>
+  <div class="hero">
+    <div class="principle"><span class="eyebrow">Principle of the day</span><span class="pill tag c-${card.p}" style="color:var(--bg);border-color:currentColor;opacity:.85">${PILLARS[card.p].name}</span>
+      <h2>${esc(card.t)}</h2><p>${esc(card.d)}</p><p style="opacity:.85"><b>Today:</b> ${esc(card.u)}</p><span class="mono small" style="opacity:.6">${esc(card.s)}</span></div>
+    <div class="panel"><div class="row" style="justify-content:space-between"><div><span class="eyebrow">Streak</span><div class="streak mono">${streak} <span class="small muted" style="font-family:var(--body);font-size:.9rem;font-weight:500">day${streak===1?"":"s"}</span></div></div>
+      <div style="text-align:right"><span class="eyebrow">Protocol</span><div class="streak mono">${done}/5</div></div></div>
+      <div class="eyebrow">Gym accuracy by lens</div><div class="meter">${meters}</div>
+      <p class="small muted">Accuracy comes from your Thinking Gym answers. Your weakest lens is where you are easiest to move.</p></div>
+  </div>
+  <div class="panel"><h2>Daily protocol</h2><p class="small muted">About ten minutes. Each item ticks itself off when you use the tool and save.</p>
+    <ul class="protocol">${items.map(i=>`<li><label class="check"><input type="checkbox" data-proto="${i[0]}" ${p[i[0]]?"checked":""}><span><a href="#${i[2]}">${i[1]}</a></span></label></li>`).join("")}</ul></div>
+  <div class="panel"><h2>Quick note</h2><label class="field" for="quicknote">What did you notice about yourself or others today?<textarea id="quicknote" placeholder="Example: I wanted the new phone right after my cousin showed me theirs."></textarea></label><div class="row"><button class="btn primary" id="saveNote">Save to journal</button></div></div>`;
+};
+B.today=()=>{
+  $$("[data-proto]").forEach(cb=>cb.addEventListener("change",()=>{const p=store.get("protocol:"+todayKey(),{});p[cb.dataset.proto]=cb.checked;store.set("protocol:"+todayKey(),p);if(cb.checked)touchStreak();route();}));
+  $("#saveNote").addEventListener("click",()=>{const v=$("#quicknote").value.trim(); if(!v){toast("Write a line first");return;} saveEntry("journal","Daily note",v,"reason"); route();});
+};
+
+/* ---------- RADAR ---------- */
+R.radar=()=>`
+ <div class="view-head"><span class="eyebrow c-influence">Influence · with Girard, Sapolsky, Halpern</span><h1>Influence Radar</h1>
+ <p class="lede">Paste any message: an ad, email, sales pitch, political post, or AI-written text. Radar marks the levers it pulls on you and gives a counter-move for each.</p></div>
+ <div class="panel"><label class="field" for="radarIn">Message to scan <span class="hint">Loaded with an example scam pitch. Replace it with your own.</span>
+   <textarea id="radarIn" style="min-height:170px">${esc(store.get("radarDraft", SAMPLE_PITCH))}</textarea></label>
+   <div class="row"><button class="btn primary" id="scan">Scan message</button><button class="btn ghost" id="clearRadar">Clear</button></div></div>
+ <div id="radarOut"></div>`;
+function scanText(text){
+  const ranges=[], counts={};
+  for(const [k,def] of Object.entries(RADAR)){
+    const seen=new Set();
+    for(const re of def.re){ re.lastIndex=0; let m; while((m=re.exec(text))){ if(!m[0]){re.lastIndex++;continue;} ranges.push({s:m.index,e:m.index+m[0].length,k}); seen.add(m[0].toLowerCase()); counts[k]=(counts[k]||[]); counts[k].push(m[0]); } }
+  }
+  ranges.sort((a,b)=>a.s-b.s||b.e-a.e);
+  const clean=[]; let last=-1; for(const r of ranges){ if(r.s>=last){clean.push(r); last=r.e;} }
+  let html="", i=0; for(const r of clean){ html+=esc(text.slice(i,r.s))+`<mark class="k-${r.k}" title="${esc(RADAR[r.k].n)}">${esc(text.slice(r.s,r.e))}</mark>`; i=r.e; } html+=esc(text.slice(i));
+  return {html, counts};
+}
+B.radar=()=>{
+  const run=()=>{
+    const text=$("#radarIn").value; store.set("radarDraft",text);
+    if(!text.trim()){ $("#radarOut").innerHTML=""; return; }
+    const {html,counts}=scanText(text);
+    const keys=Object.keys(counts).sort((a,b)=>counts[b].length-counts[a].length);
+    const words=text.trim().split(/\s+/).length;
+    const raw=keys.reduce((s,k)=>s+Math.min(counts[k].length,4)*6+8,0);
+    const score=Math.min(100,Math.round(raw*(words<40?1.2:1)));
+    const lvl=score>=60?["High pressure","var(--bad)"]:score>=30?["Moderate pressure","var(--warn)"]:["Low pressure","var(--good)"];
+    const hits=keys.map(k=>{const d=RADAR[k];const ex=[...new Set(counts[k].map(s=>s.toLowerCase()))].slice(0,4);
+      return `<div class="hit"><div class="hit-head"><h3>${d.n}</h3><span class="pill c-${d.p}">${counts[k].length}×</span></div>
+      <p class="small muted">Found: ${ex.map(x=>"“"+esc(x)+"”").join(", ")}</p><p class="small">${d.why}</p><p class="small"><b>Counter-move:</b> ${d.counter}</p></div>`}).join("");
+    $("#radarOut").innerHTML = `<div class="scan-out">
+      <div class="panel"><div class="row" style="justify-content:space-between"><h2>Marked message</h2>
+        <div class="row small"><span class="pill c-influence">Persuasion</span><span class="pill c-desire">Desire & tribe</span><span class="pill c-biology">Threat</span><span class="pill c-reason">Certainty</span></div></div>
+        <div class="marked">${html}</div></div>
+      <div class="panel"><span class="eyebrow">Pressure index</span><div class="gauge"><b class="mono" style="color:${lvl[1]}">${score}</b><span style="color:${lvl[1]};font-weight:600">${lvl[0]}</span></div>
+        <p class="small muted">${keys.length} of ${Object.keys(RADAR).length} lever types found. Pattern matching can't read intent, so a low score is not a clean bill of health. Use it to point your attention.</p>
+        ${keys.length?hits:'<p>No common levers found. Still ask: who wrote this, what do they want from me, and what would change my mind?</p>'}
+        <div class="row"><button class="btn" id="saveRadar">Save scan to journal</button></div></div></div>`;
+    const sr=$("#saveRadar"); if(sr) sr.addEventListener("click",()=>saveEntry("radar",`Radar scan · ${score} (${lvl[0]})`,`Levers: ${keys.map(k=>RADAR[k].n+" ×"+counts[k].length).join(", ")||"none"}\n\n${text.slice(0,600)}${text.length>600?"…":""}`,"influence"));
+  };
+  $("#scan").addEventListener("click",run);
+  $("#clearRadar").addEventListener("click",()=>{$("#radarIn").value="";store.set("radarDraft","");$("#radarOut").innerHTML="";$("#radarIn").focus();});
+  run();
+};
+
+/* ---------- DESIRE AUDIT ---------- */
+const DQ=[
+ {id:"model",l:"I first wanted this after seeing someone else have it or want it",w:2},
+ {id:"near",l:"That person is close to me: a peer, colleague, friend, sibling, or someone I follow",w:2},
+ {id:"seen",l:"If nobody could ever see me have it, I would want it much less",w:2},
+ {id:"smaller",l:"Their having it makes me feel smaller",w:2},
+ {id:"obsess",l:"I think about them more than about the thing itself",w:3},
+ {id:"block",l:"They are also in my way, competing for the same thing",w:2},
+ {id:"copy",l:"I've started copying their moves, words, or style",w:1},
+ {id:"feed",l:"This desire arrived mostly through a screen or feed",w:1}
+];
+R.desire=()=>{
+ const d=store.get("desireDraft",{want:"A bigger apartment in the same neighborhood as my friends",who:"My college friend, who just bought one and posts about it",checks:{model:true,near:true,seen:true,feed:true},use:""});
+ return `<div class="view-head"><span class="eyebrow c-desire">Desire · Girard</span><h1>Desire Audit</h1>
+ <p class="lede">Girard's insight is that we want what our models want. Trace one desire back to where it came from. Knowing the model doesn't mean dropping the desire, but it lets you choose it.</p></div>
+ <div class="grid2"><div class="panel">
+  <label class="field" for="dWant">What do you want? <span class="hint">An object, a title, a person, a lifestyle, a goal.</span><input type="text" id="dWant" value="${esc(d.want)}"></label>
+  <label class="field" for="dWho">Who is the model? <span class="hint">Who showed you this was desirable?</span><input type="text" id="dWho" value="${esc(d.who)}"></label>
+  <div class="eyebrow">Check what is true</div>
+  <div class="stack">${DQ.map(q=>`<label class="check"><input type="checkbox" data-dq="${q.id}" ${d.checks[q.id]?"checked":""}><span>${q.l}</span></label>`).join("")}</div>
+  <label class="field" for="dUse">If you remove the model entirely, what is the real use or value to you? <textarea id="dUse" style="min-height:80px" placeholder="Example: more room for a home office, which I do need.">${esc(d.use)}</textarea></label>
+ </div><div class="panel" id="dOut"></div></div>`;
+};
+B.desire=()=>{
+ const upd=()=>{
+  const checks={}; $$("[data-dq]").forEach(c=>checks[c.dataset.dq]=c.checked);
+  const st={want:$("#dWant").value,who:$("#dWho").value,checks,use:$("#dUse").value}; store.set("desireDraft",st);
+  const max=DQ.reduce((s,q)=>s+q.w,0), sc=DQ.reduce((s,q)=>s+(checks[q.id]?q.w:0),0), pct=Math.round(100*sc/max);
+  const kind=checks.near?"Internal mediation (close model)":checks.model?"External mediation (distant model)":"No clear model identified";
+  let read, moves=[];
+  if(pct>=60){ read="This desire looks strongly mimetic and may be turning into rivalry. The object may matter less than the model."; moves=["Name the model aloud: “I want this because they have it.” Naming it loosens it.","Ask whether you would still pursue it if they lost interest tomorrow.","Mute the feed that keeps feeding it for 14 days, then check again.","Look for a distant model, someone from another era or field, for this area of life."]; }
+  else if(pct>=30){ read="This desire is partly borrowed. There may be real value underneath, mixed with comparison."; moves=["Separate the real use (what you wrote below) from the status signal.","Choose a version of the goal that nobody else needs to see.","Set a waiting period before acting on it."]; }
+  else { read="This desire looks mostly your own, or its model is distant and harmless. Imitation from a far-off model can be healthy inspiration."; moves=["Go ahead with care. Watch for a close rival appearing later.","Write down why it matters to you now, so you can check later whether that changed."]; }
+  if(checks.obsess||checks.block) moves.unshift("Warning sign of a skandalon: the model has become an obstacle and an obsession. One unilateral act of non-rivalry, such as congratulating them sincerely, breaks the mirror.");
+  $("#dOut").innerHTML=`<span class="eyebrow">Mimetic index</span><div class="gauge"><b class="mono c-desire">${pct}</b><span class="muted">/ 100</span></div>
+   <div class="bar"><i class="bg-desire" style="width:${pct}%"></i></div>
+   <p><span class="pill c-desire">${kind}</span></p>
+   <div class="result" style="background:transparent;border:0;padding:0"><p><b>Reading:</b> ${read}</p><ul>${moves.map(m=>`<li>${m}</li>`).join("")}</ul></div>
+   <p class="small muted">Girard: rivals become doubles. The closer the model, the more the object fades and the rivalry takes over.</p>
+   <div class="row"><button class="btn primary" id="saveDesire">Save audit to journal</button></div>`;
+  $("#saveDesire").addEventListener("click",()=>saveEntry("desire",`Desire audit · ${st.want||"Untitled"} · index ${pct}`,`Want: ${st.want}\nModel: ${st.who}\nType: ${kind}\nTrue: ${DQ.filter(q=>checks[q.id]).map(q=>q.l).join("; ")||"none"}\nReal value without the model: ${st.use||"—"}\n\nReading: ${read}`,"desire"));
+ };
+ $$("#main input, #main textarea").forEach(el=>el.addEventListener("input",upd)); upd();
+};
+
+/* ---------- BEHAVIOR DECODER ---------- */
+R.decoder=()=>{
+ const d=store.get("decDraft",{who:"me",what:"I snapped at my brother during dinner when he criticized my job.",sel:{threat:true,sleep:true,chronic:true,status:true,double:true}});
+ return `<div class="view-head"><span class="eyebrow c-biology">Biology · Sapolsky</span><h1>Behavior Decoder</h1>
+ <p class="lede">Sapolsky's method: to understand an action, ask what happened one second before, then minutes, hours, months, years, and generations before. Tick what applies. You get a layered explanation and the levers you can actually pull.</p></div>
+ <div class="panel"><div class="grid2"><label class="field" for="decWhat">What happened? <textarea id="decWhat" style="min-height:80px">${esc(d.what)}</textarea></label>
+   <label class="field" for="decWho">Whose behavior? <select id="decWho"><option value="me" ${d.who==="me"?"selected":""}>Mine</option><option value="other" ${d.who==="other"?"selected":""}>Someone else's</option><option value="group" ${d.who==="group"?"selected":""}>A group's</option></select>
+   <span class="hint">Explaining is not excusing. It shows you where change is possible.</span></label></div></div>
+ ${LADDER.map(L=>`<div class="panel layer"><div class="layer-head"><h3>${L.n}</h3><span class="muted small">${L.sub}</span></div>
+   <div class="checks">${L.f.map(f=>`<label class="check"><input type="checkbox" data-f="${f.id}" ${d.sel[f.id]?"checked":""}><span>${f.l}</span></label>`).join("")}</div></div>`).join("")}
+ <div id="decOut"></div>`;
+};
+B.decoder=()=>{
+ const all=LADDER.flatMap(L=>L.f.map(f=>({...f,L})));
+ const upd=()=>{
+  const sel={}; $$("[data-f]").forEach(c=>sel[c.dataset.f]=c.checked);
+  const st={who:$("#decWho").value,what:$("#decWhat").value,sel}; store.set("decDraft",st);
+  const on=all.filter(f=>sel[f.id]);
+  if(!on.length){ $("#decOut").innerHTML=`<div class="empty">Tick the factors that apply to see a layered explanation.</div>`; return; }
+  const layers=[...new Set(on.map(f=>f.L.n))];
+  const now=on.filter(f=>["sec","min","hrs"].includes(f.L.id)), slow=on.filter(f=>!["sec","min","hrs"].includes(f.L.id));
+  const who={me:"you",other:"they",group:"the group"}[st.who];
+  $("#decOut").innerHTML=`<div class="result"><span class="eyebrow">Layered explanation · ${on.length} factors across ${layers.length} timescales</span>
+   <p>${esc(st.what)}</p>
+   <p>No single cause. What ${who} did came out of ${layers.length} layers working together, from the last second back to ${esc(layers[layers.length-1].toLowerCase())}.</p>
+   ${LADDER.filter(L=>on.some(f=>f.L.id===L.id)).map(L=>`<div class="stack" style="gap:4px"><b>${L.n}</b><ul>${on.filter(f=>f.L.id===L.id).map(f=>`<li>${f.x}</li>`).join("")}</ul></div>`).join("")}
+   <h3>Levers</h3>
+   ${now.length?`<p class="small muted">Fast levers: change the next hour</p><ul>${now.map(f=>`<li>${f.lv}</li>`).join("")}</ul>`:""}
+   ${slow.length?`<p class="small muted">Slow levers: change the conditions</p><ul>${slow.map(f=>`<li>${f.lv}</li>`).join("")}</ul>`:""}
+   <p class="small muted">Sapolsky: the more we understand, the harder simple blame gets. Accountability stays, but aim it at prevention.</p>
+   <div class="row"><button class="btn primary" id="saveDec">Save to journal</button></div></div>`;
+  $("#saveDec").addEventListener("click",()=>saveEntry("decoder",`Behavior decoded · ${on.length} factors`,`${st.what}\n\nFactors: ${on.map(f=>f.l).join("; ")}\n\nLevers:\n- ${on.map(f=>f.lv).join("\n- ")}`,"biology"));
+ };
+ $$("#main input, #main textarea, #main select").forEach(el=>el.addEventListener(el.tagName==="SELECT"?"change":"input",upd)); upd();
+};
+
+/* ---------- THINKING GYM ---------- */
+let gym=null;
+function newRound(filter){
+  const pool=QUIZ.filter(q=>!filter||filter==="all"||q.p===filter);
+  const s=gymStats();
+  const scored=pool.map(q=>{const r=s[q.tag+"|"+q.p];const acc=r?r.c/r.n:0.4;return {q,w:(1-acc)+Math.random()*0.8};}).sort((a,b)=>b.w-a.w);
+  gym={filter,qs:scored.slice(0,Math.min(5,pool.length)).map(x=>x.q),i:0,right:0,answered:false};
+}
+R.gym=()=>`<div class="view-head"><span class="eyebrow c-reason">Reason · Halpern, with all four lenses</span><h1>Thinking Gym</h1>
+ <p class="lede">Five quick drills per round. Questions you miss come back more often. Every answer explains the reasoning, so a miss still teaches you something.</p></div>
+ <div class="filters" id="gymFilters">${[["all","All lenses"],...Object.entries(PILLARS).map(([k,v])=>[k,v.name])].map(([k,n])=>`<button class="chip" data-gf="${k}" aria-pressed="${(gym?gym.filter:"all")===k}">${n}</button>`).join("")}</div>
+ <div class="panel" id="gymBox"></div>`;
+B.gym=()=>{
+  if(!gym) newRound("all");
+  $$("[data-gf]").forEach(b=>b.addEventListener("click",()=>{newRound(b.dataset.gf);route();}));
+  drawQ();
+};
+function drawQ(){
+  const box=$("#gymBox");
+  const prog=`<div class="progress">${gym.qs.map((_,k)=>`<i class="${k<gym.i||(k===gym.i&&gym.answered)?"on":""}"></i>`).join("")}</div>`;
+  if(gym.i>=gym.qs.length){
+    const pct=Math.round(100*gym.right/gym.qs.length);
+    box.innerHTML=`${prog}<span class="eyebrow">Round complete</span><div class="gauge"><b class="mono">${gym.right}/${gym.qs.length}</b><span class="muted">${pct}%</span></div>
+      <p>${pct===100?"Clean round. Your shortcuts held up today.":pct>=60?"Solid. The misses mark where you are easiest to move.":"Good training. These misses are exactly the shortcuts persuaders rely on."}</p>
+      <div class="row"><button class="btn primary" id="again">New round</button><a class="btn" href="#codex" style="text-decoration:none">Study the Codex</a></div>`;
+    $("#again").addEventListener("click",()=>{newRound(gym.filter);drawQ();});
+    markProtocol("gym"); return;
+  }
+  const q=gym.qs[gym.i];
+  box.innerHTML=`${prog}<div class="row"><span class="pill c-${q.p}">${PILLARS[q.p].name}</span><span class="pill" style="color:var(--muted)">${esc(q.tag)}</span><span class="mono small muted" style="margin-left:auto">${gym.i+1} / ${gym.qs.length}</span></div>
+   <h2 style="font-size:1.15rem;font-family:var(--body);font-weight:600;line-height:1.45">${esc(q.q)}</h2>
+   <div class="q-opts">${q.o.map((o,k)=>`<button class="q-opt" data-k="${k}">${esc(o)}</button>`).join("")}</div><div id="qExp"></div>`;
+  $$(".q-opt").forEach(b=>b.addEventListener("click",()=>{
+    if(gym.answered) return; gym.answered=true;
+    const k=+b.dataset.k, ok=k===q.a; if(ok) gym.right++;
+    const s=gymStats(), key=q.tag+"|"+q.p; s[key]=s[key]||{c:0,n:0}; s[key].n++; if(ok) s[key].c++; store.set("gym",s);
+    $$(".q-opt").forEach((x,j)=>{x.disabled=true; if(j===q.a) x.classList.add("right"); else if(j===k) x.classList.add("wrong");});
+    $("#qExp").innerHTML=`<div class="explain"><p><b>${ok?"Correct.":"Not quite."}</b> ${esc(q.e)}</p></div><div class="row" style="margin-top:12px"><button class="btn primary" id="nextQ">${gym.i+1<gym.qs.length?"Next question":"See results"}</button></div>`;
+    $("#nextQ").addEventListener("click",()=>{gym.i++;gym.answered=false;drawQ();}); $("#nextQ").focus();
+  }));
+}
+
+/* ---------- DECISION LAB ---------- */
+const DEFAULT_DEC={q:"Should I take the job offer in another city?",opts:["Take the new job","Stay and negotiate a raise"],
+ cons:[{n:"Long-term growth",w:9,r:[8,5]},{n:"Money",w:6,r:[7,6]},{n:"Close relationships",w:8,r:[4,8]},{n:"Daily stress",w:5,r:[5,6]}],
+ checks:{},pre:""};
+const MINDCHECKS=[
+ {id:"halt",l:"I'm hungry, angry, lonely, or tired right now",s:"biology",t:"Your frontal cortex is running low. Re-score after rest."},
+ {id:"rush",l:"Someone else set the deadline, or I feel rushed",s:"influence",t:"Imposed scarcity. Ask for more time. Real offers usually survive it."},
+ {id:"gift",l:"I feel I owe someone involved",s:"influence",t:"Reciprocity pressure. Separate repaying a favor from making this choice."},
+ {id:"model",l:"I'm drawn to an option because someone I compare myself with chose it",s:"desire",t:"Mimetic pull. Re-score as if that person never existed."},
+ {id:"sunk",l:"I've already invested a lot in one option",s:"reason",t:"Sunk cost. Score only future costs and benefits."},
+ {id:"public",l:"I already told people what I'd choose",s:"influence",t:"Consistency pressure. Changing your mind on new evidence is a skill."},
+ {id:"fear",l:"One option mainly avoids a scary loss",s:"reason",t:"Loss framing. Restate each option as a gain and see if the ranking holds."}
+];
+R.decide=()=>`<div class="view-head"><span class="eyebrow">All four lenses · Halpern's decision worksheet</span><h1>Decision Lab</h1>
+ <p class="lede">Weigh what matters, score each option, then check your state of mind. The numbers don't decide for you. They show where your gut and your priorities disagree.</p></div>
+ <div class="panel" id="decBox"></div><div class="grid2"><div class="panel" id="mindBox"></div><div class="panel" id="verdict"></div></div>`;
+B.decide=()=>{
+  let d=store.get("decision",DEFAULT_DEC);
+  const save=()=>store.set("decision",d);
+  const totals=()=>d.opts.map((_,j)=>d.cons.reduce((s,c)=>s+(+c.w||0)*(+c.r[j]||0),0));
+  const drawVerdict=()=>{
+    const t=totals(), max=Math.max(...t), best=t.indexOf(max), sorted=[...t].sort((a,b)=>b-a), gap=sorted.length>1?sorted[0]-sorted[1]:max;
+    const total=d.cons.reduce((s,c)=>s+(+c.w||0)*10,0)||1;
+    const flags=MINDCHECKS.filter(m=>d.checks[m.id]);
+    $$("tfoot td[data-tot]").forEach((td,j)=>{td.textContent=t[j];td.className=j===best?"win":"";});
+    $("#verdict").innerHTML=`<h2>Readout</h2>
+      <p>On your own weights, <b>${esc(d.opts[best]||"—")}</b> leads by <span class="mono">${gap}</span> points (${Math.round(100*gap/total)}% of the possible range).</p>
+      <p class="small">${gap/total<0.05?"That is close to a tie. The deciding factor is probably something you haven't listed yet. Add it.":"That is a clear margin. If your gut still disagrees, the gut may be tracking something real, or something someone planted. Find out which."}</p>
+      ${flags.length?`<div class="result"><b>${flags.length} mind-check flag${flags.length>1?"s":""}</b><ul>${flags.map(f=>`<li>${f.t}</li>`).join("")}</ul></div>`:`<p class="small muted">No mind-check flags ticked.</p>`}
+      <label class="field" for="pre">Pre-mortem: it's a year from now and this choice failed. What went wrong? <textarea id="pre" style="min-height:80px">${esc(d.pre)}</textarea></label>
+      <p class="small muted">10/10/10: how will you feel about it in 10 minutes, 10 months, and 10 years?</p>
+      <div class="row"><button class="btn primary" id="saveDecision">Save decision to journal</button><button class="btn ghost" id="resetDecision">Start new decision</button></div>`;
+    $("#pre").addEventListener("input",e=>{d.pre=e.target.value;save();});
+    $("#saveDecision").addEventListener("click",()=>{const t2=totals();saveEntry("decide",`Decision · ${d.q}`,`${d.opts.map((o,j)=>`${o}: ${t2[j]}`).join("\n")}\n\nConsiderations: ${d.cons.map(c=>`${c.n} (w${c.w})`).join(", ")}\nFlags: ${flags.map(f=>f.l).join("; ")||"none"}\nPre-mortem: ${d.pre||"—"}`,"reason");});
+    $("#resetDecision").addEventListener("click",()=>{d={q:"",opts:["Option A","Option B"],cons:[{n:"",w:5,r:[5,5]}],checks:{},pre:""};save();drawAll();});
+  };
+  const drawAll=()=>{
+    $("#decBox").innerHTML=`<label class="field" for="dq">The decision<input type="text" id="dq" value="${esc(d.q)}" placeholder="What are you deciding?"></label>
+     <div class="tbl-wrap"><table><thead><tr><th>Consideration</th><th>Weight 1–10</th>${d.opts.map((o,j)=>`<th><input type="text" data-opt="${j}" value="${esc(o)}" aria-label="Option ${j+1} name"></th>`).join("")}<th></th></tr></thead>
+     <tbody>${d.cons.map((c,i)=>`<tr><td><input type="text" data-cn="${i}" value="${esc(c.n)}" placeholder="What matters?" aria-label="Consideration ${i+1}"></td><td><input type="number" min="0" max="10" data-cw="${i}" value="${c.w}" aria-label="Weight"></td>
+       ${d.opts.map((_,j)=>`<td><input type="number" min="0" max="10" data-cr="${i}:${j}" value="${c.r[j]??5}" aria-label="Score"></td>`).join("")}<td><button class="btn sm ghost" data-del="${i}" aria-label="Remove row">✕</button></td></tr>`).join("")}</tbody>
+     <tfoot><tr><td>Weighted total</td><td></td>${d.opts.map((_,j)=>`<td data-tot="${j}"></td>`).join("")}<td></td></tr></tfoot></table></div>
+     <div class="row"><button class="btn" id="addCon">Add consideration</button>${d.opts.length<4?`<button class="btn" id="addOpt">Add option</button>`:""}${d.opts.length>2?`<button class="btn ghost" id="delOpt">Remove last option</button>`:""}</div>`;
+    $("#mindBox").innerHTML=`<h2>Mind check</h2><p class="small muted">Tick anything true right now. Each one is a known way people get moved.</p>
+      <div class="stack">${MINDCHECKS.map(m=>`<label class="check"><input type="checkbox" data-mc="${m.id}" ${d.checks[m.id]?"checked":""}><span>${m.l} <span class="pill c-${m.s}" style="margin-left:4px">${PILLARS[m.s].name}</span></span></label>`).join("")}</div>`;
+    $("#dq").addEventListener("input",e=>{d.q=e.target.value;save();});
+    $$("[data-opt]").forEach(el=>el.addEventListener("input",()=>{d.opts[+el.dataset.opt]=el.value;save();drawVerdict();}));
+    $$("[data-cn]").forEach(el=>el.addEventListener("input",()=>{d.cons[+el.dataset.cn].n=el.value;save();}));
+    $$("[data-cw]").forEach(el=>el.addEventListener("input",()=>{d.cons[+el.dataset.cw].w=Math.max(0,Math.min(10,+el.value||0));save();drawVerdict();}));
+    $$("[data-cr]").forEach(el=>el.addEventListener("input",()=>{const [i,j]=el.dataset.cr.split(":").map(Number);d.cons[i].r[j]=Math.max(0,Math.min(10,+el.value||0));save();drawVerdict();}));
+    $$("[data-del]").forEach(el=>el.addEventListener("click",()=>{d.cons.splice(+el.dataset.del,1);if(!d.cons.length)d.cons.push({n:"",w:5,r:d.opts.map(()=>5)});save();drawAll();}));
+    $("#addCon").addEventListener("click",()=>{d.cons.push({n:"",w:5,r:d.opts.map(()=>5)});save();drawAll();});
+    const ao=$("#addOpt"); if(ao) ao.addEventListener("click",()=>{d.opts.push("Option "+String.fromCharCode(65+d.opts.length));d.cons.forEach(c=>c.r.push(5));save();drawAll();});
+    const dl=$("#delOpt"); if(dl) dl.addEventListener("click",()=>{d.opts.pop();d.cons.forEach(c=>c.r.pop());save();drawAll();});
+    $$("[data-mc]").forEach(el=>el.addEventListener("change",()=>{d.checks[el.dataset.mc]=el.checked;save();drawVerdict();}));
+    drawVerdict();
+  };
+  drawAll();
+};
+
+/* ---------- CODEX ---------- */
+let codexFilter="all", codexQuery="";
+R.codex=()=>`<div class="view-head"><span class="eyebrow">Library</span><h1>Codex</h1>
+ <p class="lede">${CODEX.length} core ideas from the four books, each paired with one way to use it this week.</p></div>
+ <div class="row"><div class="filters">${[["all","All"],...Object.entries(PILLARS).map(([k,v])=>[k,v.name])].map(([k,n])=>`<button class="chip" data-cf="${k}" aria-pressed="${codexFilter===k}">${n}</button>`).join("")}</div>
+ <input type="text" id="cq" placeholder="Search ideas" value="${esc(codexQuery)}" style="max-width:260px;margin-left:auto" aria-label="Search the Codex"></div>
+ <div class="row small muted">${Object.entries(PILLARS).map(([k,v])=>`<span><span class="c-${k}">●</span> ${esc(v.book)}</span>`).join(" ")}</div>
+ <div class="cards" id="cards"></div>`;
+B.codex=()=>{
+ const draw=()=>{const q=codexQuery.toLowerCase();
+  const list=CODEX.filter(c=>(codexFilter==="all"||c.p===codexFilter)&&(!q||(c.t+c.d+c.u).toLowerCase().includes(q)));
+  $("#cards").innerHTML=list.length?list.map(c=>`<article class="card"><div class="row" style="justify-content:space-between"><span class="pill c-${c.p}">${PILLARS[c.p].name}</span><span class="src">${esc(c.s)}</span></div>
+   <h3>${esc(c.t)}</h3><p class="small">${esc(c.d)}</p><div class="use"><b>Use it</b>${esc(c.u)}</div></article>`).join(""):`<div class="empty">No ideas match “${esc(codexQuery)}”.</div>`;};
+ $$("[data-cf]").forEach(b=>b.addEventListener("click",()=>{codexFilter=b.dataset.cf;$$("[data-cf]").forEach(x=>x.setAttribute("aria-pressed",x===b));draw();}));
+ $("#cq").addEventListener("input",e=>{codexQuery=e.target.value;draw();});
+ draw();
+};
+
+/* ---------- FUTURE ---------- */
+R.future=()=>`<div class="view-head"><span class="eyebrow">Library</span><h1>Future Field Guide</h1>
+ <p class="lede">Nobody can see the future, but some pressures are already building. These are seven forces likely to shape the coming decades, each linked to the lens that helps and a practice you can start now.</p></div>
+ <div class="future">${FUTURE.map(f=>`<section class="f-item"><div class="stack"><div class="row">${f.p.map(p=>`<span class="pill c-${p}">${PILLARS[p].name}</span>`).join("")}</div><h2>${esc(f.t)}</h2><p>${esc(f.pr)}</p></div>
+  <div class="stack"><span class="eyebrow">Practice</span><ul>${f.pc.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></section>`).join("")}</div>`;
+
+/* ---------- JOURNAL ---------- */
+R.journal=()=>{
+ const j=journal();
+ return `<div class="view-head"><span class="eyebrow">Library</span><h1>Journal</h1>
+ <p class="lede">Everything you save from the tools. Re-reading old entries is how you catch your own patterns, and how you correct hindsight bias.</p></div>
+ <div class="panel"><label class="field" for="jNew">New entry<textarea id="jNew" style="min-height:80px" placeholder="A pattern you noticed, a prediction to check later, a lesson."></textarea></label>
+ <div class="row"><button class="btn primary" id="jAdd">Add entry</button><button class="btn" id="jExport">Copy backup</button><button class="btn ghost" id="jImportToggle">Restore from backup</button></div>
+ <div id="jImport" hidden class="stack"><label class="field" for="jImportText">Paste a backup you copied earlier<textarea id="jImportText"></textarea></label><div class="row"><button class="btn" id="jImportGo">Restore entries</button></div></div></div>
+ ${j.length?j.map(e=>`<article class="entry"><div class="row" style="justify-content:space-between"><div class="row"><span class="pill c-${e.pillar||"reason"}">${esc(e.tool)}</span><b>${esc(e.title)}</b></div>
+  <div class="row"><span class="mono small muted">${new Date(e.date).toLocaleString()}</span><button class="btn sm ghost" data-jdel="${e.id}">Delete</button></div></div><pre>${esc(e.body)}</pre></article>`).join(""):`<div class="empty">No entries yet. Save a scan, audit, decode, or decision and it will show up here.</div>`}`;
+};
+B.journal=()=>{
+ $("#jAdd").addEventListener("click",()=>{const v=$("#jNew").value.trim();if(!v){toast("Write something first");return;}saveEntry("journal","Note",v,"reason");route();});
+ $$("[data-jdel]").forEach(b=>b.addEventListener("click",()=>{
+   if(b.dataset.confirm!=="1"){b.dataset.confirm="1";b.textContent="Confirm delete";return;}
+   store.set("journal",journal().filter(e=>String(e.id)!==b.dataset.jdel));route();toast("Entry deleted");}));
+ $("#jExport").addEventListener("click",()=>{const data=JSON.stringify({journal:journal(),gym:gymStats()});
+   navigator.clipboard?.writeText(data).then(()=>toast("Backup copied. Paste it somewhere safe."),()=>{$("#jImport").hidden=false;$("#jImportText").value=data;$("#jImportText").select();toast("Select and copy the text shown");}) ?? (()=>{$("#jImport").hidden=false;$("#jImportText").value=data;$("#jImportText").select();})();});
+ $("#jImportToggle").addEventListener("click",()=>{$("#jImport").hidden=!$("#jImport").hidden;});
+ $("#jImportGo").addEventListener("click",()=>{try{const o=JSON.parse($("#jImportText").value);
+   if(!Array.isArray(o.journal)) throw 0; const ids=new Set(journal().map(e=>e.id));
+   store.set("journal",[...journal(),...o.journal.filter(e=>e&&e.id&&!ids.has(e.id))].sort((a,b)=>b.id-a.id));
+   if(o.gym&&typeof o.gym==="object") store.set("gym",{...o.gym,...gymStats()});
+   route();toast("Backup restored");}catch(e){toast("That text isn't a Mastermind backup. Copy the full backup and try again.");}});
+};
+
+window.addEventListener("hashchange",route);
+route();
+if("serviceWorker" in navigator && location.protocol.startsWith("http") && !location.hostname.endsWith("claude.ai") && !location.hostname.includes("claudeusercontent")){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+</script>
