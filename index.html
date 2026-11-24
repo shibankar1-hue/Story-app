@@ -167,6 +167,25 @@ tfoot td{font-weight:700;font-family:var(--mono)}
 .entry pre{white-space:pre-wrap;font-family:var(--body);margin:0;font-size:.9rem}
 .empty{border:1px dashed var(--line);border-radius:var(--r);padding:28px;text-align:center;color:var(--muted)}
 
+/* Critical Thinking Process (Halpern Fig. 1.1) */
+.proc{display:grid;grid-template-columns:250px minmax(0,1fr);gap:16px;align-items:start}
+.fmap{position:sticky;top:20px;display:flex;flex-direction:column;gap:0}
+.fnode{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;font-size:.86rem;color:var(--muted);background:none;border:0;text-align:left;cursor:pointer;width:100%}
+.fnode:disabled{cursor:default}
+.fnode.on{background:var(--ink);color:var(--bg)}
+.fnode.done{color:var(--ink)}
+.fnode .shp{width:18px;height:18px;flex:none;border:2px solid currentColor;display:grid;place-items:center}
+.shp.rect{border-radius:2px}.shp.circ{border-radius:50%}.shp.dia{transform:rotate(45deg) scale(.78)}.shp.cup{border-radius:3px 3px 9px 9px}.shp.oct{clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);background:currentColor;border:0}
+.fline{width:2px;height:10px;background:var(--line);margin-left:16px}
+.loopnote{font-family:var(--mono);font-size:.72rem;color:var(--muted);padding:6px 8px}
+.skillgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.skill{border:1px solid var(--line);background:var(--sunk);border-radius:10px 10px 22px 22px;padding:14px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.skill[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.skill .sug{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.decide-row{display:flex;gap:10px;flex-wrap:wrap}
+.calc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:860px){.proc{grid-template-columns:1fr}.fmap{position:static;flex-direction:row;flex-wrap:wrap;gap:4px}.fline{display:none}.fnode{width:auto}.fnode span.lbl{display:none}.fnode.on span.lbl{display:inline}.calc{grid-template-columns:1fr}}
+
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;font-size:.9rem;z-index:50;transition:opacity .2s}
 .result{background:var(--sunk);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px}
 .result ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
@@ -234,7 +253,7 @@ function saveEntry(tool, title, body, pillar){
   store.set("journal", j.slice(0,500)); markProtocol(tool); toast("Saved to journal");
 }
 function markProtocol(tool){
-  const map={radar:"radar",desire:"desire",decoder:"decoder",gym:"gym",decide:"decide",journal:"journal"};
+  const map={radar:"radar",desire:"desire",decoder:"decoder",gym:"gym",decide:"decide",journal:"journal",process:"decide"};
   const p = store.get("protocol:"+todayKey(), {}); if(map[tool]){ p[map[tool]]=true; store.set("protocol:"+todayKey(), p); }
   touchStreak();
 }
@@ -423,6 +442,7 @@ const FUTURE = [
    ========================================================= */
 const VIEWS = [
  {id:"today",n:"Today",g:"Daily",c:"var(--accent)"},
+ {id:"process",n:"Think It Through",g:"Tools",c:"var(--reason)"},
  {id:"radar",n:"Influence Radar",g:"Tools",c:"var(--influence)"},
  {id:"desire",n:"Desire Audit",g:"Tools",c:"var(--desire)"},
  {id:"decoder",n:"Behavior Decoder",g:"Tools",c:"var(--biology)"},
@@ -718,6 +738,141 @@ B.decide=()=>{
     drawVerdict();
   };
   drawAll();
+};
+
+/* ---------- THINK IT THROUGH (Halpern, Figure 1.1) ---------- */
+const FLOW=[
+ {id:"stimulus",n:"Initiating stimulus",s:"rect"},
+ {id:"interpret",n:"Interpret situation",s:"circ"},
+ {id:"needed",n:"Is critical thinking needed?",s:"dia"},
+ {id:"survey",n:"Survey & select skills",s:"cup"},
+ {id:"apply",n:"Apply skills",s:"rect"},
+ {id:"monitor",n:"Metacognitive monitoring",s:"rect"},
+ {id:"outcome",n:"Is outcome good enough?",s:"dia"},
+ {id:"stop",n:"Stop",s:"oct"}
+];
+const SITVARS=[
+ {id:"stakes",l:"The stakes are high (money, health, relationships, career)"},
+ {id:"irrev",l:"It would be hard to undo"},
+ {id:"press",l:"Someone is pushing me or setting a deadline",lens:"influence"},
+ {id:"emo",l:"I feel strong emotion about it right now",lens:"biology"},
+ {id:"halt",l:"I'm hungry, angry, lonely, or tired",lens:"biology"},
+ {id:"others",l:"Other people around me already seem sure",lens:"influence"}
+];
+const DISPS=[
+ {id:"acc",l:"I care more about being accurate than about being right"},
+ {id:"persist",l:"I'm willing to keep at this even if it takes effort"},
+ {id:"open",l:"I'm willing to change my mind"},
+ {id:"plan",l:"I'll plan before I act"},
+ {id:"model",l:"My view isn't just copied from someone I admire or compete with",lens:"desire"}
+];
+const SKILLS={
+ verbal:{n:"Verbal reasoning",ch:"Halpern ch. 3",use:"When words, labels, or framing may be steering you.",
+   q:["Rewrite the key claim in neutral words. Does it still feel as convincing?","Which words are vague, loaded, or emotional?","What would the opposite framing sound like (gain vs. loss)?"],link:["radar","Scan the wording with Influence Radar"]},
+ argument:{n:"Argument analysis",ch:"Halpern ch. 5",use:"When someone, including you, is making a case.",
+   q:["What exactly is the conclusion?","What reasons (premises) are given for it?","What unstated assumption must be true for it to hold?","What is the strongest counter-argument?"]},
+ hypothesis:{n:"Hypothesis testing",ch:"Halpern ch. 6",use:"When you're judging whether something is true or what caused what.",
+   q:["What do you currently believe is true or is the cause?","What evidence would prove you wrong? Have you looked for it?","Compared to what? Is there a control or comparison group?","Could a third factor explain both things?"]},
+ likelihood:{n:"Likelihood & uncertainty",ch:"Halpern ch. 7",use:"When chance, risk, or prediction is involved.",
+   q:["How common is this in general (the base rate)?","Is your sense of the risk based on vivid examples or on actual numbers?","Your honest probability estimate, in %:"],calc:true},
+ decision:{n:"Decision making & problem solving",ch:"Halpern ch. 8–9",use:"When you must choose or find a way forward.",
+   q:["Restate the problem in a different way. Draw it if you can.","List at least three options, including one you'd normally ignore.","Work backward: what would have to be true right before the goal is reached?","What would you choose if you were starting fresh today (ignoring sunk costs)?"],link:["decide","Score the options in Decision Lab"]}
+};
+const SUGGEST={decision:["decision","likelihood","argument"],claim:["verbal","argument","hypothesis","likelihood"],problem:["decision","hypothesis"],conflict:["verbal","argument","decision"],other:["argument","hypothesis"]};
+const PROC0={step:"stimulus",stim:"",type:"decision",sit:{},ind:3,disp:{},pattern:"",needed:null,skills:[],ans:{},bayes:{b:1,h:90,f:10},conf:50,mono:null,loops:0,result:""};
+function procGet(){ return {...PROC0,...store.get("proc",{})}; }
+R.process=()=>`<div class="view-head"><span class="eyebrow c-reason">Reason · Halpern, Figure 1.1</span><h1>Think It Through</h1>
+ <p class="lede">Halpern's model of the critical thinking process, made interactive. Bring a real situation and follow it from the first stimulus to a stopping point. If monitoring shows the thinking isn't working, you loop back and pick other skills, as the diagram does.</p></div>
+ <div class="proc"><nav class="panel fmap" id="fmap" aria-label="Process steps"></nav><div class="panel" id="pstep"></div></div>`;
+B.process=()=>{
+ let P=procGet();
+ const save=()=>store.set("proc",P);
+ const idx=id=>FLOW.findIndex(f=>f.id===id);
+ const go=id=>{P.step=id;save();draw();$("#pstep").scrollIntoView({block:"nearest"});};
+ const bind=()=>{ $$("#pstep [data-k]").forEach(el=>{const ev=(el.type==="checkbox"||el.tagName==="SELECT")?"change":"input";
+   el.addEventListener(ev,()=>{const k=el.dataset.k, v=el.type==="checkbox"?el.checked:(el.type==="range"||el.type==="number")?+el.value:el.value;
+     const path=k.split(".");let o=P;while(path.length>1){const p=path.shift();o[p]=o[p]||{};o=o[p];}o[path[0]]=v;save();
+     if(el.dataset.live) liveUpd();});}); };
+ let liveUpd=()=>{};
+ const nextBtn=(id,label)=>`<button class="btn primary" data-go="${id}">${label||"Next"}</button>`;
+ function needScore(){ let s=0; ["stakes","irrev","press","emo","others"].forEach(k=>{if(P.sit[k])s++;}); if(P.ind<=2)s++; if(["decision","claim","conflict"].includes(P.type))s++; return s; }
+ function map(){
+  const cur=idx(P.step);
+  $("#fmap").innerHTML=`<span class="eyebrow">Process map</span>`+FLOW.map((f,i)=>`${i?'<div class="fline"></div>':''}<button class="fnode ${i===cur?"on":i<cur?"done":""}" data-jump="${f.id}" ${i>cur?"disabled":""} title="${f.n}"><span class="shp ${f.s}"></span><span class="lbl">${f.n}</span></button>`).join("")
+   +(P.loops?`<div class="loopnote">Looped back ${P.loops}×</div>`:"");
+  $$("[data-jump]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.jump)));
+ }
+ function step(){
+  const s=P.step; let h="";
+  if(s==="stimulus") h=`<span class="eyebrow">Step 1 · Initiating stimulus</span><h2>What set this off?</h2>
+   <p class="small muted">Halpern's examples: a gasoline gauge on empty, an algebra problem, a crying baby, a career decision.</p>
+   <label class="field" for="pStim">Describe the situation<textarea id="pStim" data-k="stim" placeholder="Example: I've been offered a job in another city, but it means leaving my family.">${esc(P.stim)}</textarea></label>
+   <label class="field" for="pType">What kind of situation is it?<select id="pType" data-k="type">${[["decision","A decision to make"],["claim","A claim or message to judge"],["problem","A problem to solve"],["conflict","A conflict with someone"],["other","Something else"]].map(([v,l])=>`<option value="${v}" ${P.type===v?"selected":""}>${l}</option>`).join("")}</select></label>
+   <div class="row">${nextBtn("interpret")}</div>`;
+  else if(s==="interpret") h=`<span class="eyebrow">Step 2 · Interpret situation</span><h2>What's shaping how you see it?</h2>
+   <p class="small muted">In the diagram, three inputs feed interpretation: situational variables, individual variables, and dispositions.</p>
+   <h3>Situational variables</h3><div class="checks">${SITVARS.map(v=>`<label class="check"><input type="checkbox" data-k="sit.${v.id}" ${P.sit[v.id]?"checked":""}><span>${v.l}${v.lens?` <span class="pill c-${v.lens}">${PILLARS[v.lens].name}</span>`:""}</span></label>`).join("")}</div>
+   <h3>Individual variables</h3><label class="field" for="pInd">Your education and experience with this kind of situation <span class="hint">1 = brand new to me, 5 = I know this area well</span>
+     <input type="range" id="pInd" min="1" max="5" data-k="ind" value="${P.ind}" style="accent-color:var(--accent)"></label>
+   <h3>Dispositions</h3><div class="checks">${DISPS.map(v=>`<label class="check"><input type="checkbox" data-k="disp.${v.id}" ${P.disp[v.id]?"checked":""}><span>${v.l}${v.lens?` <span class="pill c-${v.lens}">${PILLARS[v.lens].name}</span>`:""}</span></label>`).join("")}</div>
+   <label class="field" for="pPat">Pattern recognition: what does this look like, or remind you of? <textarea id="pPat" data-k="pattern" style="min-height:70px" placeholder="Example: it's like the last time I turned down a move and regretted it.">${esc(P.pattern)}</textarea></label>
+   <div class="row">${nextBtn("needed")}</div>`;
+  else if(s==="needed"){ const sc=needScore(), rec=sc>=2;
+   const missing=DISPS.filter(d=>!P.disp[d.id]);
+   h=`<span class="eyebrow">Step 3 · Decision point</span><h2>Is critical thinking needed?</h2>
+   <p>Critical thinking takes effort, so it's not needed for everything. Based on your answers, <b>${rec?"yes, this one deserves it":"this may be fine to handle with habit"}</b> (signal ${sc} of 7).</p>
+   ${P.sit.halt||P.sit.emo?`<p class="small"><b>Note:</b> you said you're emotional or depleted. Your frontal cortex is running low (Sapolsky). If you can, rest or eat before the next step.</p>`:""}
+   ${missing.length?`<p class="small"><b>Disposition gaps:</b> ${missing.map(m=>m.l.toLowerCase()).join("; ")}. Halpern stresses that skills without the attitude to use them rarely help.</p>`:""}
+   <div class="decide-row"><button class="btn primary" data-need="yes">Yes, think it through</button><button class="btn" data-need="no">No, stop here</button></div>`; }
+  else if(s==="survey"){ const sug=SUGGEST[P.type]||[];
+   h=`<span class="eyebrow">Step 4 · Survey broad categories of skills</span><h2>Which skills fit this situation?</h2>
+   <p class="small muted">The five categories from the diagram. Suggested ones are marked for a ${esc(P.type)} situation. Pick one or more.</p>
+   ${P.loops?`<p class="small"><b>Loop ${P.loops}:</b> the last set didn't get you to a good enough outcome. Try adding or swapping a skill.</p>`:""}
+   <div class="skillgrid">${Object.entries(SKILLS).map(([k,v])=>`<button class="skill" data-skill="${k}" aria-pressed="${P.skills.includes(k)}">${sug.includes(k)?'<span class="sug">Suggested</span>':""}<b>${v.n}</b><span class="small muted">${v.use}</span><span class="mono small muted">${v.ch}</span></button>`).join("")}</div>
+   <div class="row"><button class="btn primary" data-go="apply" ${P.skills.length?"":"disabled"}>Select and apply skills</button></div>`; }
+  else if(s==="apply"){
+   h=`<span class="eyebrow">Step 5 · Select and apply skills</span><h2>Work through each skill</h2>
+   ${P.stim?`<p class="small muted">Situation: ${esc(P.stim)}</p>`:""}
+   ${P.skills.map(k=>{const v=SKILLS[k];return `<div class="result"><div class="row" style="justify-content:space-between"><h3>${v.n}</h3><span class="mono small muted">${v.ch}</span></div>
+     ${v.q.map((q,i)=>`<label class="field" for="a-${k}-${i}">${q}<textarea id="a-${k}-${i}" data-k="ans.${k}-${i}" style="min-height:60px">${esc(P.ans[k+"-"+i]||"")}</textarea></label>`).join("")}
+     ${v.calc?`<div class="stack"><span class="eyebrow">Base-rate calculator</span><div class="calc">
+       <label class="field" for="bB">How common, % <input type="number" id="bB" min="0" max="100" step="0.1" data-k="bayes.b" data-live="1" value="${P.bayes.b}"></label>
+       <label class="field" for="bH">Evidence shows up when true, % <input type="number" id="bH" min="0" max="100" data-k="bayes.h" data-live="1" value="${P.bayes.h}"></label>
+       <label class="field" for="bF">Evidence shows up when false, % <input type="number" id="bF" min="0" max="100" data-k="bayes.f" data-live="1" value="${P.bayes.f}"></label></div>
+       <p id="bOut"></p></div>`:""}
+     ${v.link?`<a class="btn sm" style="align-self:flex-start;text-decoration:none" href="#${v.link[0]}">${v.link[1]}</a>`:""}</div>`;}).join("")}
+   <div class="row">${nextBtn("monitor","Go to monitoring")}</div>`; }
+  else if(s==="monitor") h=`<span class="eyebrow">Step 6 · Metacognitive monitoring</span><h2>Are the skills you're applying making a good outcome more likely?</h2>
+   <p class="small muted">Step back and watch your own thinking. Did the answers change what you see, or just decorate what you already believed?</p>
+   <label class="field" for="pConf">How confident are you now in your current view? <span class="mono" id="confOut">${P.conf}%</span><input type="range" id="pConf" min="0" max="100" step="5" data-k="conf" data-live="1" value="${P.conf}" style="accent-color:var(--accent)"></label>
+   <div class="decide-row"><button class="btn primary" data-mono="yes">Yes, it's helping</button><button class="btn" data-mono="no">No, loop back and choose other skills</button></div>`;
+  else if(s==="outcome") h=`<span class="eyebrow">Step 7 · Decision point</span><h2>Is the outcome good enough?</h2>
+   <label class="field" for="pRes">Write your current conclusion or next action <textarea id="pRes" data-k="result" placeholder="Example: Ask for two weeks to decide, visit the city once, and talk to someone who made the same move.">${esc(P.result)}</textarea></label>
+   <p class="small muted">Good enough beats perfect. If you'd be comfortable explaining this reasoning to someone you respect, it is probably good enough.</p>
+   <div class="decide-row"><button class="btn primary" data-out="yes">Yes, stop here</button><button class="btn" data-out="no">No, loop back to the skills</button></div>`;
+  else if(s==="stop"){ const early=P.needed==="no";
+   h=`<span class="eyebrow">Stop</span><h2>${early?"Handled without effortful thinking":"Done thinking it through"}</h2>
+   <p>${early?"You judged this didn't need critical thinking. That's a legitimate outcome. Save the effort for what matters.":`Conclusion: ${esc(P.result||"(none written)")}`}</p>
+   ${!early?`<p class="small muted">Skills used: ${P.skills.map(k=>SKILLS[k].n).join(", ")||"none"} · Confidence ${P.conf}% · Loops ${P.loops}</p>`:""}
+   <div class="row"><button class="btn primary" id="pSave">Save to journal</button><button class="btn" id="pNew">Start a new situation</button></div>`; }
+  $("#pstep").innerHTML=h;
+  bind();
+  $$("#pstep [data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+  $$("[data-need]").forEach(b=>b.addEventListener("click",()=>{P.needed=b.dataset.need;go(P.needed==="yes"?"survey":"stop");}));
+  $$("[data-skill]").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.skill;P.skills=P.skills.includes(k)?P.skills.filter(x=>x!==k):[...P.skills,k];save();draw();}));
+  $$("[data-mono]").forEach(b=>b.addEventListener("click",()=>{P.mono=b.dataset.mono;if(P.mono==="yes")go("outcome");else{P.loops++;go("survey");}}));
+  $$("[data-out]").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.out==="yes")go("stop");else{P.loops++;go("survey");}}));
+  const ps=$("#pSave"); if(ps) ps.addEventListener("click",()=>{
+    const qa=P.skills.flatMap(k=>SKILLS[k].q.map((q,i)=>P.ans[k+"-"+i]?`${q}\n  ${P.ans[k+"-"+i]}`:null).filter(Boolean));
+    saveEntry("process",`Thought through · ${(P.stim||"Untitled").slice(0,60)}`,`Situation (${P.type}): ${P.stim}\nPattern: ${P.pattern||"—"}\nCritical thinking needed: ${P.needed}\n${P.needed==="yes"?`Skills: ${P.skills.map(k=>SKILLS[k].n).join(", ")}\n\n${qa.join("\n")}\n\nConfidence: ${P.conf}% · Loops: ${P.loops}\nConclusion: ${P.result||"—"}`:""}`,"reason");});
+  const pn=$("#pNew"); if(pn) pn.addEventListener("click",()=>{P={...PROC0,sit:{},disp:{},ans:{},skills:[],bayes:{b:1,h:90,f:10}};save();draw();});
+  liveUpd=()=>{const co=$("#confOut"); if(co) co.textContent=P.conf+"%";
+    const bo=$("#bOut"); if(bo){const b=P.bayes.b/100,h=P.bayes.h/100,f=P.bayes.f/100,den=b*h+(1-b)*f,post=den?b*h/den:0;
+      bo.innerHTML=`If the evidence shows up, the chance it's really true is <b class="mono">${(post*100).toFixed(post<0.1?1:0)}%</b>. Out of 1,000 cases: <span class="mono">${Math.round(1000*b*h)}</span> true hits vs <span class="mono">${Math.round(1000*(1-b)*f)}</span> false alarms.`;}};
+  liveUpd();
+ }
+ function draw(){ map(); step(); }
+ draw();
 };
 
 /* ---------- CODEX ---------- */
